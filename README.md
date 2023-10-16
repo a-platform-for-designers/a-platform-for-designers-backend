@@ -1,5 +1,5 @@
-# backend
-# Онлайн-платформа для дизайнеров (бекенд)
+# Backend
+# Онлайн-платформа для дизайнеров (бэкенд)
 
 ## Описание проекта:
 
@@ -86,15 +86,5 @@ docker compose up -d
 
  - requirements.txt:
  
-Django==4.2.1
-djoser==2.1.0
-django-cors-headers
-django-filter==22.1
-drf-extra-fields==3.5.0
-drf-spectacular
-djangorestframework==3.14.0
-flake8==6.0.0
-gunicorn==20.1.0
-psycopg2-binary==2.9.3
-python-dotenv==0.21.0
-zipp==3.15.0
+    Django==4.2.1
+    flake8==6.0.0
