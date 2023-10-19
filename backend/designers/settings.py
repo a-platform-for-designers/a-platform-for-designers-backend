@@ -1,28 +1,39 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env_path = Path("../infra") / '.env'
+
+load_dotenv()
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 if not SECRET_KEY:
     raise ValueError('SECRET_KEY не установлен')
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG', False)
 
 ALLOWED_HOSTS = [
     'localhost',
-    'backend'
+    'backend',
+    '127.0.0.1',
+    '91.226.81.209'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
-    'http://backend'
+    'http://backend',
+    'http://127.0.0.1',
+    'https://127.0.0.1',
+    'http://91.226.81.209',
+    'https://91.226.81.209'
 ]
 
 INSTALLED_APPS = [
+
     # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,6 +52,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'users',
+    'api',
     'job',
 ]
 
@@ -58,6 +70,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = 'designers.urls'
 
+# TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -76,32 +89,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'designers.wsgi.application'
 
-
-# Database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv(
+            'DB_ENGINE',
+            default='django.db.backends.postgresql'
+        ),
+        'NAME': os.getenv('DB_NAME', default='postgres'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='db'),
+        'PORT': os.getenv('DB_PORT', default='5432'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8'
+        },
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.getenv(
-#             'DB_ENGINE',
-#             default='django.db.backends.postgresql'
-#         ),
-#         'NAME': os.getenv('DB_NAME', default='postgres'),
-#         'USER': os.getenv('POSTGRES_USER', default='postgres'),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
-#         'HOST': os.getenv('DB_HOST', default='db'),
-#         'PORT': os.getenv('DB_PORT', default='5432'),
-#         'OPTIONS': {
-#             'client_encoding': 'UTF8'
-#         },
-#     }
-# }
 
 # Password validation
 
@@ -122,7 +132,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 
 LANGUAGE_CODE = 'ru'
@@ -131,9 +140,9 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
-
 USE_L10N = True
+
+USE_TZ = True
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -150,21 +159,44 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
-}
+    'SERIALIZERS': {
+        'user_create': (
+            'api.serializers.user_serializers.'
+            'UserProfileCreateSerializer'
+        ),
+        'user': (
+            'api.serializers.user_serializers.'
+            'UserProfileSerializer'
+        ),
+        'current_user': (
+            'api.serializers.user_serializers.'
+            'UserProfileSerializer'
+        ),
+    },
 
+    'PERMISSIONS': {
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+    },
+}
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Degigners API',
-    'DESCRIPTION': 'Схема API проекта Designers',
+    'TITLE': 'DesignCollab API',
+    'DESCRIPTION': 'Схема API проекта DesignCollab',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False
 }
 
 AUTH_USER_MODEL = 'users.User'
 
+
 # Static files (CSS, JavaScript, Images)
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Default primary key field type
 
