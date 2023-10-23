@@ -120,6 +120,22 @@ class Favorite(models.Model):
 
 
 class CaseImage(models.Model):
-    "Модель изображения для кейса"
-    
-    pass
+    """Модель изображения для кейса."""
+
+    case = models.ForeignKey(
+        Case,
+        on_delete=models.CASCADE,
+        related_name='image_in_case',
+    )
+    is_avatar = models.BooleanField()
+    picture = models.ImageField()
+    name = models.CharField(
+        max_length=50,
+        verbose_name='Название изображения'
+    )
+    description = models.TextField(
+        max_length=300,
+    )
+
+    def __str__(self) -> str:
+        return self.name
