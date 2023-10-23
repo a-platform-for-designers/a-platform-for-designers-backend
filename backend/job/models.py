@@ -137,6 +137,10 @@ class CaseImage(models.Model):
         max_length=300,
     )
 
+    class Meta:
+        verbose_name = 'Изображение кейса'
+        verbose_name_plural = 'Изображения кейса'
+
     def __str__(self) -> str:
         return self.name
 
@@ -157,6 +161,10 @@ class Comment(models.Model):
     comment_text = models.TextField(
         max_length=300,
     )
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self) -> str:
         return self.name
