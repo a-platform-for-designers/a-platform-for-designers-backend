@@ -117,3 +117,9 @@ class Favorite(models.Model):
     def __str__(self):
         return (f'Пользователь {self.user} добавил {self.case} '
                 'в избранное')
+
+
+class CaseImage(models.Model):
+    "Модель изображения для кейса"
+    
+    pass
