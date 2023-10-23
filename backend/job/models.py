@@ -106,7 +106,6 @@ class Favorite(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='favorites',
-
     )
 
     class Meta:
