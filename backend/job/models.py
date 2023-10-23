@@ -139,3 +139,25 @@ class CaseImage(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Comment(models.Model):
+    """Модель комментария."""
+
+    case = models.ForeignKey(
+        Case,
+        on_delete=models.CASCADE,
+        related_name='comment',
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comment',
+    )   
+    comment_text = models.TextField(
+        max_length=300,
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
