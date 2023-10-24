@@ -102,10 +102,10 @@ dos2unix: converting file wait-for-it.sh to Unix format...
 > python manage.py migrate
 > 
 > python manage.py collectstatic --no-input
-
- - Список полезных команд:
  
 ```
+ - Список полезных команд:
+
 docker compose up -d
 docker compose exec backend python manage.py makemigrations users
 docker compose exec backend python manage.py migrate
