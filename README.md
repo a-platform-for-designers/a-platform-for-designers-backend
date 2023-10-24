@@ -31,20 +31,13 @@ git clone https://github.com/a-platform-for-designers/a-platform-for-designers-b
        данными:
 ```
 DB_ENGINE=django.db.backends.postgresql
-POSTGRES_PASSWORD=goodone
-DB_NAME=postgres
+DB_NAME=poostgres
 DB_USER=postgres
 DB_PASSWORD=postgres
-DB_HOST=db
+DB_HOST=localhost/db
 DB_PORT=5432
 SECRET_KEY='secretgenerate'
 DEBUG = True
-EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=google@gmail.com
-EMAIL_HOST_PASSWORD=goodone
 ```
 
 > Генератор секретного ключа: infra/secretgenerate.py
@@ -94,11 +87,9 @@ http://localhost/api/schema/
 Ответ должен быть:
 ``` 
 MINGW64 ~/a-platform-for-designers-backend/backend (main)   
-
 dos2unix entrypoint.sh wait-for-it.sh
 dos2unix: converting file entrypoint.sh to Unix format...
 dos2unix: converting file wait-for-it.sh to Unix format...
-```
 
  - При сборке контейнеров в файле entrypoint.sh прописаны команды, которые можно отредактировать:
 
