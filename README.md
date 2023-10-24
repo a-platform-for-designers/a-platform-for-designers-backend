@@ -84,7 +84,8 @@ http://localhost/api/schema/
 ```
  dos2unix entrypoint.sh wait-for-it.sh
 ```
-Ответ должен быть:
+ - Ответ должен быть:
+
 ``` 
 MINGW64 ~/a-platform-for-designers-backend/backend (main)   
 dos2unix entrypoint.sh wait-for-it.sh
@@ -103,9 +104,11 @@ dos2unix: converting file wait-for-it.sh to Unix format...
 > 
 > python manage.py collectstatic --no-input
  
-```
+
  - Список полезных команд:
 
+
+```
 docker compose up -d
 docker compose exec backend python manage.py makemigrations users
 docker compose exec backend python manage.py migrate
