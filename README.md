@@ -91,6 +91,7 @@ MINGW64 ~/a-platform-for-designers-backend/backend (main)
 dos2unix entrypoint.sh wait-for-it.sh
 dos2unix: converting file entrypoint.sh to Unix format...
 dos2unix: converting file wait-for-it.sh to Unix format...
+```
 
  - При сборке контейнеров в файле entrypoint.sh прописаны команды, которые можно отредактировать:
 
