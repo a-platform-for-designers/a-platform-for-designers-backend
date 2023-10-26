@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from drf_extra_fields.fields import Base64ImageField
-from job.models import CaseImage, Comment, FavoriteOrder
+from job.models import CaseImage, Comment, FavoriteOrder, Sphere
 from api.serializers.user_serializers import UserProfileSerializer
 
 # заглушка
@@ -38,3 +38,10 @@ class FavoriteOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FavoriteOrder
+
+
+class SphereSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Sphere
+        fields = '__all__'
