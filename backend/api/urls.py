@@ -1,5 +1,5 @@
 from api.views.user_views import UserProfileViewSet
-from .views import CaseImageViewSet
+from .views_common import CaseImageViewSet
 from django.urls import include, path
 from rest_framework import routers
 
