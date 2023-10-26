@@ -83,3 +83,21 @@ class FavoriteOrder(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Sphere(models.Model):
+    """Модель сферы деятельности"""
+
+    name = models.CharField(
+        max_length=200,
+        verbose_name='Название деятельности'
+    )
+
+    class Meta:
+        verbose_name = 'Сфера деятельности'
+        verbose_name_plural = 'Сферы деятельности'
+        ordering = ['name',]
+
+    def __str__(self) -> str:
+        return self.name
+
