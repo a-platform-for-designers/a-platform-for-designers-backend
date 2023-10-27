@@ -6,7 +6,6 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from api.serializers.user_serializers import UserProfileSerializer
 from job.models import CaseImage, Comment, FavoriteOrder, Sphere
 from users.models import Subscription
 

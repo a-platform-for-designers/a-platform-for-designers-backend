@@ -1,5 +1,4 @@
-from api.views.user_views import UserProfileViewSet
-from .views_common import CaseImageViewSet, CommentViewSet, SphereViewSet
+from .views import UserProfileViewSet, CaseImageViewSet, CommentViewSet, SphereViewSet
 from django.urls import include, path
 from rest_framework import routers
 
