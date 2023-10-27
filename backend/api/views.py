@@ -2,15 +2,19 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from djoser.views import UserViewSet
-from rest_framework import status
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from users.models import Subscription
 from api.pagination import LimitPageNumberPagination
-from api.serializers.subscription_serializers import SubscriptionSerializer
-from api.serializers.user_serializers import UserProfileSerializer
+from api.serializers import (
+    LanguageSerializer, SpecializationSerializer, SubscriptionSerializer,
+    UserProfileSerializer, ResumeReadSerializer, ResumeWriteSerializer,
+    OrderSerializer
+)
+from job.models import Language, Order, Specialization
 
 User = get_user_model()
 
@@ -107,3 +111,35 @@ class UserProfileViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
+
+
+class SpecializationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = SpecializationSerializer
+    queryset = Specialization.objects.all()
+
+
+class LanguageViewSet(viewsets.ModelViewSet):
+    queryset = Language.objects.all()
+    serializer_class = LanguageSerializer
+
+
+class ResumeViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   viewsets.GenericViewSet):
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ResumeReadSerializer
+        return ResumeWriteSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
