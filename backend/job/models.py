@@ -2,11 +2,12 @@ from django.db import models
 from users.models import User
 
 
-# поставила просто заглушки двух требуемых мне моделей
+# заглушка
 class Case(models.Model):
     pass
 
 
+# заглушка
 class Order(models.Model):
     pass
 

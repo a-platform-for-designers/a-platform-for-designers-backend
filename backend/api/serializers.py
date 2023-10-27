@@ -110,6 +110,14 @@ class CaseImageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CaseImageShortSerializer(serializers.ModelSerializer):
+    picture = Base64ImageField()
+
+    class Meta:
+        model = CaseImage
+        fields = ('picture', )
+
+
 class CommentSerializer(serializers.ModelSerializer):
     case = CaseSerializer()
     user = UserProfileSerializer(read_only=True)
