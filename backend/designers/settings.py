@@ -169,16 +169,13 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'reset/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': (
-            'api.serializers.user_serializers.'
-            'UserProfileCreateSerializer'
+            'api.serializers.UserProfileCreateSerializer'  
         ),
         'user': (
-            'api.serializers.user_serializers.'
-            'UserProfileSerializer'
+            'api.serializers.UserProfileSerializer'
         ),
         'current_user': (
-            'api.serializers.user_serializers.'
-            'UserProfileSerializer'
+            'api.serializers.UserProfileSerializer'
         ),
     },
 

@@ -12,7 +12,7 @@ from users.models import Subscription
 
 from .serializers import (CaseImageSerializer, CommentSerializer,
                           SphereSerializer, SubscriptionSerializer,
-                          UserProfileSerializer)
+                          UserProfileSerializer, CaseImageShortSerializer)
 
 User = get_user_model()
 
@@ -114,6 +114,12 @@ class CaseImageViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post')
     queryset = CaseImage.objects.all()
     serializer_class = CaseImageSerializer
+
+    @action(detail=True,
+            methods=['get', ])
+    def portfolio(self, request, pk):
+        serializer = CaseImageShortSerializer
+
 
 
 class CommentViewSet(viewsets.ModelViewSet):
