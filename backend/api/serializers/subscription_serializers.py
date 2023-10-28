@@ -27,9 +27,9 @@ class SubscriptionSerializer(UserProfileSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name',
+        fields = ('email', 'id', 'first_name',
                   'last_name', 'is_subscribed')
-        read_only_fields = ('email', 'username')
+        read_only_fields = ('email',)
 
     def validate(self, data: Dict) -> Dict:
         author = self.instance
