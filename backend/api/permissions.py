@@ -16,3 +16,20 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return obj.author == request.user
+
+
+class IsInitiatorOrReceiverChatPermission(permissions.BasePermission):
+    """Права для работы с чатами."""
+
+    def has_object_permission(self, request, view, obj):
+        return obj.initiator == request.user or obj.receiver == request.user
+
+
+class IsInitiatorOrReceiverMessagePermission(permissions.BasePermission):
+    """Права для работы с сообщениями чатов."""
+
+    def has_object_permission(self, request, view, obj):
+        if request.method == 'DELETE':
+            return obj.sender == request.user
+        return (obj.chat.initiator == request.user
+                or obj.chat.receiver == request.user)
