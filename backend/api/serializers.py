@@ -1,4 +1,4 @@
-from job.models import Language, Order, Resume, Specialization
+from job.models import Language, Like, Order, Resume, Specialization
 from djoser.serializers import UserSerializer
 
 from typing import Dict
@@ -7,6 +7,7 @@ from djoser.serializers import (
     UserCreateSerializer, UserSerializer, ValidationError
 )
 from rest_framework.fields import SerializerMethodField
+from rest_framework.validators import UniqueTogetherValidator
 
 from rest_framework import serializers
 from users.models import Subscription
@@ -139,11 +140,55 @@ class ResumeWriteSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    specialization = SpecializationSerializer(many=True)
-    sphere = SphereSerializer(many=True)
+    specialization = SpecializationSerializer()
+    sphere = SphereSerializer()
     skills = SkillSerializer(many=True)
     instruments = InstrumentSerializer(many=True)
+    is_favorited_order = serializers.SerializerMethodField()
     
     class Meta:
         model = Order
         fields = '__all__'
+    
+    def validate_skills(self, value):
+        if not value:
+            raise ValidationError('Укажите хотя бы один навык')
+        if len(set(value)) != len(value):
+            raise ValidationError('Навыки не должны повторяться')
+        return value
+
+    def validate_instruments(self, value):
+        if not value:
+            raise ValidationError('Укажите хотя бы один инструмент')
+        if len(set(value)) != len(value):
+            raise ValidationError('Ингредиенты не должны повторяться')
+        return value
+    
+    def validate_sphere(self, value):
+        if not value:
+            raise ValidationError('Укажите сферу заказа')
+    
+    def validate_specialization(self, value):
+        if not value:
+            raise ValidationError('Укажите спемиализацию заказа')
+    
+    def get_is_favorited_order(self, obj):
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
+            return False
+        return FavoriteOrder.objects.filter(
+            viewer=request.user, order=obj
+        ).exists()
+
+
+class LikeSerializer(ModelSerializer):
+    class Meta:
+        model = Like
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Like.objects.all(),
+                fields=['liker', 'author'],
+                message='Лайк уже поставлен'
+            )
+        ]

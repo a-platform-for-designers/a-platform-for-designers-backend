@@ -9,6 +9,7 @@ from rest_framework.response import Response
 
 from users.models import Subscription
 from api.pagination import LimitPageNumberPagination
+from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (
     LanguageSerializer, SpecializationSerializer, SubscriptionSerializer,
     UserProfileSerializer, ResumeReadSerializer, ResumeWriteSerializer,
@@ -127,6 +128,7 @@ class ResumeViewSet(mixins.CreateModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
                    viewsets.GenericViewSet):
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -140,6 +142,7 @@ class ResumeViewSet(mixins.CreateModelMixin,
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    permission_classes = (IsAuthorOrReadOnly,)
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
