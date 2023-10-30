@@ -89,29 +89,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'designers.wsgi.application'
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#         'ENGINE': os.getenv(
+#             'DB_ENGINE',
+#             default='django.db.backends.postgresql'
+#         ),
+#         'NAME': os.getenv('DB_NAME', default='postgres'),
+#         'USER': os.getenv('POSTGRES_USER', default='postgres'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+#         'HOST': os.getenv('DB_HOST', default='db'),
+#         'PORT': os.getenv('DB_PORT', default='5432'),
+#         'OPTIONS': {
+#             'client_encoding': 'UTF8'
+#         },
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv(
-            'DB_ENGINE',
-            default='django.db.backends.postgresql'
-        ),
-        'NAME': os.getenv('DB_NAME', default='postgres'),
-        'USER': os.getenv('POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
-        'HOST': os.getenv('DB_HOST', default='db'),
-        'PORT': os.getenv('DB_PORT', default='5432'),
-        'OPTIONS': {
-            'client_encoding': 'UTF8'
-        },
-    }
-}
+
 
 # Password validation
 
@@ -167,16 +169,13 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'reset/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': (
-            'api.serializers.user_serializers.'
-            'UserProfileCreateSerializer'
+            'api.serializers.UserProfileCreateSerializer'  
         ),
         'user': (
-            'api.serializers.user_serializers.'
-            'UserProfileSerializer'
+            'api.serializers.UserProfileSerializer'
         ),
         'current_user': (
-            'api.serializers.user_serializers.'
-            'UserProfileSerializer'
+            'api.serializers.UserProfileSerializer'
         ),
     },
 
@@ -190,7 +189,7 @@ DJOSER = {
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
