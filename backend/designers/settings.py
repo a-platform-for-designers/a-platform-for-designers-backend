@@ -167,6 +167,7 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'reset/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': (
+<<<<<<< HEAD
             'api.serializers.'
             'UserProfileCreateSerializer'
         ),
@@ -177,6 +178,15 @@ DJOSER = {
         'current_user': (
             'api.serializers.'
             'UserProfileSerializer'
+=======
+            'api.serializers.UserProfileCreateSerializer'  
+        ),
+        'user': (
+            'api.serializers.UserProfileSerializer'
+        ),
+        'current_user': (
+            'api.serializers.UserProfileSerializer'
+>>>>>>> develop
         ),
     },
 
@@ -190,7 +200,7 @@ DJOSER = {
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')

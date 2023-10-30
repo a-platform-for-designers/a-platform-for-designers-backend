@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
@@ -5,6 +6,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
+from api.pagination import LimitPageNumberPagination
+from job.models import CaseImage, Comment, Sphere
+from .serializers import (CaseImageSerializer, CommentSerializer,
+                          SphereSerializer, )
 from job.models import Case, Favorite, Instrument, Skill
 from pagination import LimitPageNumberPagination
 from serializers import (CaseSerializer,
@@ -17,6 +22,9 @@ from .permissions import (IsInitiatorOrReceiverChatPermission,
 from .serializers import (ChatCreateSerializer, ChatReadSerializer,
                           MessageSerializer, )
 from job.models import Chat
+
+
+User = get_user_model()
 
 
 class InstrumentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -130,4 +138,28 @@ class MessageViewSet(viewsets.ModelViewSet):
             sender=self.request.user,
             chat=self.get_chat()
         )
+
+
+class CaseImageViewSet(viewsets.ModelViewSet):
+    http_method_names = ('get', 'post')
+    queryset = CaseImage.objects.all()
+    serializer_class = CaseImageSerializer
+
+    @action(detail=True,
+            methods=['get', ])
+    def portfolio(self, request, pk):        
+        cover = CaseImage
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    http_method_names = ('get', 'post')
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+
+class SphereViewSet(viewsets.ModelViewSet):
+    http_method_names = ('get')
+    queryset = Sphere.objects.all()
+    serializer_class = SphereSerializer
+
 

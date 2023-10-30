@@ -7,6 +7,18 @@ from api.serializers.user_serializers import UserProfileSerializer
 
 from job.models import Case, Favorite, Instrument, Skill, Chat, Message
 
+from django.contrib.auth import get_user_model
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from drf_extra_fields.fields import Base64ImageField
+from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
+from api.serializers.user_serializers import UserProfileSerializer
+from job.models import CaseImage, Comment, FavoriteOrder, Sphere, Case, Favorite, Instrument, Skill
+from users.models import Subscription
+
+User = get_user_model()
+
+
 MIN_AMOUNT = 1
 MAX_AMOUNT = 1000
 
@@ -162,3 +174,85 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ('id', 'chat', 'sender', 'text', 'pub_date')
+
+
+class SubscriptionSerializer(UserProfileSerializer):
+    """
+    Сериализатор для подписки на автора.
+
+    Атрибуты:
+        email: адрес электронной почты пользователя.
+        username: имя пользователя.
+        first_name: имя пользователя.
+        last_name: фамилия пользователя.
+        is_subscribed: подписка.
+
+    Методы:
+        validate: метод для валидации данных при создании подписки.
+
+    """
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed')
+        read_only_fields = ('email', 'username')
+
+    def validate(self, data: Dict) -> Dict:
+        author = self.instance
+        user = self.context.get('request').user
+        subscription_exists = Subscription.objects.filter(
+            author=author, user=user
+        ).exists()
+
+        if subscription_exists:
+            raise serializers.ValidationError(
+                {'subscription': ['Подписка уже есть']}
+            )
+        if user == author:
+            raise serializers.ValidationError(
+                {'subscription': ['Нельзя подписаться на себя']}
+            )
+        return data
+
+
+class CaseImageSerializer(serializers.ModelSerializer):
+    case = CaseSerializer()
+    is_avatar = SerializerMethodField(read_only=True)
+    picture = Base64ImageField()
+
+    class Meta:
+        model = CaseImage
+        fields = '__all__'
+
+
+class CaseImageShortSerializer(serializers.ModelSerializer):
+    picture = Base64ImageField()
+
+    class Meta:
+        model = CaseImage
+        fields = ('picture', )
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    case = CaseSerializer()
+    user = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+
+class FavoriteOrderSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer(read_only=True)
+    order = OrderSerializer()
+
+    class Meta:
+        model = FavoriteOrder
+
+
+class SphereSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Sphere
+        fields = '__all__'

@@ -1,4 +1,7 @@
 from api.views.user_views import ProfileCustomerViewSet, ProfileDesignerViewSet, UserProfileViewSet
+from .views import CaseImageViewSet, CommentViewSet, SphereViewSet
+from api.views.user_views import ProfileCustomerViewSet, ProfileDesignerViewSet
+from api.views.user_views import UserProfileViewSet
 from api.views import CaseViewSet
 
 from django.urls import include, path
@@ -9,6 +12,9 @@ from . import views
 router = routers.DefaultRouter()
 
 router.register('users', UserProfileViewSet, basename='user')
+router.register('caseimages', CaseImageViewSet)
+router.register('comments', CommentViewSet)
+router.register('spheres', SphereViewSet)
 router.register(
     'profile_customer',
     ProfileCustomerViewSet,
