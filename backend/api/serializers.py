@@ -1,4 +1,11 @@
+from rest_framework import serializers
+from drf_extra_fields.fields import Base64ImageField
 from typing import Dict
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from api.serializers.user_serializers import UserProfileSerializer
+
+from job.models import Case, Favorite, Instrument, Skill, Chat, Message
 
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer, UserSerializer
@@ -108,6 +115,65 @@ class CaseCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return CaseSerializer(instance).data
+
+
+class ChatReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для метода get для чатов."""
+
+    initiator = UserProfileSerializer(read_only=True)
+    receiver = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Chat
+        fields = ('id', 'initiator', 'receiver')
+
+
+class ChatCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания чата."""
+
+    class Meta:
+        model = Chat
+        fields = ('receiver',)
+
+    def validate(self, data):
+        initiator = self.context.get('request').user
+        receiver = data.get('receiver')
+        if initiator == receiver:
+            raise ValidationError('Нельзя создавать чат с самим собой.')
+        if Chat.objects.filter(
+            initiator=initiator,
+            receiver=receiver
+        ).exists():
+            raise serializers.ValidationError(
+                detail='Чат уже существует.'
+            )
+        if Chat.objects.filter(
+            initiator=receiver,
+            receiver=initiator
+        ).exists():
+            raise serializers.ValidationError(
+                detail='Чат уже существует.'
+            )
+        data['initiator'] = initiator
+        return data
+
+    def to_representation(self, instance):
+        serializer = ChatReadSerializer(
+            instance,
+            context={'request': self.context.get('request')}
+        )
+        return serializer.data
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    """Сериализатор сообщения."""
+
+    sender = UserProfileSerializer(read_only=True)
+    chat = ChatReadSerializer(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ('id', 'chat', 'sender', 'text', 'pub_date')
 
 
 class SubscriptionSerializer(UserProfileSerializer):

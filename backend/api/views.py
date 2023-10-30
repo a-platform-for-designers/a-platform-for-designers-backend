@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from django.db.models import Q
 from api.pagination import LimitPageNumberPagination
 from job.models import CaseImage, Comment, Sphere
 from .serializers import (CaseImageSerializer, CommentSerializer,
@@ -16,6 +17,11 @@ from serializers import (CaseSerializer,
                          CaseShortSerializer,
                          InstrumentSerializer,
                          SkillSerializer)
+from .permissions import (IsInitiatorOrReceiverChatPermission,
+                          IsInitiatorOrReceiverMessagePermission)
+from .serializers import (ChatCreateSerializer, ChatReadSerializer,
+                          MessageSerializer, )
+from job.models import Chat
 
 
 User = get_user_model()
@@ -83,6 +89,55 @@ class CaseViewSet(ModelViewSet):
                 {'errors': 'Проект не найден в избранном.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class ChatViewSet(viewsets.ModelViewSet):
+    """"Класс ChatViewSet для работы с чатами."""
+
+    http_method_names = ['get', 'post']
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsInitiatorOrReceiverChatPermission
+    ]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Chat.objects.filter(Q(initiator=user) | Q(receiver=user))
+
+    def get_serializer_class(self):
+        if self.request.method in ('POST'):
+            return ChatCreateSerializer
+        return ChatReadSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(initiator=self.request.user)
+
+
+class MessageViewSet(viewsets.ModelViewSet):
+    """"Класс MessageViewSet для работы с сообщениями чатов."""
+
+    serializer_class = MessageSerializer
+    http_method_names = ['get', 'post', 'delete']
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsInitiatorOrReceiverMessagePermission
+    ]
+
+    def get_chat(self):
+        user = self.request.user
+        return get_object_or_404(
+            Chat.objects.filter(Q(initiator=user) | Q(receiver=user)),
+            pk=self.kwargs.get('chat_id'),
+        )
+
+    def get_queryset(self):
+        return self.get_chat().messages.all()
+
+    def perform_create(self, serializer):
+        serializer.save(
+            sender=self.request.user,
+            chat=self.get_chat()
+        )
 
 
 class CaseImageViewSet(viewsets.ModelViewSet):

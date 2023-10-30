@@ -113,8 +113,6 @@ DATABASES = {
 #     }
 # }
 
-
-
 # Password validation
 
 AUTH_PWD_MODULE = "django.contrib.auth.password_validation."
@@ -169,6 +167,18 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'reset/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': (
+<<<<<<< HEAD
+            'api.serializers.'
+            'UserProfileCreateSerializer'
+        ),
+        'user': (
+            'api.serializers.'
+            'UserProfileSerializer'
+        ),
+        'current_user': (
+            'api.serializers.'
+            'UserProfileSerializer'
+=======
             'api.serializers.UserProfileCreateSerializer'  
         ),
         'user': (
@@ -176,6 +186,7 @@ DJOSER = {
         ),
         'current_user': (
             'api.serializers.UserProfileSerializer'
+>>>>>>> develop
         ),
     },
 
@@ -216,3 +227,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MESSAGE_STR = 30
