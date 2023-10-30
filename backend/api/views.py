@@ -5,16 +5,71 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework.viewsets import ModelViewSet
 from api.pagination import LimitPageNumberPagination
 from job.models import CaseImage, Comment, Sphere
 from users.models import Subscription
-
 from .serializers import (CaseImageSerializer, CommentSerializer,
-                          SphereSerializer, SubscriptionSerializer,
-                          UserProfileSerializer, CaseImageShortSerializer)
+                          SphereSerializer, )
+from api.serializers.subscription_serializers import SubscriptionSerializer
+from api.serializers.user_serializers import UserProfileSerializer
+from api.serializers.user_serializers import ProfileCustomerSerializer
+from api.serializers.user_serializers import ProfileDesignerSerializer
+from api.permissions import IsOwnerOrReadOnly
+from users.models import ProfileCustomer, ProfileDesigner
+from job.models import Case, Favorite, Instrument, Skill
+from pagination import LimitPageNumberPagination
+from serializers import (CaseSerializer,
+                         CaseCreateSerializer,
+                         CaseShortSerializer,
+                         InstrumentSerializer,
+                         SkillSerializer)
+
 
 User = get_user_model()
+
+
+class ProfileCustomerViewSet(viewsets.ModelViewSet):
+    queryset = ProfileCustomer.objects.all().order_by('id')
+    serializer_class = ProfileCustomerSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_customer:
+            return Response({"detail": "Вы не являетесь покупателем."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if (
+            not request.user.is_staff and
+            request.user.id != request.data.get('user')
+        ):
+            return Response({"detail": "Нет разрешения."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if ProfileCustomer.objects.filter(user=request.user).exists():
+            return Response({"detail": "Профиль уже существует."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
+
+
+class ProfileDesignerViewSet(viewsets.ModelViewSet):
+    queryset = ProfileDesigner.objects.all().order_by('id')
+    serializer_class = ProfileDesignerSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def create(self, request, *args, **kwargs):
+        if request.user.is_customer:
+            return Response({"detail": "Вы не являетесь дизайнером."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if (
+            not request.user.is_staff and
+            request.user.id != request.data.get('user')
+        ):
+            return Response({"detail": "У вас нет разрешения."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if ProfileDesigner.objects.filter(user=request.user).exists():
+            return Response({"detail": "Профиль уже существует."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
+
 
 class UserProfileViewSet(UserViewSet):
     """"
@@ -35,7 +90,10 @@ class UserProfileViewSet(UserViewSet):
 
     """
 
-    queryset = User.objects.all()
+    queryset = User.objects.select_related(
+        'profilecustomer',
+        'profiledesigner'
+    ).order_by('id')
     serializer_class = UserProfileSerializer
     permission_classes = (AllowAny,)
     pagination_class = LimitPageNumberPagination
@@ -135,3 +193,67 @@ class SphereViewSet(viewsets.ModelViewSet):
     http_method_names = ('get')
     queryset = Sphere.objects.all()
     serializer_class = SphereSerializer
+
+
+class InstrumentViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Instrument.objects.all()
+    serializer_class = InstrumentSerializer
+    pagination_class = None
+    permission_classes = [AllowAny, ]
+    search_fields = ['^name', ]
+
+
+class SkillViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
+    pagination_class = None
+    permission_classes = [AllowAny, ]
+
+
+class CaseViewSet(ModelViewSet):
+    """"
+    Класс CaseViewSet для работы с проектами авторов.
+
+    """
+    queryset = Case.objects.all()
+    pagination_class = LimitPageNumberPagination
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CaseSerializer
+        return CaseCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    @action(
+        detail=True,
+        methods=['POST', 'DELETE'],
+    )
+    def favorite(self, request, pk):
+        case_obj = get_object_or_404(Case, pk=pk)
+        if request.method == 'POST':
+            already_existed, created = Favorite.objects.get_or_create(
+                user=request.user,
+                case=case_obj
+            )
+            if not created:
+                return Response(
+                    {'errors': 'Ошибка при создании записи.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            serializer = CaseShortSerializer(case_obj,
+                                             context={'request': request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'DELETE':
+            favorite = request.user.favorites.all()
+            if favorite:
+                favorite.delete()
+                return Response(
+                    {'message': 'Проект удален из избранного.'},
+                    status=status.HTTP_204_NO_CONTENT,
+                )
+            return Response(
+                {'errors': 'Проект не найден в избранном.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
