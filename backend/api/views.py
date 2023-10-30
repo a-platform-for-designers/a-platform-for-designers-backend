@@ -1,27 +1,27 @@
+from api.permissions import IsAuthorOrReadOnly
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets, permissions
+from rest_framework import status, viewsets, permissions, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
-from api.pagination import LimitPageNumberPagination
-from job.models import CaseImage, Comment, Sphere
 from .serializers import (CaseImageSerializer, CommentSerializer,
-                          SphereSerializer, )
-from job.models import Case, Favorite, Instrument, Skill
+                          SphereSerializer, LanguageSerializer, 
+                          SpecializationSerializer, ResumeReadSerializer,
+                          ResumeWriteSerializer, OrderSerializer, CaseSerializer,
+                          CaseCreateSerializer, CaseShortSerializer,
+                          InstrumentSerializer, SkillSerializer, 
+                          ChatCreateSerializer, ChatReadSerializer,
+                          MessageSerializer, )
+from job.models import (Case, Favorite, Instrument, Skill, CaseImage, Comment,
+                        Sphere, Language, Order, Specialization, Chat)
+
 from pagination import LimitPageNumberPagination
-from serializers import (CaseSerializer,
-                         CaseCreateSerializer,
-                         CaseShortSerializer,
-                         InstrumentSerializer,
-                         SkillSerializer)
 from .permissions import (IsInitiatorOrReceiverChatPermission,
                           IsInitiatorOrReceiverMessagePermission)
-from .serializers import (ChatCreateSerializer, ChatReadSerializer,
-                          MessageSerializer, )
-from job.models import Chat
 
 
 User = get_user_model()
@@ -163,3 +163,35 @@ class SphereViewSet(viewsets.ModelViewSet):
     serializer_class = SphereSerializer
 
 
+class SpecializationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = SpecializationSerializer
+    queryset = Specialization.objects.all()
+
+
+class LanguageViewSet(viewsets.ModelViewSet):
+    queryset = Language.objects.all()
+    serializer_class = LanguageSerializer
+
+
+class ResumeViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   viewsets.GenericViewSet):
+    permission_classes = (IsAuthorOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ResumeReadSerializer
+        return ResumeWriteSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = (IsAuthorOrReadOnly,)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

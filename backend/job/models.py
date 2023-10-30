@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 MIN_AMOUNT = 1
 MAX_AMOUNT = 1000
+RESUME_STATUS_CHOICES = ((1, 'Ищу работу'), (2, 'Не ищу работу'))
 
 
 class Instrument(models.Model):
@@ -183,11 +184,6 @@ class Message(models.Model):
         return f'{self.sender.email}: {self.text[:settings.MESSAGE_STR]}'
 
 
-# заглушка
-class Order(models.Model):
-    pass
-
-
 class CaseImage(models.Model):
     """Модель изображения для кейса."""
 
@@ -275,5 +271,95 @@ class Sphere(models.Model):
         verbose_name_plural = 'Сферы деятельности'
         ordering = ['name',]
 
-    def __str__(self) -> str:
+
+class Resume(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='resume'
+    )
+    skills = models.ManyToManyField('Skill')
+    instruments = models.ManyToManyField('Instrument')
+    about = models.TextField()
+    status = models.CharField(
+        max_length=1,
+        choices=RESUME_STATUS_CHOICES,
+        default=1
+    )
+
+    class Meta:
+        verbose_name = 'Резюме'
+        verbose_name_plural = 'Резюме'
+
+    def __str__(self):
+        return f'Резюме {self.user.username}'
+
+
+class Specialization(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Специализация'
+        verbose_name_plural = 'Специализации'
+
+    def __str__(self):
         return self.name
+
+
+class Like(models.Model):
+    liker = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='likers'
+    )
+
+    class Meta:
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'
+
+    def __str__(self):
+        return f'{self.liker} лайкнул {self.author}'
+
+
+class Language(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Язык'
+        verbose_name_plural = 'Языки'
+
+    def __str__(self):
+        return self.name
+
+
+class Order(models.Model):
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='orders'
+    )
+    title = models.CharField(max_length=150)
+    specialization = models.ForeignKey(
+        Specialization,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    price_min = models.PositiveIntegerField(blank=True, null=True)
+    price_max = models.PositiveIntegerField(blank=True, null=True)
+    currency = models.CharField(max_length=20)
+    sphere = models.ForeignKey('Sphere', on_delete=models.SET_NULL, null=True)
+    skills = models.ManyToManyField('Skill')
+    instruments = models.ManyToManyField('Instrument')
+    description = models.TextField()
+
+    class Meta:
+        verbose_name = 'Резюме'
+        verbose_name_plural = 'Резюме'
+
+    def __str__(self):
+        return f'Резюме {self.user.username}'

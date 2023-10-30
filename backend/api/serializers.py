@@ -1,3 +1,4 @@
+from rest_framework.validators import UniqueTogetherValidator
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
 from typing import Dict
@@ -8,19 +9,30 @@ from api.serializers.user_serializers import UserProfileSerializer
 from job.models import Case, Favorite, Instrument, Skill, Chat, Message
 
 from django.contrib.auth import get_user_model
-from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from api.serializers.user_serializers import UserProfileSerializer
-from job.models import CaseImage, Comment, FavoriteOrder, Sphere, Case, Favorite, Instrument, Skill
-from users.models import Subscription
+from job.models import (CaseImage, Comment, FavoriteOrder, Sphere, Case,
+                        Favorite, Instrument, Skill, Language, Like,
+                        Order, Resume, Specialization)
+
 
 User = get_user_model()
 
-
 MIN_AMOUNT = 1
 MAX_AMOUNT = 1000
+
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = '__all__'
+
+
+class SpecializationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Specialization
+        fields = '__all__'
 
 
 class InstrumentSerializer(serializers.ModelSerializer):
@@ -35,6 +47,100 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = '__all__'
+
+
+class ResumeReadSerializer(serializers.ModelSerializer):
+    skills = SkillSerializer(many=True)
+    instruments = InstrumentSerializer(many=True)
+
+    class Meta:
+        model = Resume
+        fields = ('description', 'instruments', 'skills')
+
+
+class ResumeWriteSerializer(serializers.ModelSerializer):
+    skills = SkillSerializer(many=True)
+    instruments = InstrumentSerializer(many=True)
+
+    class Meta:
+        model = Resume
+        fields = '__all__'
+
+    def validate_skills(self, value):
+        if not value:
+            raise ValidationError('Укажите хотя бы один навык')
+        if len(set(value)) != len(value):
+            raise ValidationError('Навыки не должны повторяться')
+        return value
+
+    def validate_instruments(self, value):
+        if not value:
+            raise ValidationError('Укажите хотя бы один инструмент')
+        if len(set(value)) != len(value):
+            raise ValidationError('Ингредиенты не должны повторяться')
+        return value
+
+
+class SphereSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Sphere
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    specialization = SpecializationSerializer()
+    sphere = SphereSerializer()
+    skills = SkillSerializer(many=True)
+    instruments = InstrumentSerializer(many=True)
+    is_favorited_order = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Order
+        fields = '__all__'
+    
+    def validate_skills(self, value):
+        if not value:
+            raise ValidationError('Укажите хотя бы один навык')
+        if len(set(value)) != len(value):
+            raise ValidationError('Навыки не должны повторяться')
+        return value
+
+    def validate_instruments(self, value):
+        if not value:
+            raise ValidationError('Укажите хотя бы один инструмент')
+        if len(set(value)) != len(value):
+            raise ValidationError('Ингредиенты не должны повторяться')
+        return value
+    
+    def validate_sphere(self, value):
+        if not value:
+            raise ValidationError('Укажите сферу заказа')
+    
+    def validate_specialization(self, value):
+        if not value:
+            raise ValidationError('Укажите спемиализацию заказа')
+    
+    def get_is_favorited_order(self, obj):
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
+            return False
+        return FavoriteOrder.objects.filter(
+            viewer=request.user, order=obj
+        ).exists()
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Like.objects.all(),
+                fields=['liker', 'author'],
+                message='Лайк уже поставлен'
+            )
+        ]
 
 
 class CaseSerializer(serializers.ModelSerializer):
@@ -176,46 +282,6 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ('id', 'chat', 'sender', 'text', 'pub_date')
 
 
-class SubscriptionSerializer(UserProfileSerializer):
-    """
-    Сериализатор для подписки на автора.
-
-    Атрибуты:
-        email: адрес электронной почты пользователя.
-        username: имя пользователя.
-        first_name: имя пользователя.
-        last_name: фамилия пользователя.
-        is_subscribed: подписка.
-
-    Методы:
-        validate: метод для валидации данных при создании подписки.
-
-    """
-
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed')
-        read_only_fields = ('email', 'username')
-
-    def validate(self, data: Dict) -> Dict:
-        author = self.instance
-        user = self.context.get('request').user
-        subscription_exists = Subscription.objects.filter(
-            author=author, user=user
-        ).exists()
-
-        if subscription_exists:
-            raise serializers.ValidationError(
-                {'subscription': ['Подписка уже есть']}
-            )
-        if user == author:
-            raise serializers.ValidationError(
-                {'subscription': ['Нельзя подписаться на себя']}
-            )
-        return data
-
-
 class CaseImageSerializer(serializers.ModelSerializer):
     case = CaseSerializer()
     is_avatar = SerializerMethodField(read_only=True)
@@ -249,10 +315,3 @@ class FavoriteOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FavoriteOrder
-
-
-class SphereSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Sphere
-        fields = '__all__'
