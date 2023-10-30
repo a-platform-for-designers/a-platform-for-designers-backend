@@ -118,7 +118,10 @@ class CaseImageViewSet(viewsets.ModelViewSet):
     @action(detail=True,
             methods=['get', ])
     def portfolio(self, request, pk):
-        serializer = CaseImageShortSerializer
+        # забираем объекты обложки данного автора
+        cover = CaseImage
+
+        # serializer = CaseImageShortSerializer
 
 
 
