@@ -1,3 +1,4 @@
+[![Dave-YP-DesignCollab workflow](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml)
 # DesignCollab
 
 ## Описание проекта:
