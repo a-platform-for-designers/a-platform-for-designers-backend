@@ -12,7 +12,8 @@ services:
     restart: on-failure
 
   backend:
-    build: ../backend
+    # build: ../backend
+    image: carkazm/designcollab_backend:latest
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
@@ -22,6 +23,12 @@ services:
     env_file:
       - ./.env
     restart: on-failure
+  
+  # frontend:
+  #   # build: ../frontend
+  #   image: carkazm/designcollab_frontend:latest
+  #   volumes:
+  #     - ../frontend/:/app/result_build/
 
   nginx:
     image: nginx:1.25.0-alpine
