@@ -65,7 +65,7 @@ jobs:
 #       with:
 #         context: ./frontend/
 #         push: true
-#         ttags: ${{ secrets.DOCKER_USERNAME }}/designcollab_frontend:latest
+#         tags: ${{ secrets.DOCKER_USERNAME }}/designcollab_frontend:latest
 
   deploy:
     runs-on: ubuntu-latest
