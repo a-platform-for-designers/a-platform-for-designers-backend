@@ -82,8 +82,8 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo systemctl stop nginx
-            sudo docker-compose stop
-            sudo docker compose rm backend
+            sudo docker-compose down
+            sudo docker-compose rm backend
             sudo docker pull carkazm/designcollab_backend:latest
             touch .env
             sudo echo SECRET_KEY=${{ secrets.SECRET_KEY }} >>.env
