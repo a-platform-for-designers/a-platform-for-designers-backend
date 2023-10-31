@@ -14,12 +14,13 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 if not SECRET_KEY:
     raise ValueError('SECRET_KEY не установлен')
 
-DEBUG = os.getenv('DEBUG', False)
+DEBUG = os.getenv('DEBUG', True)
 
 ALLOWED_HOSTS = [
     'localhost',
     'backend',
     '127.0.0.1',
+    '46.183.163.139',
     '91.226.81.209'
 ]
 
@@ -28,6 +29,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://backend',
     'http://127.0.0.1',
     'https://127.0.0.1',
+    'http://46.183.163.139',
+    'https://46.183.163.139',
     'http://91.226.81.209',
     'https://91.226.81.209'
 ]
