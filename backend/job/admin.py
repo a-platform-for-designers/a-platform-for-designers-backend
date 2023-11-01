@@ -32,7 +32,7 @@ class CaseAdmin(admin.ModelAdmin):
     )
     fields = (
         ('title', 'working_term',),
-        ('description', 'skills',),
+        ('description', 'skills', 'author'),
     )
     # list_editable = ('skills',)
     search_fields = ('title',)
