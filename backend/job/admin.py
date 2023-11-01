@@ -71,5 +71,6 @@ class CaseImageAdmin(admin.ModelAdmin):
         'case',
         'picture',
         'name',
-        'description'
+        'description',
+        'is_avatar'
     )
