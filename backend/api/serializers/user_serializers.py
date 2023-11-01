@@ -43,8 +43,6 @@ class UserProfileSerializer(UserSerializer):
     Методы:
         get_is_subscribed(obj: User) -> bool: возвращает True,
         если текущий пользователь подписан на автора, иначе False.
-    Внимание! Код картинки для регистрации пользователя через json:
-    iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC
 
     """
     profilecustomer = ProfileCustomerSerializer(read_only=True)

@@ -78,7 +78,8 @@ class UserProfileViewSet(UserViewSet):
         POST /api/users/{id}/subscribe/
         DELETE /api/users/{id}/subscribe/
         GET /api/users/subscriptions/
-
+    Внимание! Код картинки для регистрации пользователя через json:
+    iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC
     """
 
     queryset = User.objects.select_related(
