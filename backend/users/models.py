@@ -28,6 +28,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     """
     Кастомная модель пользователя.
+
     """
 
     email = models.EmailField(
@@ -80,6 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class ProfileCustomer(models.Model):
     """
     Модель профиля покупателя.
+
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)

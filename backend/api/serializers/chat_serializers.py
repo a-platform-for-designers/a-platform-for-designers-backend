@@ -1,4 +1,5 @@
 from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 
 from api.serializers.user_serializers import UserProfileSerializer
 from job.models import Chat

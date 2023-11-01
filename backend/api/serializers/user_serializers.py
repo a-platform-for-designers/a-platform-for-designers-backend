@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.fields import SerializerMethodField
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 from drf_extra_fields.fields import Base64ImageField
 
 from users.models import ProfileCustomer, ProfileDesigner
@@ -43,6 +43,8 @@ class UserProfileSerializer(UserSerializer):
     Методы:
         get_is_subscribed(obj: User) -> bool: возвращает True,
         если текущий пользователь подписан на автора, иначе False.
+    Внимание! Код картинки для регистрации пользователя через json:
+    iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC
 
     """
     profilecustomer = ProfileCustomerSerializer(read_only=True)

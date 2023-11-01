@@ -11,7 +11,10 @@ RESUME_STATUS_CHOICES = ((1, 'Ищу работу'), (2, 'Не ищу работ
 
 
 class Instrument(models.Model):
-    """Модель инструментов."""
+    """
+    Модель инструментов.
+
+    """
 
     name = models.CharField(
         max_length=200,
@@ -28,7 +31,10 @@ class Instrument(models.Model):
 
 
 class Skill(models.Model):
-    """Модель навыков."""
+    """
+    Модель навыков.
+
+    """
 
     name = models.CharField(
         max_length=200,
@@ -45,7 +51,10 @@ class Skill(models.Model):
 
 
 class Case(models.Model):
-    """Модель проекта."""
+    """
+    Модель проекта.
+
+    """
 
     author = models.ForeignKey(
         User,
@@ -106,7 +115,10 @@ class Case(models.Model):
 
 
 class Favorite(models.Model):
-    """Модель избранных проектов."""
+    """
+    Модель избранных проектов.
+
+    """
 
     case = models.ForeignKey(
         Case,
@@ -132,7 +144,10 @@ class Favorite(models.Model):
 
 
 class Chat(models.Model):
-    """Модель чата."""
+    """
+    Модель чата.
+
+    """
 
     initiator = models.ForeignKey(
         User,
@@ -160,7 +175,10 @@ class Chat(models.Model):
 
 
 class Message(models.Model):
-    """Модель сообщения чата."""
+    """
+    Модель сообщения чата.
+
+    """
 
     chat = models.ForeignKey(
         Chat,
@@ -185,7 +203,10 @@ class Message(models.Model):
 
 
 class CaseImage(models.Model):
-    """Модель изображения для кейса."""
+    """
+    Модель изображения для кейса.
+
+    """
 
     case = models.ForeignKey(
         Case,
@@ -211,7 +232,10 @@ class CaseImage(models.Model):
 
 
 class Comment(models.Model):
-    """Модель комментария."""
+    """
+    Модель комментария.
+
+    """
 
     case = models.ForeignKey(
         Case,
@@ -222,7 +246,7 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='comment',
-    )   
+    )
     comment_text = models.TextField(
         max_length=300,
     )
@@ -235,31 +259,11 @@ class Comment(models.Model):
         return self.name
 
 
-class FavoriteOrder(models.Model):
-    """Модель избранного заказа."""
-    
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='favorite_order',
-    )
-
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name='favorite_order',
-    )
-
-    class Meta:
-        verbose_name = 'Избранный заказ'
-        verbose_name_plural = 'Избранные заказ'
-
-    def __str__(self) -> str:
-        return self.name
-
-
 class Sphere(models.Model):
-    """Модель сферы деятельности"""
+    """
+    Модель сферы деятельности.
+
+    """
 
     name = models.CharField(
         max_length=200,
@@ -273,6 +277,11 @@ class Sphere(models.Model):
 
 
 class Resume(models.Model):
+    """
+    Модель резюме.
+
+    """
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -296,6 +305,11 @@ class Resume(models.Model):
 
 
 class Specialization(models.Model):
+    """
+    Модель специализации.
+
+    """
+
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -307,6 +321,11 @@ class Specialization(models.Model):
 
 
 class Like(models.Model):
+    """
+    Модель лайков.
+
+    """
+
     liker = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -327,6 +346,11 @@ class Like(models.Model):
 
 
 class Language(models.Model):
+    """
+    Модель языка.
+
+    """
+
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -338,6 +362,11 @@ class Language(models.Model):
 
 
 class Order(models.Model):
+    """
+    Модель резюме...
+
+    """
+
     customer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -363,3 +392,29 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Резюме {self.user.username}'
+
+
+class FavoriteOrder(models.Model):
+    """
+    Модель избранного заказа.
+
+    """
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite_order',
+    )
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='favorite_order',
+    )
+
+    class Meta:
+        verbose_name = 'Избранный заказ'
+        verbose_name_plural = 'Избранные заказ'
+
+    def __str__(self) -> str:
+        return self.name

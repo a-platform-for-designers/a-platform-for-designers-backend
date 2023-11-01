@@ -14,12 +14,13 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 if not SECRET_KEY:
     raise ValueError('SECRET_KEY не установлен')
 
-DEBUG = os.getenv('DEBUG', False)
+DEBUG = os.getenv('DEBUG', True)
 
 ALLOWED_HOSTS = [
     'localhost',
     'backend',
     '127.0.0.1',
+    '46.183.163.139',
     '91.226.81.209'
 ]
 
@@ -28,6 +29,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://backend',
     'http://127.0.0.1',
     'https://127.0.0.1',
+    'http://46.183.163.139',
+    'https://46.183.163.139',
     'http://91.226.81.209',
     'https://91.226.81.209'
 ]
@@ -89,29 +92,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'designers.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': os.getenv(
-#             'DB_ENGINE',
-#             default='django.db.backends.postgresql'
-#         ),
-#         'NAME': os.getenv('DB_NAME', default='postgres'),
-#         'USER': os.getenv('POSTGRES_USER', default='postgres'),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
-#         'HOST': os.getenv('DB_HOST', default='db'),
-#         'PORT': os.getenv('DB_PORT', default='5432'),
-#         'OPTIONS': {
-#             'client_encoding': 'UTF8'
-#         },
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv(
+            'DB_ENGINE',
+            default='django.db.backends.postgresql'
+        ),
+        'NAME': os.getenv('DB_NAME', default='postgres'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='db'),
+        'PORT': os.getenv('DB_PORT', default='5432'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8'
+        },
+    }
+}
 
 # Password validation
 
@@ -167,26 +170,16 @@ DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'reset/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': (
-<<<<<<< HEAD
-            'api.serializers.'
+            'api.serializers.user_serializers.'
             'UserProfileCreateSerializer'
         ),
         'user': (
-            'api.serializers.'
+            'api.serializers.user_serializers.'
             'UserProfileSerializer'
         ),
         'current_user': (
-            'api.serializers.'
+            'api.serializers.user_serializers.'
             'UserProfileSerializer'
-=======
-            'api.serializers.UserProfileCreateSerializer'  
-        ),
-        'user': (
-            'api.serializers.UserProfileSerializer'
-        ),
-        'current_user': (
-            'api.serializers.UserProfileSerializer'
->>>>>>> develop
         ),
     },
 
@@ -198,12 +191,12 @@ DJOSER = {
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+# EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+# EMAIL_HOST = os.getenv('EMAIL_HOST')
+# EMAIL_PORT = os.getenv('EMAIL_PORT')
+# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'DesignCollab API',

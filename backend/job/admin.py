@@ -63,4 +63,3 @@ class MessageAdmin(admin.ModelAdmin):
     search_fields = ('chat', 'sender', 'text')
     list_filter = ('chat', 'sender', 'pub_date')
     empty_value_display = '-пусто-'
-

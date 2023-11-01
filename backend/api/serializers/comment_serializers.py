@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from api.serializers.case_serializers import CaseSerializer
 from api.serializers.user_serializers import UserProfileSerializer
 

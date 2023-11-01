@@ -3,6 +3,10 @@ from rest_framework.permissions import BasePermission
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Права для администратора или только для чтения.
+
+    """
 
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
@@ -10,6 +14,10 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
+    """
+    Права для автора или только для чтения.
+
+    """
 
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
@@ -20,6 +28,10 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
 
 
 class IsOwnerOrReadOnly(BasePermission):
+    """
+    Права для владельца или только для чтения.
+
+    """
     def has_object_permission(self, request, view, obj):
         if request.method in ['PUT', 'DELETE']:
             return obj.user == request.user
@@ -27,14 +39,20 @@ class IsOwnerOrReadOnly(BasePermission):
 
 
 class IsInitiatorOrReceiverChatPermission(permissions.BasePermission):
-    """Права для работы с чатами."""
+    """
+    Права для работы с чатами.
+
+    """
 
     def has_object_permission(self, request, view, obj):
         return obj.initiator == request.user or obj.receiver == request.user
 
 
 class IsInitiatorOrReceiverMessagePermission(permissions.BasePermission):
-    """Права для работы с сообщениями чатов."""
+    """
+    Права для работы с сообщениями чатов.
+
+    """
 
     def has_object_permission(self, request, view, obj):
         if request.method == 'DELETE':

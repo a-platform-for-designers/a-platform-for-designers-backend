@@ -1,7 +1,9 @@
 from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
 
 from api.serializers.skill_serializers import SkillSerializer
 from job.models import Skill
+
 
 class SkillViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Skill.objects.all()

@@ -1,8 +1,12 @@
 from rest_framework.fields import SerializerMethodField
+from drf_extra_fields.fields import Base64ImageField
+
+from rest_framework import serializers
 
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
-from job.models import Case
+from job.models import Instrument, Skill
+from job.models import Case, Favorite
 
 
 MIN_AMOUNT = 1
@@ -10,7 +14,11 @@ MAX_AMOUNT = 1000
 
 
 class CaseSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Case."""
+    """
+    Сериализатор для модели Case.
+
+    """
+
     instrument = InstrumentSerializer(many=True)
     skill = SkillSerializer(many=True)
     is_favorited = SerializerMethodField(
@@ -20,11 +28,11 @@ class CaseSerializer(serializers.ModelSerializer):
         model = Case
         fields = [
             'id',
-            'skills',
+            'skill',
             'author',
             'title',
             'sphere',
-            'instruments',
+            'instrument',
             'working_term',
             'description',
             'is_favorited',
@@ -40,7 +48,10 @@ class CaseSerializer(serializers.ModelSerializer):
 
 
 class CaseShortSerializer(serializers.ModelSerializer):
-    """"Сериализатор для добавления в избранное"""
+    """"
+    Сериализатор для добавления в избранное
+
+    """
 
     class Meta:
         model = Case

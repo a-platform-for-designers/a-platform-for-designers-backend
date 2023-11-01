@@ -134,3 +134,7 @@ dmypy.json
 
 # .idea
 .idea
+
+# ignore all migrations but __init__.py
+_migrations/*
+!_migrations/__init__.py

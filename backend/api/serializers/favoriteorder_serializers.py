@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from api.serializers.order_serializers import OrderSerializer
 from api.serializers.user_serializers import UserProfileSerializer
 from job.models import FavoriteOrder

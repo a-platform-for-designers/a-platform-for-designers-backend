@@ -1,10 +1,14 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 
 from api.pagination import LimitPageNumberPagination
-from api.serializers.case_serializers import CaseCreateSerializer, CaseSerializer, CaseShortSerializer
-from job.models import Case, Favorite 
+from api.serializers.case_serializers import CaseCreateSerializer
+from api.serializers.case_serializers import CaseShortSerializer
+from api.serializers.case_serializers import CaseSerializer
+from job.models import Case, Favorite
 
 
 class CaseViewSet(ModelViewSet):
@@ -12,6 +16,7 @@ class CaseViewSet(ModelViewSet):
     Класс CaseViewSet для работы с проектами авторов.
 
     """
+
     queryset = Case.objects.all()
     pagination_class = LimitPageNumberPagination
 

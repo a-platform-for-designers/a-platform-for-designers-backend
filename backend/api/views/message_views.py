@@ -1,5 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from api.permissions import IsInitiatorOrReceiverMessagePermission
@@ -7,9 +9,11 @@ from api.serializers.message_serializers import MessageSerializer
 from job.models import Chat
 
 
-
 class MessageViewSet(viewsets.ModelViewSet):
-    """"Класс MessageViewSet для работы с сообщениями чатов."""
+    """"
+    Класс MessageViewSet для работы с сообщениями чатов.
+
+    """
 
     serializer_class = MessageSerializer
     http_method_names = ['get', 'post', 'delete']

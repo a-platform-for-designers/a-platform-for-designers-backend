@@ -1,5 +1,6 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework.fields import SerializerMethodField
+from rest_framework import serializers
 
 from api.serializers.case_serializers import CaseSerializer
 from job.models import CaseImage

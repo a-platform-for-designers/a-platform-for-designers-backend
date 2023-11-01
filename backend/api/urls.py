@@ -10,15 +10,16 @@ from api.views.resume_views import ResumeViewSet
 from api.views.specialization_views import SpecializationViewSet
 from api.views.sphere_views import SphereViewSet
 from api.views.message_views import MessageViewSet
-from api.views.user_views import ProfileCustomerViewSet, ProfileDesignerViewSet, UserProfileViewSet
+from api.views.user_views import ProfileCustomerViewSet, ProfileDesignerViewSet
+from api.views.user_views import UserProfileViewSet
 
 
 router = routers.DefaultRouter()
 
 router.register('users', UserProfileViewSet, basename='user')
-router.register('caseimages', CaseImageViewSet)
-router.register('comments', CommentViewSet)
-router.register('spheres', SphereViewSet)
+router.register('caseimages', CaseImageViewSet, basename='caseimages')
+router.register('comments', CommentViewSet, basename='comments')
+router.register('spheres', SphereViewSet, basename='spheres')
 router.register(
     'profile_customer',
     ProfileCustomerViewSet,
@@ -29,16 +30,20 @@ router.register(
     ProfileDesignerViewSet,
     basename='profile_designer'
 )
-router.register('cases', CaseViewSet)
+router.register('cases', CaseViewSet, basename='cases')
 router.register('chats', ChatViewSet, basename='chats')
 router.register(
     r'chats/(?P<chat_id>\d+)/messages',
     MessageViewSet,
     basename='messages'
 )
-router.register('specializations', SpecializationViewSet)
-router.register('orders', OrderViewSet)
-router.register('resume', ResumeViewSet)
+router.register(
+    'specializations',
+    SpecializationViewSet,
+    basename='specializations'
+)
+router.register('orders', OrderViewSet, basename='orders')
+router.register('resume', ResumeViewSet, basename='resume')
 
 urlpatterns = [
     path('', include(router.urls)),

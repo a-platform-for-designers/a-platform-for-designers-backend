@@ -1,13 +1,18 @@
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets
 
 from api.permissions import IsInitiatorOrReceiverChatPermission
-from api.serializers.chat_serializers import ChatCreateSerializer, ChatReadSerializer
+from api.serializers.chat_serializers import ChatCreateSerializer
+from api.serializers.chat_serializers import ChatReadSerializer
 from job.models import Chat
 
 
 class ChatViewSet(viewsets.ModelViewSet):
-    """"Класс ChatViewSet для работы с чатами."""
+    """"
+    Класс ChatViewSet для работы с чатами.
+
+    """
 
     http_method_names = ['get', 'post']
     permission_classes = [
