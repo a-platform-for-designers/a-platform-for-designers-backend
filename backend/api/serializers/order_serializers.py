@@ -9,7 +9,7 @@ from api.serializers.sphere_serializers import SphereSerializer
 from job.models import FavoriteOrder, Order
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderReadSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer()
     sphere = SphereSerializer()
     skills = SkillSerializer(many=True)
@@ -18,7 +18,42 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = (
+            'id',
+            'customer',
+            'title',
+            'specialization',
+            'price_min',
+            'price_max',
+            'currency',
+            'sphere',
+            'skills',
+            'instruments',
+            'description',
+            'is_favorite_order'
+        )
+
+
+class OrderWriteSerializer(serializers.ModelSerializer):
+    specialization = SpecializationSerializer()
+    sphere = SphereSerializer()
+    skills = SkillSerializer(many=True)
+    instruments = InstrumentSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = fields = (
+            'id',
+            'title',
+            'specialization',
+            'price_min',
+            'price_max',
+            'currency',
+            'sphere',
+            'skills',
+            'instruments',
+            'description',
+        )
 
     def validate_skills(self, value):
         if not value:

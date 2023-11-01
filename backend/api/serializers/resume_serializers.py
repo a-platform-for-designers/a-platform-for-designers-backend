@@ -12,7 +12,7 @@ class ResumeReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Resume
-        fields = ('instruments', 'skills')
+        fields = ('id', 'instruments', 'skills', 'about')
 
 
 class ResumeWriteSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class ResumeWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Resume
-        fields = '__all__'
+        fields = ('id', 'instruments', 'skills', 'about', 'status')
 
     def validate_skills(self, value):
         if not value:

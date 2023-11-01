@@ -7,8 +7,7 @@ from job.models import Order
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
     permission_classes = (IsAuthorOrReadOnly,)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(customer=self.request.user)
