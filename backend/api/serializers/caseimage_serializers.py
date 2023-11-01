@@ -17,8 +17,9 @@ class CaseImageSerializer(serializers.ModelSerializer):
 
 
 class CaseImageShortSerializer(serializers.ModelSerializer):
-    picture = Base64ImageField()
+    # picture = Base64ImageField()
 
     class Meta:
         model = CaseImage
-        fields = ('picture', )
+        # fields = ('picture', )
+        fields = ('name', )
