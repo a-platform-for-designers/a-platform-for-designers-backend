@@ -10,10 +10,10 @@ class CaseImageViewSet(viewsets.ModelViewSet):
     queryset = CaseImage.objects.all()
     serializer_class = CaseImageSerializer
 
-    @action(detail=True, methods=['get'])
-    def portfolio(self, request, pk=None):
-        cover = CaseImage.objects.get(pk=pk)
-        # Далее вы можете что-то сделать с cover
-        # Например, сериализовать его и вернуть в ответе
-        serializer = self.get_serializer(cover)
-        return response.Response(serializer.data)
+    # @action(detail=True, methods=['get'])
+    # def portfolio(self, request, pk=None):
+    #     cover = CaseImage.objects.get(pk=pk)
+    #     # Далее вы можете что-то сделать с cover
+    #     # Например, сериализовать его и вернуть в ответе
+    #     serializer = self.get_serializer(cover)
+    #     return response.Response(serializer.data)
