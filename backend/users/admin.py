@@ -46,7 +46,7 @@ class UserAdmin(UserAdmin):
             'user_permissions'
         )}),
         ('Important dates', {'fields': (
-            'last_login'
+            'last_login',
         )}),
     )
 
