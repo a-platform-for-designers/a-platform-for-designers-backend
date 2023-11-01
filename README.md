@@ -92,8 +92,8 @@ MINGW64 ~/a-platform-for-designers-backend/backend (main)
 dos2unix entrypoint.sh wait-for-it.sh
 dos2unix: converting file entrypoint.sh to Unix format...
 dos2unix: converting file wait-for-it.sh to Unix format...
-```
 
+```
  - При сборке контейнеров в файле entrypoint.sh прописаны команды, которые можно отредактировать:
 
 команды в entrypoint.sh:
@@ -111,11 +111,11 @@ dos2unix: converting file wait-for-it.sh to Unix format...
 
 
 ```
-docker compose up -d
-docker compose exec backend python manage.py makemigrations users
-docker compose exec backend python manage.py migrate
-docker compose exec backend python manage.py createsuperuser
-docker compose exec backend python manage.py collectstatic --noinput
+docker-compose up -d
+docker-compose exec backend python manage.py makemigrations users
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py createsuperuser
+docker-compose exec backend python manage.py collectstatic --noinput
 ```
 
  - requirements.txt:
@@ -132,6 +132,7 @@ docker compose exec backend python manage.py collectstatic --noinput
     gunicorn==20.1.0
     importlib-metadata==4.12.0
     Markdown==3.4.1
+    Pillow
     psycopg2-binary==2.9.3
     python-dotenv==0.21.0
     zipp==3.15.0

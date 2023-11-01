@@ -3,8 +3,9 @@ from typing import Dict
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from users.models import Subscription
 from .user_serializers import UserProfileSerializer
+from users.models import Subscription
+
 
 User = get_user_model()
 
@@ -27,9 +28,9 @@ class SubscriptionSerializer(UserProfileSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name',
+        fields = ('email', 'id', 'first_name',
                   'last_name', 'is_subscribed')
-        read_only_fields = ('email', 'username')
+        read_only_fields = ('email',)
 
     def validate(self, data: Dict) -> Dict:
         author = self.instance
