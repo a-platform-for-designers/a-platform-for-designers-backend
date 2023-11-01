@@ -1,3 +1,4 @@
+[![Dave-YP-DesignCollab workflow](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml)
 # DesignCollab
 
 ## Описание проекта:
@@ -91,8 +92,8 @@ MINGW64 ~/a-platform-for-designers-backend/backend (main)
 dos2unix entrypoint.sh wait-for-it.sh
 dos2unix: converting file entrypoint.sh to Unix format...
 dos2unix: converting file wait-for-it.sh to Unix format...
-``` 
 
+```
  - При сборке контейнеров в файле entrypoint.sh прописаны команды, которые можно отредактировать:
 
 команды в entrypoint.sh:
