@@ -21,8 +21,8 @@ class CaseSerializer(serializers.ModelSerializer):
 
     # instrument = InstrumentSerializer(many=True)
     # skill = SkillSerializer(many=True)
-    is_favorited = SerializerMethodField(
-        method_name='get_is_favorited')
+    # is_favorited = SerializerMethodField(
+    #     method_name='get_is_favorited')
 
     class Meta:
         model = Case
@@ -35,16 +35,16 @@ class CaseSerializer(serializers.ModelSerializer):
             # 'instrument',
             'working_term',
             'description',
-            'is_favorited',
+            # 'is_favorited',
         ]
 
-    def get_is_favorited(self, obj):
-        """проверка на добавление проекта в избранное"""
-        request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
-        return Favorite.objects.filter(
-            case=obj, user=request.user).exists()
+    # def get_is_favorited(self, obj):
+    #     """проверка на добавление проекта в избранное"""
+    #     request = self.context.get('request')
+    #     if request.user.is_anonymous:
+    #         return False
+    #     return Favorite.objects.filter(
+    #         case=obj, user=request.user).exists()
 
 
 class CaseShortSerializer(serializers.ModelSerializer):
