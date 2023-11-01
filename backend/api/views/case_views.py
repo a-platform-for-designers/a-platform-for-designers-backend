@@ -60,6 +60,9 @@ class CaseViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get', 'post'])
     def caseimages(self, request, pk=None):
-        pass
+        return Response(
+                    {'message': 'Картинки пока нет'},
+                    status=status.HTTP_204_NO_CONTENT,
+                )
