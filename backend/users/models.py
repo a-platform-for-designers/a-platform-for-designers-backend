@@ -30,7 +30,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     Кастомная модель пользователя.
 
     """
-
     email = models.EmailField(
         'Адрес электронной почты',
         max_length=70,

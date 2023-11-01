@@ -40,25 +40,26 @@ class ProfileCustomerViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
-    class ProfileDesignerViewSet(viewsets.ModelViewSet):
-        queryset = ProfileDesigner.objects.all().order_by('id')
-        serializer_class = ProfileDesignerSerializer
-        permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
-        def create(self, request, *args, **kwargs):
-            if request.user.is_customer:
-                return Response({"detail": "Вы не являетесь дизайнером."},
-                                status=status.HTTP_403_FORBIDDEN)
-            if (
-                not request.user.is_staff
-                and request.user.id != request.data.get('user')
-            ):
-                return Response({"detail": "У вас нет разрешения."},
-                                status=status.HTTP_403_FORBIDDEN)
-            if ProfileDesigner.objects.filter(user=request.user).exists():
-                return Response({"detail": "Профиль уже существует."},
-                                status=status.HTTP_400_BAD_REQUEST)
-            return super().create(request, *args, **kwargs)
+class ProfileDesignerViewSet(viewsets.ModelViewSet):
+    queryset = ProfileDesigner.objects.all().order_by('id')
+    serializer_class = ProfileDesignerSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def create(self, request, *args, **kwargs):
+        if request.user.is_customer:
+            return Response({"detail": "Вы не являетесь дизайнером."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if (
+            not request.user.is_staff
+            and request.user.id != request.data.get('user')
+        ):
+            return Response({"detail": "У вас нет разрешения."},
+                            status=status.HTTP_403_FORBIDDEN)
+        if ProfileDesigner.objects.filter(user=request.user).exists():
+            return Response({"detail": "Профиль уже существует."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
 
 
 class UserProfileViewSet(UserViewSet):
@@ -77,7 +78,8 @@ class UserProfileViewSet(UserViewSet):
         POST /api/users/{id}/subscribe/
         DELETE /api/users/{id}/subscribe/
         GET /api/users/subscriptions/
-
+    Внимание! Код картинки для регистрации пользователя через json:
+    iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC
     """
 
     queryset = User.objects.select_related(
