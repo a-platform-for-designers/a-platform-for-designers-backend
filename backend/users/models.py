@@ -30,9 +30,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     Кастомная модель пользователя.
 
     """
-    date_joined = models.DateTimeField(
-        auto_now_add=True
-    )
     email = models.EmailField(
         'Адрес электронной почты',
         max_length=70,
