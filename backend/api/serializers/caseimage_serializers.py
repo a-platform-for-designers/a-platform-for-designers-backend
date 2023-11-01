@@ -8,7 +8,7 @@ from job.models import CaseImage
 
 class CaseImageSerializer(serializers.ModelSerializer):
     case = CaseSerializer()
-    is_avatar = SerializerMethodField(read_only=True)
+    # is_avatar = SerializerMethodField(read_only=True)
     picture = Base64ImageField()
 
     class Meta:
