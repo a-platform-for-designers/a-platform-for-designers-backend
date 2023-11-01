@@ -99,7 +99,7 @@ class UserProfileCreateSerializer(UserCreateSerializer):
             'last_name',
             'password',
             'is_customer'
-            )
+        )
 
     def __init__(self, *args, **kwargs):
         super(UserProfileCreateSerializer, self).__init__(*args, **kwargs)
