@@ -25,8 +25,8 @@ class CaseAdmin(admin.ModelAdmin):
         'title',
         'author',
         'sphere',
-        # 'instruments',
-        # 'skills',
+        'instruments',
+        'skills',
         'working_term',
         'description',
     )
