@@ -8,6 +8,7 @@ from api.pagination import LimitPageNumberPagination
 from api.serializers.case_serializers import CaseCreateSerializer
 from api.serializers.case_serializers import CaseShortSerializer
 from api.serializers.case_serializers import CaseSerializer
+from api.serializers.caseimage_serializers import CaseImageSerializer
 from job.models import Case, Favorite
 
 
@@ -62,6 +63,7 @@ class CaseViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get', 'post'])
     def caseimages(self, request, pk=None):
+        serializer = CaseImageSerializer
         return Response(
                     {'message': 'Картинки пока нет'},
                     status=status.HTTP_204_NO_CONTENT,
