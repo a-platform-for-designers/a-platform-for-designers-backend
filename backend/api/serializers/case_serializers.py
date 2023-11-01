@@ -19,8 +19,8 @@ class CaseSerializer(serializers.ModelSerializer):
 
     """
 
-    instrument = InstrumentSerializer(many=True)
-    skill = SkillSerializer(many=True)
+    # instrument = InstrumentSerializer(many=True)
+    # skill = SkillSerializer(many=True)
     is_favorited = SerializerMethodField(
         method_name='get_is_favorited')
 
@@ -28,11 +28,11 @@ class CaseSerializer(serializers.ModelSerializer):
         model = Case
         fields = [
             'id',
-            'skill',
+            # 'skill',
             'author',
             'title',
             'sphere',
-            'instrument',
+            # 'instrument',
             'working_term',
             'description',
             'is_favorited',
