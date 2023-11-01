@@ -30,8 +30,8 @@ class ProfileCustomerViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Вы не являетесь покупателем."},
                             status=status.HTTP_403_FORBIDDEN)
         if (
-            not request.user.is_staff and
-            request.user.id != request.data.get('user')
+            not request.user.is_staff
+            and request.user.id != request.data.get('user')
         ):
             return Response({"detail": "Нет разрешения."},
                             status=status.HTTP_403_FORBIDDEN)
@@ -51,8 +51,8 @@ class ProfileDesignerViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Вы не являетесь дизайнером."},
                             status=status.HTTP_403_FORBIDDEN)
         if (
-            not request.user.is_staff and
-            request.user.id != request.data.get('user')
+            not request.user.is_staff
+            and request.user.id != request.data.get('user')
         ):
             return Response({"detail": "У вас нет разрешения."},
                             status=status.HTTP_403_FORBIDDEN)
