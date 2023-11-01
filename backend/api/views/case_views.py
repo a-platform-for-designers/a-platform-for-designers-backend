@@ -59,3 +59,7 @@ class CaseViewSet(ModelViewSet):
                 {'errors': 'Проект не найден в избранном.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+    @action(detail=True, methods=['get'])
+    def caseimages(self, request, pk=None):
+        pass
