@@ -6,7 +6,7 @@ from rest_framework import serializers
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
 from job.models import Instrument, Skill
-from job.models import Case, Favorite
+from job.models import Case, Favorite, CaseImage
 
 
 MIN_AMOUNT = 1
@@ -98,3 +98,10 @@ class CaseCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return CaseSerializer(instance).data
+
+
+class CaseShowPortfolioSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CaseImage
+        fileds = '__all__'
