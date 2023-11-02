@@ -398,7 +398,4 @@ class FavoriteOrder(models.Model):
 
     class Meta:
         verbose_name = 'Избранный заказ'
-        verbose_name_plural = 'Избранные заказ'
-
-    def __str__(self) -> str:
-        return self.name
+        verbose_name_plural = 'Избранные заказы'
