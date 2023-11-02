@@ -12,6 +12,7 @@ from api.views.sphere_views import SphereViewSet
 from api.views.message_views import MessageViewSet
 from api.views.user_views import ProfileCustomerViewSet, ProfileDesignerViewSet
 from api.views.user_views import UserProfileViewSet
+from api.views.sphere_views import SphereViewSet
 
 
 router = routers.DefaultRouter()
@@ -44,6 +45,7 @@ router.register(
 )
 router.register('orders', OrderViewSet, basename='orders')
 router.register('resume', ResumeViewSet, basename='resume')
+router.register('spheres', SphereViewSet, basename='spheres')
 
 urlpatterns = [
     path('', include(router.urls)),
