@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Case, Instrument, Skill, Favorite, Chat, Message, Sphere,
-    Specialization, Order
+    Specialization, Order, CaseImage
     )
 
 
@@ -43,7 +43,7 @@ class CaseAdmin(admin.ModelAdmin):
     )
     fields = (
         ('title', 'working_term',),
-        ('description', 'skills',),
+        ('description', 'skills', 'author'),
     )
     # list_editable = ('skills',)
     search_fields = ('title',)
@@ -79,3 +79,16 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'customer', 'title', 'specialization', 'price_min', 'price_max', 'currency', 'sphere', 'description')
+
+
+@admin.register(CaseImage)
+class CaseImageAdmin(admin.ModelAdmin):
+    list_display = ('case', 'picture', 'name', 'description', 'is_avatar', 'id')
+ 
+
+@admin.register(Sphere)
+class SphereAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'id',
+    )

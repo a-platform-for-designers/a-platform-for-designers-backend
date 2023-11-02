@@ -6,7 +6,7 @@ from rest_framework import serializers
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
 from job.models import Instrument, Skill
-from job.models import Case, Favorite
+from job.models import Case, Favorite, CaseImage
 
 
 MIN_AMOUNT = 1
@@ -19,32 +19,32 @@ class CaseSerializer(serializers.ModelSerializer):
 
     """
 
-    instrument = InstrumentSerializer(many=True)
-    skill = SkillSerializer(many=True)
-    is_favorited = SerializerMethodField(
-        method_name='get_is_favorited')
+    # instrument = InstrumentSerializer(many=True)
+    # skill = SkillSerializer(many=True)
+    # is_favorited = SerializerMethodField(
+    #     method_name='get_is_favorited')
 
     class Meta:
         model = Case
         fields = [
             'id',
-            'skill',
+            # 'skill',
             'author',
             'title',
             'sphere',
-            'instrument',
+            # 'instrument',
             'working_term',
             'description',
-            'is_favorited',
+            # 'is_favorited',
         ]
 
-    def get_is_favorited(self, obj):
-        """проверка на добавление проекта в избранное"""
-        request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
-        return Favorite.objects.filter(
-            case=obj, user=request.user).exists()
+    # def get_is_favorited(self, obj):
+    #     """проверка на добавление проекта в избранное"""
+    #     request = self.context.get('request')
+    #     if request.user.is_anonymous:
+    #         return False
+    #     return Favorite.objects.filter(
+    #         case=obj, user=request.user).exists()
 
 
 class CaseShortSerializer(serializers.ModelSerializer):
@@ -98,3 +98,10 @@ class CaseCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return CaseSerializer(instance).data
+
+
+class CaseShowPortfolioSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CaseImage
+        fileds = '__all__'
