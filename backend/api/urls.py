@@ -5,7 +5,6 @@ from api.views.case_views import CaseViewSet
 from api.views.caseimage_views import CaseImageViewSet
 from api.views.chat_views import ChatViewSet
 from api.views.comment_views import CommentViewSet
-from api.views.language_views import LanguageViewSet
 from api.views.order_views import OrderViewSet
 from api.views.resume_views import ResumeViewSet
 from api.views.specialization_views import SpecializationViewSet
@@ -42,11 +41,6 @@ router.register(
     'specializations',
     SpecializationViewSet,
     basename='specializations'
-)
-router.register(
-    'languages',
-    LanguageViewSet,
-    basename='languages'
 )
 router.register('orders', OrderViewSet, basename='orders')
 router.register('resume', ResumeViewSet, basename='resume')

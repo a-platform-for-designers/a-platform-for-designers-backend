@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from rest_framework.permissions import BasePermission
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -24,10 +23,20 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
                 or request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        return obj.author == request.user
+        if hasattr(obj, 'author'):
+            author_field = 'author'
+        elif hasattr(obj, 'customer'):
+            author_field = 'customer'
+        elif hasattr(obj, 'user'):
+            author_field = 'user'
+        else:
+            return False
+        return (
+            request.method in permissions.SAFE_METHODS
+            or getattr(obj, author_field) == request.user
+        )
 
-
-class IsOwnerOrReadOnly(BasePermission):
+class IsOwnerOrReadOnly(permissions.BasePermission):
     """
     Права для владельца или только для чтения.
 
