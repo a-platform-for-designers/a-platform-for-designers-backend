@@ -9,7 +9,7 @@ from api.serializers.case_serializers import CaseCreateSerializer
 from api.serializers.case_serializers import CaseShortSerializer
 from api.serializers.case_serializers import CaseSerializer
 from api.serializers.caseimage_serializers import CaseImageSerializer
-from job.models import Case, Favorite
+from job.models import Case, Favorite, CaseImage
 
 
 class CaseViewSet(ModelViewSet):
@@ -63,8 +63,9 @@ class CaseViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get', 'post'])
     def caseimages(self, request, pk):        
-        # case = get_object_or_404(Case, pk=pk)
-        serializer = CaseImageSerializer()
+        caseimage = get_object_or_404(CaseImage, pk=pk)
+        queryset = CaseImage.objects.all()
+        serializer = CaseImageSerializer(queryset)
         # return Response(
         #             {'message': 'Картинки пока нет'},
         #             status=status.HTTP_204_NO_CONTENT,

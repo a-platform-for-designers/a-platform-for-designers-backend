@@ -6,7 +6,7 @@ from job.models import CaseImage
 
 
 class CaseImageViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get', 'post']
+    http_method_names = ['get', 'post', 'patch']
     queryset = CaseImage.objects.all()
     serializer_class = CaseImageSerializer
 
