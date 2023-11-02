@@ -1,9 +1,19 @@
 from django.contrib import admin
-
-from .models import Case, Instrument, Skill, Favorite, Chat, Message, CaseImage, Sphere
+from .models import (
+    Case, Instrument, Skill, Favorite, Chat, Message, Sphere,
+    Specialization, Order, CaseImage
+    )
 
 
 @admin.register(Instrument)
+class InstrumentAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'id',
+    )
+
+
+@admin.register(Specialization)
 class InstrumentAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -64,6 +74,11 @@ class MessageAdmin(admin.ModelAdmin):
     search_fields = ('chat', 'sender', 'text')
     list_filter = ('chat', 'sender', 'pub_date')
     empty_value_display = '-пусто-'
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer', 'title', 'specialization', 'price_min', 'price_max', 'currency', 'sphere', 'description')
 
 
 @admin.register(CaseImage)
