@@ -63,8 +63,8 @@ class CaseViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get', 'post'])
     def caseimages(self, request, pk):        
-        case = get_object_or_404(Case, pk=pk)
-        serializer = CaseImageSerializer(case)
+        # case = get_object_or_404(Case, pk=pk)
+        serializer = CaseImageSerializer()
         # return Response(
         #             {'message': 'Картинки пока нет'},
         #             status=status.HTTP_204_NO_CONTENT,
