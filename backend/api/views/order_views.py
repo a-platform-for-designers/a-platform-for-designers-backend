@@ -6,7 +6,6 @@ from rest_framework import status
 
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers.order_serializers import OrderReadSerializer, OrderWriteSerializer
-from api.serializers.favoriteorder_serializers import FavoriteOrderSerializer
 from job.models import Order, FavoriteOrder
 
 
@@ -42,3 +41,4 @@ class OrderViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             return self.add_to(FavoriteOrder, request.user, pk)
         return self.delete_from(FavoriteOrder, request.user, pk)
+    
