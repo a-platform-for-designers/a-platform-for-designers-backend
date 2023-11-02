@@ -25,16 +25,16 @@ class OrderViewSet(viewsets.ModelViewSet):
     def add_to(self, model, user, pk):
         order = get_object_or_404(Order, id=pk)
         model.objects.create(user=user, order=order)
-        serializer = FavoriteOrderSerializer(order)
+        serializer = OrderReadSerializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # def delete_from(self, model, user, pk):
-    #     obj = model.objects.filter(user=user, recipe__id=pk)
-    #     if obj.exists():
-    #         obj.delete()
-    #         return Response(status=status.HTTP_204_NO_CONTENT)
-    #     return Response({'errors': 'Этого заказа не существует'},
-    #                     status=status.HTTP_400_BAD_REQUEST)
+    def delete_from(self, model, user, pk):
+        obj = model.objects.filter(user=user, order__id=pk)
+        if obj.exists():
+            obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'errors': 'Этого заказа не существует'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True,
             methods=['post', 'delete'])

@@ -6,8 +6,9 @@ from job.models import FavoriteOrder
 
 
 class FavoriteOrderSerializer(serializers.ModelSerializer):
-    # user = UserProfileSerializer(read_only=True)
+    user = UserProfileSerializer()
     order = OrderWriteSerializer()
 
     class Meta:
         model = FavoriteOrder
+        fields = '__all__'
