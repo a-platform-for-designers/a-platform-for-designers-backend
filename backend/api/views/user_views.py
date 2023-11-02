@@ -158,3 +158,7 @@ class UserProfileViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def portfolio():
+        pass
