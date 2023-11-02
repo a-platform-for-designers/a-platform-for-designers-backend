@@ -8,7 +8,8 @@ from api.pagination import LimitPageNumberPagination
 from api.serializers.case_serializers import CaseCreateSerializer
 from api.serializers.case_serializers import CaseShortSerializer
 from api.serializers.case_serializers import CaseSerializer
-from job.models import Case, Favorite
+from api.serializers.caseimage_serializers import CaseImageSerializer
+from job.models import Case, Favorite, CaseImage
 
 
 class CaseViewSet(ModelViewSet):
@@ -59,3 +60,10 @@ class CaseViewSet(ModelViewSet):
                 {'errors': 'Проект не найден в избранном.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+    @action(detail=True, methods=['get', 'post'])
+    def caseimages(self, request, pk):
+        case =  get_object_or_404(Case, pk=pk)        
+        queryset = CaseImage.objects.filter(case=case)
+        serializer = CaseImageSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

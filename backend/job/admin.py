@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Case, Instrument, Skill, Favorite, Chat, Message, Sphere
+
+from .models import Case, Instrument, Skill, Favorite, Chat, Message, CaseImage, Sphere
 
 
 @admin.register(Instrument)
@@ -32,7 +33,7 @@ class CaseAdmin(admin.ModelAdmin):
     )
     fields = (
         ('title', 'working_term',),
-        ('description', 'skills',),
+        ('description', 'skills', 'author'),
     )
     # list_editable = ('skills',)
     search_fields = ('title',)
@@ -64,6 +65,11 @@ class MessageAdmin(admin.ModelAdmin):
     list_filter = ('chat', 'sender', 'pub_date')
     empty_value_display = '-пусто-'
 
+
+@admin.register(CaseImage)
+class CaseImageAdmin(admin.ModelAdmin):
+    list_display = ('case', 'picture', 'name', 'description', 'is_avatar', 'id')
+ 
 
 @admin.register(Sphere)
 class SphereAdmin(admin.ModelAdmin):
