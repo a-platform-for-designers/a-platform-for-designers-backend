@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Case, Instrument, Skill, Favorite, Chat, Message, CaseImage
+
+from .models import Case, Instrument, Skill, Favorite, Chat, Message, CaseImage, Sphere
 
 
 @admin.register(Instrument)
@@ -68,3 +69,11 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(CaseImage)
 class CaseImageAdmin(admin.ModelAdmin):
     list_display = ('case', 'picture', 'name', 'description', 'is_avatar', 'id')
+ 
+
+@admin.register(Sphere)
+class SphereAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'id',
+    )
