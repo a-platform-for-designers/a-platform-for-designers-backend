@@ -29,14 +29,6 @@ class SkillAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(Sphere)
-class SkillAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'id',
-    )
-
-
 @admin.register(Case)
 class CaseAdmin(admin.ModelAdmin):
     list_display = (
