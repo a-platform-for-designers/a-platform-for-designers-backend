@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Case, Instrument, Skill, Favorite, Chat, Message, Sphere,
+    Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
     Specialization, Order, CaseImage
     )
 
@@ -51,7 +51,7 @@ class CaseAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-@admin.register(Favorite)
+@admin.register(FavoriteCase)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
         'pk',

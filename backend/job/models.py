@@ -114,7 +114,7 @@ class Case(models.Model):
         return self.title
 
 
-class Favorite(models.Model):
+class FavoriteCase(models.Model):
     """
     Модель избранных проектов.
 
