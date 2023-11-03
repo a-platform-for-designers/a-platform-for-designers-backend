@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers.resume_serializers import ResumeReadSerializer
 from api.serializers.resume_serializers import ResumeWriteSerializer
+from job.models import Resume
 
 
 class ResumeViewSet(
@@ -13,6 +14,7 @@ class ResumeViewSet(
     viewsets.GenericViewSet
 ):
     permission_classes = (IsAuthorOrReadOnly,)
+    queryset = Resume.objects.all()
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

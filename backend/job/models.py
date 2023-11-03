@@ -114,7 +114,7 @@ class Case(models.Model):
         return self.title
 
 
-class Favorite(models.Model):
+class FavoriteCase(models.Model):
     """
     Модель избранных проектов.
 
@@ -345,22 +345,6 @@ class Like(models.Model):
         return f'{self.liker} лайкнул {self.author}'
 
 
-class Language(models.Model):
-    """
-    Модель языка.
-
-    """
-
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name = 'Язык'
-        verbose_name_plural = 'Языки'
-
-    def __str__(self):
-        return self.name
-
-
 class Order(models.Model):
     """
     Модель резюме...
@@ -375,23 +359,23 @@ class Order(models.Model):
     title = models.CharField(max_length=150)
     specialization = models.ForeignKey(
         Specialization,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True
     )
     price_min = models.PositiveIntegerField(blank=True, null=True)
     price_max = models.PositiveIntegerField(blank=True, null=True)
     currency = models.CharField(max_length=20)
-    sphere = models.ForeignKey('Sphere', on_delete=models.SET_NULL, null=True)
-    skills = models.ManyToManyField('Skill')
-    instruments = models.ManyToManyField('Instrument')
+    sphere = models.ForeignKey(Sphere, on_delete=models.SET_NULL, null=True)
+    skills = models.ManyToManyField(Skill)
+    instruments = models.ManyToManyField(Instrument)
     description = models.TextField()
 
     class Meta:
-        verbose_name = 'Резюме'
-        verbose_name_plural = 'Резюме'
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return f'Резюме {self.user.username}'
+        return f'Резюме {self.customer.email}'
 
 
 class FavoriteOrder(models.Model):

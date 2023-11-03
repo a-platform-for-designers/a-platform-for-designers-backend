@@ -1,8 +1,19 @@
 from django.contrib import admin
-from .models import Case, Instrument, Skill, Favorite, Chat, Message
+from .models import (
+    Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
+    Specialization, Order, CaseImage
+    )
 
 
 @admin.register(Instrument)
+class InstrumentAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'id',
+    )
+
+
+@admin.register(Specialization)
 class InstrumentAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -32,7 +43,7 @@ class CaseAdmin(admin.ModelAdmin):
     )
     fields = (
         ('title', 'working_term',),
-        ('description', 'skills',),
+        ('description', 'skills', 'author'),
     )
     # list_editable = ('skills',)
     search_fields = ('title',)
@@ -40,7 +51,7 @@ class CaseAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-@admin.register(Favorite)
+@admin.register(FavoriteCase)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
@@ -63,3 +74,21 @@ class MessageAdmin(admin.ModelAdmin):
     search_fields = ('chat', 'sender', 'text')
     list_filter = ('chat', 'sender', 'pub_date')
     empty_value_display = '-пусто-'
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer', 'title', 'specialization', 'price_min', 'price_max', 'currency', 'sphere', 'description')
+
+
+@admin.register(CaseImage)
+class CaseImageAdmin(admin.ModelAdmin):
+    list_display = ('case', 'picture', 'name', 'description', 'is_avatar', 'id')
+ 
+
+@admin.register(Sphere)
+class SphereAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'id',
+    )
