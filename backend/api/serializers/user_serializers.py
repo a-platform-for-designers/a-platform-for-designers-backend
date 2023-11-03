@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from drf_extra_fields.fields import Base64ImageField
 
+from api.serializers.resume_serializers import ResumeReadSerializer
 from users.models import ProfileCustomer, ProfileDesigner
 
 
@@ -14,7 +15,7 @@ User = get_user_model()
 class ProfileCustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileCustomer
-        fields = ('id', 'user', 'post')
+        fields = ('id', 'post')
 
 
 class ProfileDesignerSerializer(serializers.ModelSerializer):
@@ -48,6 +49,7 @@ class UserProfileSerializer(UserSerializer):
     profilecustomer = ProfileCustomerSerializer(read_only=True)
     profiledesigner = ProfileDesignerSerializer(read_only=True)
     is_subscribed = SerializerMethodField(read_only=True)
+    resume = ResumeReadSerializer(read_only=True)
 
     class Meta:
         ordering = ['id']
@@ -62,7 +64,8 @@ class UserProfileSerializer(UserSerializer):
             'description',
             'is_customer',
             'profilecustomer',
-            'profiledesigner'
+            'profiledesigner',
+            'resume'
         )
 
     def get_is_subscribed(self, obj: User) -> bool:

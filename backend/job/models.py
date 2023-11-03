@@ -114,7 +114,7 @@ class Case(models.Model):
         return self.title
 
 
-class Favorite(models.Model):
+class FavoriteCase(models.Model):
     """
     Модель избранных проектов.
 
@@ -282,11 +282,7 @@ class Resume(models.Model):
 
     """
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='resume'
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     skills = models.ManyToManyField('Skill')
     instruments = models.ManyToManyField('Instrument')
     about = models.TextField()
@@ -301,7 +297,7 @@ class Resume(models.Model):
         verbose_name_plural = 'Резюме'
 
     def __str__(self):
-        return f'Резюме {self.user.username}'
+        return f'Резюме {self.user.email}'
 
 
 class Specialization(models.Model):

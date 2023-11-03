@@ -9,7 +9,12 @@ from api.serializers.case_serializers import CaseCreateSerializer
 from api.serializers.case_serializers import CaseShortSerializer
 from api.serializers.case_serializers import CaseSerializer
 from api.serializers.caseimage_serializers import CaseImageSerializer
-from job.models import Case, Favorite, CaseImage
+from api.serializers.case_serializers import (CaseSerializer,
+                                              CaseCreateSerializer,
+                                              CaseShortSerializer,
+                                              )
+from job.models import Case, FavoriteCase, CaseImage
+from api.permissions import IsAuthorOrReadOnly
 
 
 class CaseViewSet(ModelViewSet):
@@ -17,9 +22,9 @@ class CaseViewSet(ModelViewSet):
     Класс CaseViewSet для работы с проектами авторов.
 
     """
-
     queryset = Case.objects.all()
     pagination_class = LimitPageNumberPagination
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -36,7 +41,7 @@ class CaseViewSet(ModelViewSet):
     def favorite(self, request, pk):
         case_obj = get_object_or_404(Case, pk=pk)
         if request.method == 'POST':
-            already_existed, created = Favorite.objects.get_or_create(
+            already_existed, created = FavoriteCase.objects.get_or_create(
                 user=request.user,
                 case=case_obj
             )
@@ -49,9 +54,9 @@ class CaseViewSet(ModelViewSet):
                                              context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
-            favorite = request.user.favorites.all()
-            if favorite:
-                favorite.delete()
+            favorite = FavoriteCase.objects.filter(user=request.user,
+                                                   case=case_obj)
+            if favorite.delete()[0]:
                 return Response(
                     {'message': 'Проект удален из избранного.'},
                     status=status.HTTP_204_NO_CONTENT,
@@ -63,7 +68,7 @@ class CaseViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get', 'post'])
     def caseimages(self, request, pk):
-        case =  get_object_or_404(Case, pk=pk)        
+        case = get_object_or_404(Case, pk=pk)        
         queryset = CaseImage.objects.filter(case=case)
         serializer = CaseImageSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

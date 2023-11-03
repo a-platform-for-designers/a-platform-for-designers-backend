@@ -1,7 +1,17 @@
 from django.contrib import admin
 from .models import (
-    Case, Instrument, Skill, Favorite, Chat, Message, Sphere,
-    Specialization, Order, CaseImage, FavoriteOrder,
+    Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
+    Specialization, Order, CaseImage, FavoriteOrder, Resume
+    )
+
+
+@admin.register(Resume)
+class InstrumentAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'id',
+        'about',
+        'status'
     )
 
 
@@ -51,7 +61,7 @@ class CaseAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-@admin.register(Favorite)
+@admin.register(FavoriteCase)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
