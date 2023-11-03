@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Case, Instrument, Skill, Favorite, Chat, Message, Sphere,
-    Specialization, Order, CaseImage
+    Specialization, Order, CaseImage, FavoriteOrder,
     )
 
 
@@ -90,5 +90,13 @@ class CaseImageAdmin(admin.ModelAdmin):
 class SphereAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'id',
+    )
+
+@admin.register(FavoriteOrder)
+class FavoriteOrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'order',
         'id',
     )
