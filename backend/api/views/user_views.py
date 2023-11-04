@@ -46,7 +46,7 @@ class ProfileCustomerViewSet(
             return Response({"detail": "Профиль уже существует"},
                             status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 

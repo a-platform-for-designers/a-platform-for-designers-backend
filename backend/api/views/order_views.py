@@ -43,4 +43,3 @@ class OrderViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             return self.add_to(FavoriteOrder, request.user, pk)
         return self.delete_from(FavoriteOrder, request.user, pk)
-    
