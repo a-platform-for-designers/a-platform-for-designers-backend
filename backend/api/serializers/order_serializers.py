@@ -52,7 +52,7 @@ class OrderWriteSerializer(ModelSerializer):
         queryset=Specialization.objects.all()
     )
     sphere = PrimaryKeyRelatedField(queryset=Sphere.objects.all())
-    skills = PrimaryKeyRelatedField(queryset=Skill.objects.all(), many= True)
+    skills = PrimaryKeyRelatedField(queryset=Skill.objects.all(), many=True)
     instruments = PrimaryKeyRelatedField(
         queryset=Instrument.objects.all(),
         many=True

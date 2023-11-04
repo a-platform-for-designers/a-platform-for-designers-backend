@@ -27,7 +27,7 @@ class ProfileCustomerViewSet(
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet
-    ):
+):
     queryset = ProfileCustomer.objects.all().order_by('id')
     serializer_class = ProfileCustomerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -56,7 +56,7 @@ class ProfileDesignerViewSet(
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet
-    ):
+):
     queryset = ProfileDesigner.objects.all().order_by('id')
     serializer_class = ProfileDesignerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -75,7 +75,7 @@ class ProfileDesignerViewSet(
             return Response({"detail": "Профиль уже существует."},
                             status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -114,7 +114,6 @@ class UserProfileViewSet(UserViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated]
     )
-
     def subscribe(self, request, **kwargs):
         current_user = request.user
         target_author_id = self.kwargs.get('id')

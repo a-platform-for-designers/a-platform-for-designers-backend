@@ -65,7 +65,7 @@ class CaseViewSet(ModelViewSet):
 
     @action(detail=True, methods=['get', 'post'])
     def caseimages(self, request, pk):
-        case = get_object_or_404(Case, pk=pk)        
+        case = get_object_or_404(Case, pk=pk)
         queryset = CaseImage.objects.filter(case=case)
         serializer = CaseImageSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

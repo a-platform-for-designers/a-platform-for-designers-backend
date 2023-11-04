@@ -6,7 +6,7 @@ from .models import (
 
 
 @admin.register(Resume)
-class InstrumentAdmin(admin.ModelAdmin):
+class ResumeAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'id',
@@ -24,7 +24,7 @@ class InstrumentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Specialization)
-class InstrumentAdmin(admin.ModelAdmin):
+class SpecializationAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'id',
@@ -93,7 +93,7 @@ class OrderAdmin(admin.ModelAdmin):
         'customer',
         'title',
         'specialization',
-        'price_min', 
+        'price_min',
         'price_max',
         'currency',
         'sphere',
@@ -119,6 +119,7 @@ class SphereAdmin(admin.ModelAdmin):
         'name',
         'id',
     )
+
 
 @admin.register(FavoriteOrder)
 class FavoriteOrderAdmin(admin.ModelAdmin):
