@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
     Specialization, Order, CaseImage, FavoriteOrder, Resume
-    )
+)
 
 
 @admin.register(Resume)
@@ -88,13 +88,30 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer', 'title', 'specialization', 'price_min', 'price_max', 'currency', 'sphere', 'description')
+    list_display = (
+        'id',
+        'customer',
+        'title',
+        'specialization',
+        'price_min', 
+        'price_max',
+        'currency',
+        'sphere',
+        'description'
+    )
 
 
 @admin.register(CaseImage)
 class CaseImageAdmin(admin.ModelAdmin):
-    list_display = ('case', 'picture', 'name', 'description', 'is_avatar', 'id')
- 
+    list_display = (
+        'case',
+        'picture',
+        'name',
+        'description',
+        'is_avatar',
+        'id'
+    )
+
 
 @admin.register(Sphere)
 class SphereAdmin(admin.ModelAdmin):

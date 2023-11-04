@@ -5,9 +5,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 
 from api.pagination import LimitPageNumberPagination
-from api.serializers.case_serializers import CaseCreateSerializer
-from api.serializers.case_serializers import CaseShortSerializer
-from api.serializers.case_serializers import CaseSerializer
 from api.serializers.caseimage_serializers import CaseImageSerializer
 from api.serializers.case_serializers import (CaseSerializer,
                                               CaseCreateSerializer,

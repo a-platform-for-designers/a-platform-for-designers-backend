@@ -1,10 +1,7 @@
-from drf_extra_fields.fields import Base64ImageField
-
 from rest_framework import serializers
 
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
-from job.models import Instrument, Skill
 from job.models import Case, FavoriteCase, Instrument, Skill, CaseImage
 
 

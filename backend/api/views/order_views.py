@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from api.permissions import IsAuthorOrReadOnly
-from api.serializers.order_serializers import OrderReadSerializer, OrderWriteSerializer
+from api.serializers.order_serializers import (
+    OrderReadSerializer, OrderWriteSerializer
+)
 from job.models import Order, FavoriteOrder
 
 

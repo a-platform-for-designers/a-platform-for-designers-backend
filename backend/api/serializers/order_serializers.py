@@ -8,7 +8,9 @@ from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from api.serializers.sphere_serializers import SphereSerializer
-from job.models import FavoriteOrder, Instrument, Order, Skill, Specialization, Sphere
+from job.models import (
+    FavoriteOrder, Instrument, Order, Skill, Specialization, Sphere
+)
 
 
 class OrderReadSerializer(ModelSerializer):
@@ -46,10 +48,15 @@ class OrderReadSerializer(ModelSerializer):
 
 
 class OrderWriteSerializer(ModelSerializer):
-    specialization = PrimaryKeyRelatedField(queryset=Specialization.objects.all())
+    specialization = PrimaryKeyRelatedField(
+        queryset=Specialization.objects.all()
+    )
     sphere = PrimaryKeyRelatedField(queryset=Sphere.objects.all())
     skills = PrimaryKeyRelatedField(queryset=Skill.objects.all(), many= True)
-    instruments = PrimaryKeyRelatedField(queryset=Instrument.objects.all(), many=True)
+    instruments = PrimaryKeyRelatedField(
+        queryset=Instrument.objects.all(),
+        many=True
+    )
 
     class Meta:
         model = Order

@@ -46,7 +46,6 @@ router.register(
 )
 router.register('orders', OrderViewSet, basename='orders')
 router.register('resume', ResumeViewSet, basename='resume')
-router.register('spheres', SphereViewSet, basename='spheres')
 router.register('instruments', InstrumentViewSet, basename='instruments')
 router.register('skills', SkillViewSet, basename='skills')
 
