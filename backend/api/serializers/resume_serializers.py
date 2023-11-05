@@ -17,8 +17,11 @@ class ResumeReadSerializer(serializers.ModelSerializer):
 
 
 class ResumeWriteSerializer(serializers.ModelSerializer):
-    skills = PrimaryKeyRelatedField(queryset=Skill.objects.all(), many= True)
-    instruments = PrimaryKeyRelatedField(queryset=Instrument.objects.all(), many=True)
+    skills = PrimaryKeyRelatedField(queryset=Skill.objects.all(), many=True)
+    instruments = PrimaryKeyRelatedField(
+        queryset=Instrument.objects.all(),
+        many=True
+    )
 
     class Meta:
         model = Resume

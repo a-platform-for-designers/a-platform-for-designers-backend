@@ -36,6 +36,7 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
             or getattr(obj, author_field) == request.user
         )
 
+
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
     Права для владельца или только для чтения.

@@ -2,17 +2,22 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from djoser.views import UserViewSet
-from rest_framework import viewsets, status
+from djoser.views import TokenCreateView as DjoserTokenCreateView
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
 
 from users.models import Subscription
 from api.pagination import LimitPageNumberPagination
-from api.serializers.subscription_serializers import SubscriptionSerializer
+from api.serializers.subscription_serializers import (
+    SubscriptionSerializer, SubscriptionCreateSerializer
+)
 from api.serializers.user_serializers import UserProfileSerializer
 from api.serializers.user_serializers import ProfileCustomerSerializer
 from api.serializers.user_serializers import ProfileDesignerSerializer
+from api.serializers.user_serializers import TokenResponseSerializer
 from api.permissions import IsOwnerOrReadOnly
 from users.models import ProfileCustomer, ProfileDesigner
 
@@ -20,14 +25,26 @@ from users.models import ProfileCustomer, ProfileDesigner
 User = get_user_model()
 
 
-class ProfileCustomerViewSet(viewsets.ModelViewSet):
+@extend_schema(
+    responses=TokenResponseSerializer(many=False)
+)
+class TokenCreateView(DjoserTokenCreateView):
+    pass
+
+
+class ProfileCustomerViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
     queryset = ProfileCustomer.objects.all().order_by('id')
     serializer_class = ProfileCustomerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def create(self, request, *args, **kwargs):
         if not request.user.is_customer:
-            return Response({"detail": "Вы не являетесь покупателем."},
+            return Response({"detail": "Вы не являетесь заказчиком"},
                             status=status.HTTP_403_FORBIDDEN)
         if (
             not request.user.is_staff
@@ -36,12 +53,20 @@ class ProfileCustomerViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Нет разрешения."},
                             status=status.HTTP_403_FORBIDDEN)
         if ProfileCustomer.objects.filter(user=request.user).exists():
-            return Response({"detail": "Профиль уже существует."},
+            return Response({"detail": "Профиль уже существует"},
                             status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-class ProfileDesignerViewSet(viewsets.ModelViewSet):
+
+class ProfileDesignerViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
     queryset = ProfileDesigner.objects.all().order_by('id')
     serializer_class = ProfileDesignerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -60,6 +85,9 @@ class ProfileDesignerViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Профиль уже существует."},
                             status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class UserProfileViewSet(UserViewSet):
@@ -82,10 +110,11 @@ class UserProfileViewSet(UserViewSet):
     iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC
     """
 
-    queryset = User.objects.select_related(
-        'profilecustomer',
-        'profiledesigner'
-    ).order_by('id')
+    # queryset = User.objects.select_related(
+    #     'profilecustomer',
+    #     'profiledesigner',
+    # ).order_by('id')
+    queryset = User.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = (AllowAny,)
     pagination_class = LimitPageNumberPagination
@@ -124,10 +153,11 @@ class UserProfileViewSet(UserViewSet):
             action_type
     ):
         if action_type == 'create':
-            serializer = SubscriptionSerializer(
-                target_author,
-                data=request.data,
-                context={"request": request}
+            serializer = SubscriptionCreateSerializer(
+                data={
+                    'user': current_user.id,
+                    'author': target_author.id
+                },
             )
             serializer.is_valid(raise_exception=True)
             Subscription.objects.create(

@@ -1,7 +1,17 @@
 from django.contrib import admin
 from .models import (
     Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
-    Specialization, Order, CaseImage
+    Specialization, Order, CaseImage, FavoriteOrder, Resume
+)
+
+
+@admin.register(Resume)
+class ResumeAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'id',
+        'about',
+        'status'
     )
 
 
@@ -14,7 +24,7 @@ class InstrumentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Specialization)
-class InstrumentAdmin(admin.ModelAdmin):
+class SpecializationAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'id',
@@ -78,17 +88,43 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer', 'title', 'specialization', 'price_min', 'price_max', 'currency', 'sphere', 'description')
+    list_display = (
+        'id',
+        'customer',
+        'title',
+        'specialization',
+        'price_min',
+        'price_max',
+        'currency',
+        'sphere',
+        'description'
+    )
 
 
 @admin.register(CaseImage)
 class CaseImageAdmin(admin.ModelAdmin):
-    list_display = ('case', 'picture', 'name', 'description', 'is_avatar', 'id')
- 
+    list_display = (
+        'case',
+        'picture',
+        'name',
+        'description',
+        'is_avatar',
+        'id'
+    )
+
 
 @admin.register(Sphere)
 class SphereAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'id',
+    )
+
+
+@admin.register(FavoriteOrder)
+class FavoriteOrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'order',
         'id',
     )
