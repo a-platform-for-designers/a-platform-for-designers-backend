@@ -14,6 +14,7 @@ from api.views.sphere_views import SphereViewSet
 from api.views.message_views import MessageViewSet
 from api.views.user_views import ProfileCustomerViewSet, ProfileDesignerViewSet
 from api.views.user_views import UserProfileViewSet
+from api.views.user_views import TokenCreateView
 
 
 router = routers.DefaultRouter()
@@ -51,6 +52,7 @@ router.register('skills', SkillViewSet, basename='skills')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('auth/token/login/', TokenCreateView.as_view(), name='login'),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]

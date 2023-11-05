@@ -2,10 +2,12 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from djoser.views import UserViewSet
+from djoser.views import TokenCreateView as DjoserTokenCreateView
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
 
 from users.models import Subscription
 from api.pagination import LimitPageNumberPagination
@@ -15,11 +17,19 @@ from api.serializers.subscription_serializers import (
 from api.serializers.user_serializers import UserProfileSerializer
 from api.serializers.user_serializers import ProfileCustomerSerializer
 from api.serializers.user_serializers import ProfileDesignerSerializer
+from api.serializers.user_serializers import TokenResponseSerializer
 from api.permissions import IsOwnerOrReadOnly
 from users.models import ProfileCustomer, ProfileDesigner
 
 
 User = get_user_model()
+
+
+@extend_schema(
+    responses=TokenResponseSerializer(many=False)
+)
+class TokenCreateView(DjoserTokenCreateView):
+    pass
 
 
 class ProfileCustomerViewSet(

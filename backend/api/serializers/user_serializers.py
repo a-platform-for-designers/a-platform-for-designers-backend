@@ -12,6 +12,10 @@ from users.models import ProfileCustomer, ProfileDesigner
 User = get_user_model()
 
 
+class TokenResponseSerializer(serializers.Serializer):
+    auth_token = serializers.CharField()
+
+
 class ProfileCustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileCustomer
