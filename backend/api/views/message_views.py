@@ -16,7 +16,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = MessageSerializer
-    http_method_names = ['get', 'post', 'delete']
+    http_method_names = ['get', 'post']
     permission_classes = [
         IsAuthenticated,
         IsInitiatorOrReceiverMessagePermission

@@ -110,3 +110,14 @@ class UserProfileCreateSerializer(UserCreateSerializer):
         super(UserProfileCreateSerializer, self).__init__(*args, **kwargs)
         for field in self.Meta.required_fields:
             self.fields[field].required = True
+
+
+class UserShortSerializer(UserSerializer):
+    """
+    Сериализатор профиля пользователя короткий для чатов и сообщений.
+
+    """
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'first_name', 'last_name')

@@ -105,6 +105,11 @@ class Case(models.Model):
         verbose_name='Дата публикации'
     )
 
+    specialization = models.CharField(
+        max_length=200,
+        verbose_name='Специализация'
+    )
+
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'

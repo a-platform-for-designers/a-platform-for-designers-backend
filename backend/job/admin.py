@@ -50,9 +50,10 @@ class CaseAdmin(admin.ModelAdmin):
         # 'skills',
         'working_term',
         'description',
+        'specialization',
     )
     fields = (
-        ('title', 'working_term',),
+        ('title', 'working_term', 'specialization'),
         ('description', 'skills', 'author'),
     )
     # list_editable = ('skills',)
