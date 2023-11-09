@@ -104,7 +104,10 @@ class CaseCreateSerializer(serializers.ModelSerializer):
         return case
 
 class CaseShowPortfolioSerializer(serializers.ModelSerializer):
-
+    avatar = Base64ImageField()
+    
     class Meta:
-        model = CaseImage
-        fileds = '__all__'
+        model = Case
+        fields = ('title',                  
+                  'avatar',
+                  )
