@@ -1,6 +1,34 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django_countries.fields import CountryField
 from django.db import models
+
+
+LANGUAGE_CHOICES = (
+    ("AZE", "Азербайджанский"),
+    ("ENG", "Английский"),
+    ("ARB", "Арабский"),
+    ("ARM", "Армянский"),
+    ("BLR", "Белорусский"),
+    ("BN", "Бенгальский"),
+    ("GEO", "Грузинский"),
+    ("ES", "Испанский"),
+    ("KZ", "Казахский"),
+    ("KRG", "Киргизский"),
+    ("CHI", "Китайский"),
+    ("MOL", "Молдавский"),
+    ("DE", "Немецкий"),
+    ("POR", "Португальский"),
+    ("RUS", "Русский"),
+    ("TGK", "Таджикский"),
+    ("TUR", "Турецкий"),
+    ("TUK", "Туркменский"),
+    ("UZB", "Узбекский"),
+    ("UKR", "Украинский"),
+    ("FAS", "Фарси"),
+    ("FRA", "Французский"),
+    ("HIN", "Хинди"),
+)
 
 
 class UserManager(BaseUserManager):
@@ -103,10 +131,10 @@ class ProfileDesigner(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     education = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
+    country = CountryField()
     specialization = models.IntegerField()
     hobby = models.CharField(max_length=255)
-    language = models.CharField(max_length=255)
+    language = models.CharField(choices=LANGUAGE_CHOICES)
 
     class Meta:
         ordering = ['id']
