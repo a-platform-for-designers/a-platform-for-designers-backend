@@ -101,18 +101,6 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(CaseImage)
-class CaseImageAdmin(admin.ModelAdmin):
-    list_display = (
-        'case',
-        'picture',
-        'name',
-        'description',
-        'is_avatar',
-        'id'
-    )
-
-
 @admin.register(Sphere)
 class SphereAdmin(admin.ModelAdmin):
     list_display = (

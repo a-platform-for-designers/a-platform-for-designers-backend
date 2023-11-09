@@ -1,12 +1,23 @@
 from rest_framework import serializers
+from drf_extra_fields.fields import Base64ImageField
+from django.db import transaction
 
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
 from job.models import Case, FavoriteCase, Instrument, Skill, CaseImage
+from api.serializers.user_serializers import UserSerializer
 
 
 MIN_AMOUNT = 1
 MAX_AMOUNT = 1000
+
+
+class CaseImageSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
+
+    class Meta:
+        model = CaseImage
+        fields = ('image', )
 
 
 class CaseSerializer(serializers.ModelSerializer):
@@ -14,6 +25,7 @@ class CaseSerializer(serializers.ModelSerializer):
     instruments = InstrumentSerializer(many=True)
     skills = SkillSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
+    images = CaseImageSerializer(many=True)
 
     class Meta:
         model = Case
@@ -27,6 +39,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
+            'images'
         ]
 
     def get_is_favorited(self, obj):
@@ -53,27 +66,56 @@ class CaseShortSerializer(serializers.ModelSerializer):
 
 
 class CaseCreateSerializer(serializers.ModelSerializer):
-    working_term = serializers.IntegerField(
-        min_value=MIN_AMOUNT,
-        max_value=MAX_AMOUNT
-    )
-    instruments = serializers.PrimaryKeyRelatedField(
-        queryset=Instrument.objects.all(), many=True, required=False)
-    skills = serializers.PrimaryKeyRelatedField(
-        queryset=Skill.objects.all(), many=True, required=False)
+    author = UserSerializer(read_only=True)
+    # avatar = Base64ImageField()
+    images = CaseImageSerializer(many=True)
+    # uploaded_images = serializers.ListField(
+    #     child=serializers.ImageField(allow_empty_file=False, use_url=False),
+    #     write_only=True
+    # )
 
     class Meta:
         model = Case
-        fields = (
-            'id',
-            'skills',
-            'title',
-            'sphere',
-            'instruments',
-            'working_term',
-            'description',
+        fields = ('sphere',
+                  'instruments',
+                  'skills',
+                  'title',
+                  'description',
+                  'working_term',
+                  'images',
+                  'author',
+                  )
+            
+    @staticmethod
+    def add_images(case, images):
+        CaseImage.objects.bulk_create(
+            [
+                CaseImage(
+                    image=image['image'],
+                    case=case,                    
+                ) for image in images
+            ]
         )
 
+    @transaction.atomic
+    def create(self, validated_data):
+        # instruments = validated_data.pop('instruments')
+        images = validated_data.pop('images')
+        instruments = validated_data.pop('instruments')
+        skills = validated_data.pop('skills')
+        author = self.context['request'].user
+        case = Case.objects.create(**validated_data)
+        case.instruments.set(instruments)
+        # print('AAA', author)
+        # print(validated_data)
+        # print(images)
+        # for image in uploaded_images:
+        #     CaseImage.objects.create(case=case, image=image)
+
+
+        self.add_images(case=case, images=images)
+
+        return case
 
 class CaseShowPortfolioSerializer(serializers.ModelSerializer):
 

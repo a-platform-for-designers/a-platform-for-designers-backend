@@ -207,28 +207,20 @@ class CaseImage(models.Model):
     Модель изображения для кейса.
 
     """
-
     case = models.ForeignKey(
         Case,
         on_delete=models.CASCADE,
         related_name='image_in_case',
     )
-    is_avatar = models.BooleanField()
-    picture = models.ImageField()
-    name = models.CharField(
-        max_length=50,
-        verbose_name='Название изображения'
-    )
-    description = models.TextField(
-        max_length=300,
-    )
+    image = models.ImageField()
+
 
     class Meta:
         verbose_name = 'Изображение кейса'
         verbose_name_plural = 'Изображения кейса'
-
-    def __str__(self) -> str:
-        return self.name
+    
+    def __str__(self):
+        return "%s" % (self.case.title)
 
 
 class Comment(models.Model):
