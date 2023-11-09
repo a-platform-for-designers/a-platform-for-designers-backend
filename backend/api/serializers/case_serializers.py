@@ -39,7 +39,8 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
-            'images'
+            'images',
+            'avatar'
         ]
 
     def get_is_favorited(self, obj):
@@ -84,6 +85,7 @@ class CaseCreateSerializer(serializers.ModelSerializer):
                   'working_term',
                   'images',
                   'author',
+                  'avatar',
                   )
             
     @staticmethod

@@ -112,6 +112,8 @@ class Case(models.Model):
         verbose_name='Дата публикации'
     )
 
+    avatar = models.ImageField()
+
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
