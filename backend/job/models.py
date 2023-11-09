@@ -210,7 +210,7 @@ class CaseImage(models.Model):
     case = models.ForeignKey(
         Case,
         on_delete=models.CASCADE,
-        related_name='image_in_case',
+        related_name='images',
     )
     image = models.ImageField()
 
