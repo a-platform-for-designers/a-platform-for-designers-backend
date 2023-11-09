@@ -4,7 +4,7 @@ from django.db import transaction
 
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
-from job.models import Case, FavoriteCase, Instrument, Skill, CaseImage
+from job.models import Case, FavoriteCase, CaseImage, Like
 from api.serializers.user_serializers import UserSerializer
 
 
@@ -25,6 +25,7 @@ class CaseSerializer(serializers.ModelSerializer):
     instruments = InstrumentSerializer(many=True)
     skills = SkillSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
     avatar = Base64ImageField()
 
@@ -41,7 +42,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
-            'is_like',         
+            'is_liked',         
         ]
 
     def get_is_favorited(self, obj):
@@ -51,6 +52,14 @@ class CaseSerializer(serializers.ModelSerializer):
             return False
         return FavoriteCase.objects.filter(
             case=obj, user=request.user).exists()
+
+    def get_is_liked(self, obj):
+        """проверка на добавление проекта в лайки."""
+        request = self.context.get('request')
+        if request.user.is_anonymous:
+            return False
+        return Like.objects.filter(
+            author=obj.author).exists()
 
 
 class CaseShortSerializer(serializers.ModelSerializer):

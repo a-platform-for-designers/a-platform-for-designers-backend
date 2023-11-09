@@ -303,22 +303,6 @@ class Resume(models.Model):
         return f'Резюме {self.user.email}'
 
 
-class Specialization(models.Model):
-    """
-    Модель специализации.
-
-    """
-
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name = 'Специализация'
-        verbose_name_plural = 'Специализации'
-
-    def __str__(self):
-        return self.name
-
-
 class Like(models.Model):
     """
     Модель лайков.
