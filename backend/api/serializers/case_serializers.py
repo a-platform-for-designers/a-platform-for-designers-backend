@@ -17,7 +17,7 @@ class CaseImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CaseImage
-        fields = ('image', )
+        fields = ('id', 'image', )
 
 
 class CaseSerializer(serializers.ModelSerializer):
@@ -26,21 +26,22 @@ class CaseSerializer(serializers.ModelSerializer):
     skills = SkillSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
+    avatar = Base64ImageField()
 
     class Meta:
         model = Case
         fields = [
             'id',
-            'skills',
             'author',
             'title',
-            'sphere',
             'instruments',
+            'sphere',
+            'avatar'
+            'images',
             'working_term',
             'description',
             'is_favorited',
-            'images',
-            'avatar'
+            'is_like',         
         ]
 
     def get_is_favorited(self, obj):
@@ -68,12 +69,8 @@ class CaseShortSerializer(serializers.ModelSerializer):
 
 class CaseCreateSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    # avatar = Base64ImageField()
+    avatar = Base64ImageField()
     images = CaseImageSerializer(many=True)
-    # uploaded_images = serializers.ListField(
-    #     child=serializers.ImageField(allow_empty_file=False, use_url=False),
-    #     write_only=True
-    # )
 
     class Meta:
         model = Case
@@ -100,21 +97,13 @@ class CaseCreateSerializer(serializers.ModelSerializer):
         )
 
     @transaction.atomic
-    def create(self, validated_data):
-        # instruments = validated_data.pop('instruments')
+    def create(self, validated_data):        
         images = validated_data.pop('images')
         instruments = validated_data.pop('instruments')
         skills = validated_data.pop('skills')
-        author = self.context['request'].user
         case = Case.objects.create(**validated_data)
         case.instruments.set(instruments)
-        # print('AAA', author)
-        # print(validated_data)
-        # print(images)
-        # for image in uploaded_images:
-        #     CaseImage.objects.create(case=case, image=image)
-
-
+        case.skills.set(skills)
         self.add_images(case=case, images=images)
 
         return case

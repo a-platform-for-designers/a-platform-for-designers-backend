@@ -64,6 +64,22 @@ class Sphere(models.Model):
         ordering = ['name',]
 
 
+class Specialization(models.Model):
+    """
+    Модель специализации.
+
+    """
+    name = models.CharField(
+        max_length=200,
+        verbose_name='Название специализации'
+    )
+
+    class Meta:
+        verbose_name = 'Специализация'
+        verbose_name_plural = 'Специализации'
+        ordering = ['name',]
+
+
 class Case(models.Model):
     """
     Модель проекта.
@@ -82,6 +98,13 @@ class Case(models.Model):
         verbose_name='Название'
     )
 
+    spezialisation = models.ForeignKey(
+        Specialization,
+        verbose_name='Специализация',
+        on_delete=models.CASCADE,
+        related_name='specialization',
+    )
+
     sphere = models.ForeignKey(
         Sphere,
         verbose_name='Сфера',
@@ -94,10 +117,6 @@ class Case(models.Model):
         verbose_name='Список инструментов'
     )
 
-    skills = models.ManyToManyField(
-        Skill,
-        verbose_name='Список навыков'
-    )
 
     working_term = models.TextField(
         verbose_name='Время, затраченное на изготовление проекта',
