@@ -1,15 +1,15 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 
-from api.serializers.user_serializers import UserShortSerializer
+from api.serializers.user_serializers import UserProfileSerializer
 from job.models import Chat
 
 
 class ChatReadSerializer(serializers.ModelSerializer):
     """Сериализатор для метода get для чатов."""
 
-    initiator = UserShortSerializer(read_only=True)
-    receiver = UserShortSerializer(read_only=True)
+    initiator = UserProfileSerializer(read_only=True)
+    receiver = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = Chat

@@ -25,12 +25,16 @@ class DesignersFilter(filters.FilterSet):
     specialization = filters.AllValuesMultipleFilter(
         field_name='profiledesigner__specialization'
     )
-    resume = filters.MultipleChoiceFilter(
+    resume = filters.ChoiceFilter(
         field_name='resume__status',
         choices=RESUME_STATUS_CHOICES,
     )
-    skills = filters.AllValuesMultipleFilter(field_name='resume__skills__id')
-    instruments = filters.AllValuesMultipleFilter(field_name='resume__instruments__id')
+    skills = filters.AllValuesMultipleFilter(
+        field_name='resume__skills__id',
+    )
+    instruments = filters.AllValuesMultipleFilter(
+        field_name='resume__instruments__id',
+    )
 
     class Meta:
         model = User

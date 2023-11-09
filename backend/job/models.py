@@ -50,6 +50,22 @@ class Skill(models.Model):
         return self.name
 
 
+class Specialization(models.Model):
+    """
+    Модель специализации.
+
+    """
+
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Специализация'
+        verbose_name_plural = 'Специализации'
+
+    def __str__(self):
+        return self.name
+
+
 class Case(models.Model):
     """
     Модель проекта.
@@ -105,9 +121,11 @@ class Case(models.Model):
         verbose_name='Дата публикации'
     )
 
-    specialization = models.CharField(
-        max_length=200,
-        verbose_name='Специализация'
+    specialization = models.ForeignKey(
+        Specialization,
+        verbose_name='Специализация',
+        on_delete=models.CASCADE,
+        related_name='specialization',
     )
 
     class Meta:
@@ -303,22 +321,6 @@ class Resume(models.Model):
 
     def __str__(self):
         return f'Резюме {self.user.email}'
-
-
-class Specialization(models.Model):
-    """
-    Модель специализации.
-
-    """
-
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name = 'Специализация'
-        verbose_name_plural = 'Специализации'
-
-    def __str__(self):
-        return self.name
 
 
 class Like(models.Model):
