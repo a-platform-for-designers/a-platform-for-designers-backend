@@ -83,17 +83,8 @@ class Case(models.Model):
         verbose_name='Список навыков'
     )
 
-    working_term = models.PositiveSmallIntegerField(
-        verbose_name='Время изготовления (в часах)',
-        validators=[
-            MinValueValidator(
-                MIN_AMOUNT,
-                message='Время изготовления не менее 1 часа'),
-            MaxValueValidator(
-                MAX_AMOUNT,
-                message='Время изготовления не может быть бесконечным'
-            )
-        ]
+    working_term = models.TextField(
+        verbose_name='Время, затраченное на изготовление проекта',
     )
 
     description = models.TextField(
