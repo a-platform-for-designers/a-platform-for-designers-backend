@@ -2,11 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from users.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 
-MIN_AMOUNT = 1
-MAX_AMOUNT = 1000
 RESUME_STATUS_CHOICES = ((1, 'Ищу работу'), (2, 'Не ищу работу'))
 
 
@@ -50,6 +47,23 @@ class Skill(models.Model):
         return self.name
 
 
+class Sphere(models.Model):
+    """
+    Модель сферы деятельности.
+
+    """
+
+    name = models.CharField(
+        max_length=200,
+        verbose_name='Название деятельности'
+    )
+
+    class Meta:
+        verbose_name = 'Сфера деятельности'
+        verbose_name_plural = 'Сферы деятельности'
+        ordering = ['name',]
+
+
 class Case(models.Model):
     """
     Модель проекта.
@@ -68,9 +82,11 @@ class Case(models.Model):
         verbose_name='Название'
     )
 
-    sphere = models.CharField(
-        max_length=200,
-        verbose_name='Сфера'
+    sphere = models.ForeignKey(
+        Sphere,
+        verbose_name='Сфера',
+        on_delete=models.CASCADE,
+        related_name='sphere',
     )
 
     instruments = models.ManyToManyField(
@@ -240,23 +256,6 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-
-class Sphere(models.Model):
-    """
-    Модель сферы деятельности.
-
-    """
-
-    name = models.CharField(
-        max_length=200,
-        verbose_name='Название деятельности'
-    )
-
-    class Meta:
-        verbose_name = 'Сфера деятельности'
-        verbose_name_plural = 'Сферы деятельности'
-        ordering = ['name',]
 
 
 class Resume(models.Model):
