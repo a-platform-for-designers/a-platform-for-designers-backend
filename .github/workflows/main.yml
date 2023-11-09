@@ -89,7 +89,11 @@ jobs:
             sudo systemctl stop nginx
             sudo docker-compose down -v
 
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_json
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py direction_import_csv
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py sphere_import_csv
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py skills_import_csv
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py tools_import_csv
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py country_import_csv         
             
             sudo docker rmi $(docker images -q)
             sudo docker pull carkazm/designcollab_backend:latest
