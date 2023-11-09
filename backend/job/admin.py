@@ -53,11 +53,11 @@ class CaseAdmin(admin.ModelAdmin):
     )
     fields = (
         ('title', 'working_term',),
-        ('description', 'skills', 'author'),
+        ('description', 'author'),
     )
     # list_editable = ('skills',)
     search_fields = ('title',)
-    list_filter = ('sphere', 'title', 'skills',)
+    list_filter = ('sphere', 'title', )
     empty_value_display = '-пусто-'
 
 

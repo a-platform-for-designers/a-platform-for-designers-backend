@@ -98,7 +98,7 @@ class Case(models.Model):
         verbose_name='Название'
     )
 
-    spezialisation = models.ForeignKey(
+    specialization = models.ForeignKey(
         Specialization,
         verbose_name='Специализация',
         on_delete=models.CASCADE,

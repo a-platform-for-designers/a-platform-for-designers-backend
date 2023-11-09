@@ -3,31 +3,21 @@ from drf_extra_fields.fields import Base64ImageField
 from django.db import transaction
 
 from api.serializers.instrument_serializers import InstrumentSerializer
-from api.serializers.skill_serializers import SkillSerializer
+from api.serializers.sphere_serializers import SphereSerializer
+from api.serializers.caseimage_serializers import CaseImageSerializer
 from job.models import Case, FavoriteCase, CaseImage, Like
 from api.serializers.user_serializers import UserSerializer
 
 
-MIN_AMOUNT = 1
-MAX_AMOUNT = 1000
-
-
-class CaseImageSerializer(serializers.ModelSerializer):
-    image = Base64ImageField()
-
-    class Meta:
-        model = CaseImage
-        fields = ('id', 'image', )
-
-
 class CaseSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Case."""
+    author = UserSerializer(read_only=True)
     instruments = InstrumentSerializer(many=True)
-    skills = SkillSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
     avatar = Base64ImageField()
+    sphere = SphereSerializer()
 
     class Meta:
         model = Case
@@ -37,7 +27,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'title',
             'instruments',
             'sphere',
-            'avatar'
+            'avatar',
             'images',
             'working_term',
             'description',
@@ -77,21 +67,19 @@ class CaseShortSerializer(serializers.ModelSerializer):
 
 
 class CaseCreateSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
     avatar = Base64ImageField()
     images = CaseImageSerializer(many=True)
 
     class Meta:
         model = Case
-        fields = ('sphere',
+        fields = ('title',
+                  'specialization',
                   'instruments',
-                  'skills',
-                  'title',
-                  'description',
-                  'working_term',
-                  'images',
-                  'author',
+                  'sphere',
                   'avatar',
+                  'images',
+                  'working_term',
+                  'description',
                   )
             
     @staticmethod
@@ -109,10 +97,8 @@ class CaseCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):        
         images = validated_data.pop('images')
         instruments = validated_data.pop('instruments')
-        skills = validated_data.pop('skills')
         case = Case.objects.create(**validated_data)
         case.instruments.set(instruments)
-        case.skills.set(skills)
         self.add_images(case=case, images=images)
 
         return case
