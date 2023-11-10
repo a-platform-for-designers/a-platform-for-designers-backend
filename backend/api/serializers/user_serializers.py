@@ -23,6 +23,11 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
         model = ProfileCustomer
         fields = ('id', 'post')
 
+    def update(self, instance, validated_data):
+        instance.post = validated_data.get('post', instance.post)
+        instance.save()
+        return instance
+
 
 class ProfileDesignerSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer()
