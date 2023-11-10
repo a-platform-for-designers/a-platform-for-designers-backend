@@ -23,7 +23,7 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
         model = ProfileCustomer
         fields = ('id', 'post')
 
-    def update(self, instance, validated_data):
+    def partial_update(self, instance, validated_data):
         instance.post = validated_data.get('post', instance.post)
         instance.save()
         return instance
@@ -54,7 +54,7 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
         )
         return profile_designer
 
-    def update(self, instance, validated_data):
+    def partial_update(self, instance, validated_data):
         specialization_data = validated_data.pop('specialization')
         specialization, created = Specialization.objects.get_or_create(
             **specialization_data

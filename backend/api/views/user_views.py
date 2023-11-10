@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from djoser.views import TokenCreateView as DjoserTokenCreateView
 from rest_framework import viewsets, status, mixins
-# from rest_framework.decorators import action
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
@@ -23,6 +23,7 @@ from api.serializers.user_serializers import ProfileDesignerSerializer
 from api.serializers.user_serializers import TokenResponseSerializer
 from api.permissions import IsOwnerOrReadOnly
 from users.models import ProfileCustomer, ProfileDesigner
+from .mixins import PatchModelMixin
 
 
 User = get_user_model()
@@ -35,15 +36,25 @@ class TokenCreateView(DjoserTokenCreateView):
     pass
 
 
+@extend_schema(
+    methods=['GET', 'POST', 'PATCH'],
+)
 class ProfileCustomerViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
+    PatchModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = ProfileCustomer.objects.all().order_by('id')
     serializer_class = ProfileCustomerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    http_method_names = ['get', 'post', 'patch', 'head', 'options', 'trace']
+
+    def get_allowed_methods(self, detail=None):
+        allowed_methods = super().get_allowed_methods(detail=detail)
+        if 'PUT' in allowed_methods:
+            allowed_methods.remove('PUT')
+        return allowed_methods
 
     def create(self, request, *args, **kwargs):
         if not request.user.is_customer:
@@ -57,16 +68,38 @@ class ProfileCustomerViewSet(
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.partial_update(instance, serializer.validated_data)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def post_update(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
 
 class ProfileDesignerViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
+    PatchModelMixin,
     viewsets.GenericViewSet
 ):
     queryset = ProfileDesigner.objects.all().order_by('id')
     serializer_class = ProfileDesignerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    http_method_names = ['get', 'post', 'patch', 'head', 'options', 'trace']
+
+    def get_allowed_methods(self, detail=None):
+        allowed_methods = super().get_allowed_methods(detail=detail)
+        if 'PUT' in allowed_methods:
+            allowed_methods.remove('PUT')
+        return allowed_methods
 
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
@@ -79,6 +112,21 @@ class ProfileDesignerViewSet(
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.partial_update(instance, serializer.validated_data)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def post_update(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
 
 class UserProfileViewSet(UserViewSet):
