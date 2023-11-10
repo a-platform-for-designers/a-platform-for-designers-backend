@@ -81,6 +81,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True
     )
+    date_joined = models.DateTimeField(
+        'Дата регистрации',
+        auto_now_add=True
+    )
     is_customer = models.BooleanField(
         'Покупатель',
     )

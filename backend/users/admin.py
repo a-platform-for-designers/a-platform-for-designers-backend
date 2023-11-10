@@ -18,6 +18,7 @@ class UserAdmin(UserAdmin):
         'last_name',
         'photo',
         'is_customer',
+        'date_joined'
     )
     list_filter = ('email', 'first_name')
     search_fields = (

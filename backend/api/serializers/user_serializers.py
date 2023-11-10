@@ -108,6 +108,7 @@ class UserProfileSerializer(UserSerializer):
             'first_name',
             'last_name',
             'photo',
+            'date_joined',
             'is_customer',
             # 'is_subscribed',
             'resume',
