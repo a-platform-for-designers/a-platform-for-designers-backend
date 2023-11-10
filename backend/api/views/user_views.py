@@ -11,11 +11,11 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 
 from users.models import Subscription
-from api.filters import DesignersFilter
 from api.pagination import LimitPageNumberPagination
 from api.serializers.subscription_serializers import (
     SubscriptionSerializer, SubscriptionCreateSerializer
 )
+from api.serializers.case_serializers import CaseShowPortfolioSerializer
 from api.serializers.user_serializers import UserProfileSerializer
 from api.serializers.user_serializers import ProfileCustomerSerializer
 from api.serializers.user_serializers import ProfileDesignerSerializer
@@ -197,5 +197,14 @@ class UserProfileViewSet(UserViewSet):
         detail=True,
         methods=['get']
     )
-    def portfolio(self, request):
-        pass
+    def portfolio(self, request, id):
+        print(id)
+        author = get_object_or_404(User, id=id)
+        print(author)
+        queryset = Case.objects.filter(author=id)
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = CaseShowPortfolioSerializer(
+            paginated_queryset,
+            many=True
+        )
+        return self.get_paginated_response(serializer.data)
