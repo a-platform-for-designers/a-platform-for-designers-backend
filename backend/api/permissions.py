@@ -40,11 +40,11 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
     Права для владельца или только для чтения.
-
     """
+
     def has_object_permission(self, request, view, obj):
-        if request.method in ['PUT', 'DELETE']:
-            return obj.user == request.user
+        if request.method == 'PATCH':
+            return obj == request.user
         return True
 
 

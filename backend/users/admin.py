@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Subscription, User
+from .models import User
 from .models import ProfileCustomer, ProfileDesigner
 
 
@@ -17,7 +17,6 @@ class UserAdmin(UserAdmin):
         'first_name',
         'last_name',
         'photo',
-        'description',
         'is_customer',
     )
     list_filter = ('email', 'first_name')
@@ -35,7 +34,6 @@ class UserAdmin(UserAdmin):
             'first_name',
             'last_name',
             'photo',
-            'description',
             'is_customer',
         )}),
         ('Permissions', {'fields': (
@@ -60,7 +58,6 @@ class UserAdmin(UserAdmin):
                 'first_name',
                 'last_name',
                 'photo',
-                'description',
                 'is_customer',
             ),
         }),
@@ -92,11 +89,11 @@ class ProfileDesignerAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
-    """
-    Класс администратора подписок.
+# @admin.register(Subscription)
+# class SubscriptionAdmin(admin.ModelAdmin):
+#     """
+#     Класс администратора подписок.
 
-    """
+#     """
 
-    list_display = ('user', 'author',)
+#     list_display = ('user', 'author',)

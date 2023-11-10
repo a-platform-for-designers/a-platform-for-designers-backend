@@ -19,7 +19,7 @@ from api.views.user_views import TokenCreateView
 
 router = routers.DefaultRouter()
 
-router.register('users', UserProfileViewSet, basename='user')
+router.register('users', UserProfileViewSet, basename='users')
 router.register('caseimages', CaseImageViewSet, basename='caseimages')
 router.register('comments', CommentViewSet, basename='comments')
 router.register('spheres', SphereViewSet, basename='spheres')
