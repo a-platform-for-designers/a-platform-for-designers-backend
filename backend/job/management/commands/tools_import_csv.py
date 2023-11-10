@@ -12,4 +12,4 @@ class Command(BaseCommand):
             for row in csvreader:
                 name = row[0]
                 Instrument.objects.create(name=name)
-                self.stdout.write(self.style.SUCCESS(f'Skill "{name}" created.'))
+                self.stdout.write(self.style.SUCCESS(f'Tool "{name}" created.'))
