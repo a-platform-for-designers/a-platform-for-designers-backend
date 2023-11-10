@@ -21,7 +21,7 @@ from api.serializers.user_serializers import UserListSerializer
 from api.serializers.user_serializers import ProfileCustomerSerializer
 from api.serializers.user_serializers import ProfileDesignerSerializer
 from api.serializers.user_serializers import TokenResponseSerializer
-from api.permissions import IsOwnerOrReadOnly
+from api.permissions import IsOwnerOrReadOnly, IsOwnerOrReadOnlyProfile
 from users.models import ProfileCustomer, ProfileDesigner
 from .mixins import PatchModelMixin
 
@@ -47,7 +47,7 @@ class ProfileCustomerViewSet(
 ):
     queryset = ProfileCustomer.objects.all().order_by('id')
     serializer_class = ProfileCustomerSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnlyProfile]
     http_method_names = ['get', 'post', 'patch', 'head', 'options', 'trace']
 
     def get_allowed_methods(self, detail=None):
@@ -92,7 +92,7 @@ class ProfileDesignerViewSet(
 ):
     queryset = ProfileDesigner.objects.all().order_by('id')
     serializer_class = ProfileDesignerSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnlyProfile]
     http_method_names = ['get', 'post', 'patch', 'head', 'options', 'trace']
 
     def get_allowed_methods(self, detail=None):
