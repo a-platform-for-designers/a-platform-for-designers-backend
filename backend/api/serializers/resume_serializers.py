@@ -13,7 +13,7 @@ class ResumeReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Resume
-        fields = ('id', 'instruments', 'skills', 'about')
+        fields = ('id', 'instruments', 'skills', 'about', 'status')
 
 
 class ResumeWriteSerializer(serializers.ModelSerializer):

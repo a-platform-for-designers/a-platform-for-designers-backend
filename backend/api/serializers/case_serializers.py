@@ -27,6 +27,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
+            'specialization',
         ]
 
     def get_is_favorited(self, obj):

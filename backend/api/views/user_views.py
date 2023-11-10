@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
@@ -10,6 +11,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 
 from users.models import Subscription
+from api.filters import DesignersFilter
 from api.pagination import LimitPageNumberPagination
 from api.serializers.subscription_serializers import (
     SubscriptionSerializer, SubscriptionCreateSerializer
@@ -118,6 +120,8 @@ class UserProfileViewSet(UserViewSet):
     serializer_class = UserProfileSerializer
     permission_classes = (AllowAny,)
     pagination_class = LimitPageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = DesignersFilter
 
     @action(
         detail=True,
