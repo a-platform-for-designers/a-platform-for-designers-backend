@@ -20,4 +20,6 @@ class Command(BaseCommand):
                 for row in csvreader:
                     name = row[0]
                     model.objects.create(name=name)
-                    self.stdout.write(self.style.SUCCESS(f'{model} "{name}" created.'))
+                    self.stdout.write(
+                        self.style.SUCCESS(f'{model} "{name}" created.')
+                    )

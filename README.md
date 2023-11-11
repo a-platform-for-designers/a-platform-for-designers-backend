@@ -121,16 +121,17 @@ docker-compose exec backend python manage.py collectstatic --noinput
  - requirements.txt:
  
     Django==4.2.1
-    django-cors-headers==3.11.0
-    django-colorful==1.3
+    django-cors-header
+    djabgo-countries == 7.5.1
     django-filter==22.1
     djangorestframework==3.14.0
     djoser==2.1.0
     drf-extra-fields==3.5.0
-    drf-spectacular==0.25.0
+    drf-spectacular
     flake8==6.0.0
     gunicorn==20.1.0
-    importlib-metadata==4.12.0
+    importlib-metadata
+    isort
     Markdown==3.4.1
     Pillow
     psycopg2-binary==2.9.3
