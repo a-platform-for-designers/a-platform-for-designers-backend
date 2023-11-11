@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from job.models import Case, RESUME_STATUS_CHOICES
+from job.models import Case
 from users.models import User
 
 
@@ -25,9 +25,8 @@ class DesignersFilter(filters.FilterSet):
     specialization = filters.AllValuesMultipleFilter(
         field_name='profiledesigner__specialization'
     )
-    resume = filters.ChoiceFilter(
+    resume = filters.BooleanFilter(
         field_name='resume__status',
-        choices=RESUME_STATUS_CHOICES,
     )
     skills = filters.AllValuesMultipleFilter(
         field_name='resume__skills__id',

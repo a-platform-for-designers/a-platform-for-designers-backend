@@ -40,3 +40,18 @@ class ResumeWriteSerializer(serializers.ModelSerializer):
         if len(set(value)) != len(value):
             raise ValidationError('Ингредиенты не должны повторяться')
         return value
+    
+    def create(self, validated_data):
+        user = self.context.get('request').user
+        try:
+            resume = user.resume
+            instruments = validated_data.pop('instruments')
+            skills = validated_data.pop('skills')
+            for attr, value in validated_data.items():
+                setattr(resume, attr, value)
+            resume.instruments.set(instruments)
+            resume.skills.set(skills)
+            resume.save()
+            return resume
+        except Resume.DoesNotExist:
+            return super().create(validated_data)

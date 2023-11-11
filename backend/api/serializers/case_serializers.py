@@ -6,15 +6,15 @@ from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.sphere_serializers import SphereSerializer
 from api.serializers.caseimage_serializers import CaseImageSerializer
 from job.models import Case, FavoriteCase, CaseImage, Like
-from api.serializers.user_serializers import UserSerializer
+from api.serializers.user_serializers import UserSerializer, AuthorSerializer
 
 
 class CaseSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Case."""
-    author = UserSerializer(read_only=True)
+    author = AuthorSerializer(read_only=True)
     instruments = InstrumentSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
-    is_liked = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
     avatar = Base64ImageField()
     sphere = SphereSerializer()
@@ -32,9 +32,10 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
+            'is_like'
         ]
 
-    def get_is_favorited(self, obj):
+    def get_is_favorited(self, obj) -> bool:
         """проверка на добавление проекта в избранное."""
         request = self.context.get('request')
         if request.user.is_anonymous:
@@ -42,7 +43,7 @@ class CaseSerializer(serializers.ModelSerializer):
         return FavoriteCase.objects.filter(
             case=obj, user=request.user).exists()
 
-    def get_is_liked(self, obj):
+    def get_is_like(self, obj) -> bool:
         """проверка на добавление проекта в лайки."""
         request = self.context.get('request')
         if request.user.is_anonymous:
@@ -66,20 +67,25 @@ class CaseShortSerializer(serializers.ModelSerializer):
 
 
 class CaseCreateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     avatar = Base64ImageField()
+    author = AuthorSerializer(read_only=True)
     images = CaseImageSerializer(many=True)
 
     class Meta:
         model = Case
-        fields = ('title',
-                  'specialization',
-                  'instruments',
-                  'sphere',
-                  'avatar',
-                  'images',
-                  'working_term',
-                  'description',
-                  )
+        fields = (
+            'id',
+            'author',
+            'title',
+            'specialization',
+            'instruments',
+            'sphere',
+            'avatar',
+            'images',
+            'working_term',
+            'description',
+        )
             
     @staticmethod
     def add_images(case, images):
@@ -99,14 +105,4 @@ class CaseCreateSerializer(serializers.ModelSerializer):
         case = Case.objects.create(**validated_data)
         case.instruments.set(instruments)
         self.add_images(case=case, images=images)
-
         return case
-
-class CaseShowPortfolioSerializer(serializers.ModelSerializer):
-    avatar = Base64ImageField()
-    
-    class Meta:
-        model = Case
-        fields = ('title',                  
-                  'avatar',
-                  )
