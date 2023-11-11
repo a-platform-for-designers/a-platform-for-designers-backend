@@ -40,7 +40,7 @@ class ResumeWriteSerializer(serializers.ModelSerializer):
         if len(set(value)) != len(value):
             raise ValidationError('Ингредиенты не должны повторяться')
         return value
-    
+
     def create(self, validated_data):
         user = self.context.get('request').user
         try:
