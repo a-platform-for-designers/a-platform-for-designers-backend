@@ -1,3 +1,5 @@
+from django.db.models import Count
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
@@ -10,15 +12,17 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 
 from users.models import Subscription
+from api.filters import DesignersFilter
 from api.pagination import LimitPageNumberPagination
 from api.serializers.subscription_serializers import (
     SubscriptionSerializer, SubscriptionCreateSerializer
 )
-from api.serializers.user_serializers import UserProfileSerializer
-from api.serializers.user_serializers import ProfileCustomerSerializer
-from api.serializers.user_serializers import ProfileDesignerSerializer
-from api.serializers.user_serializers import TokenResponseSerializer
-from api.permissions import IsOwnerOrReadOnly
+from api.serializers.user_serializers import (
+    AuthorListSerializer, UserProfileSerializer, ProfileCustomerSerializer,
+    ProfileDesignerSerializer, ProfileDesignerCreateSerializer,
+    TokenResponseSerializer, UserProfileCreateSerializer
+)
+from api.permissions import IsOwnerOrReadOnly, IsAuthorOrReadOnly
 from users.models import ProfileCustomer, ProfileDesigner
 
 
@@ -34,13 +38,10 @@ class TokenCreateView(DjoserTokenCreateView):
 
 class ProfileCustomerViewSet(
     mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = ProfileCustomer.objects.all().order_by('id')
     serializer_class = ProfileCustomerSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def create(self, request, *args, **kwargs):
         if not request.user.is_customer:
@@ -63,27 +64,15 @@ class ProfileCustomerViewSet(
 
 class ProfileDesignerViewSet(
     mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = ProfileDesigner.objects.all().order_by('id')
-    serializer_class = ProfileDesignerSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    serializer_class = ProfileDesignerCreateSerializer
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
             return Response({"detail": "Вы не являетесь дизайнером."},
                             status=status.HTTP_403_FORBIDDEN)
-        if (
-            not request.user.is_staff
-            and request.user.id != request.data.get('user')
-        ):
-            return Response({"detail": "У вас нет разрешения."},
-                            status=status.HTTP_403_FORBIDDEN)
-        if ProfileDesigner.objects.filter(user=request.user).exists():
-            return Response({"detail": "Профиль уже существует."},
-                            status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
@@ -110,14 +99,27 @@ class UserProfileViewSet(UserViewSet):
     iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC
     """
 
-    # queryset = User.objects.select_related(
-    #     'profilecustomer',
-    #     'profiledesigner',
-    # ).order_by('id')
-    queryset = User.objects.all()
-    serializer_class = UserProfileSerializer
     permission_classes = (AllowAny,)
     pagination_class = LimitPageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = DesignersFilter
+
+    def get_queryset(self):
+        if self.action == 'list':
+            queryset = User.objects.annotate(
+                num_cases=Count('case')
+            ).filter(num_cases__gte=2, is_customer=False)
+            if self.request.user.is_authenticated:
+                queryset = queryset.exclude(pk=self.request.user.pk)
+            return queryset
+        return User.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return AuthorListSerializer
+        elif self.action == 'create':
+            return UserProfileCreateSerializer
+        return UserProfileSerializer
 
     @action(
         detail=True,
@@ -188,10 +190,3 @@ class UserProfileViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
-
-    @action(
-        detail=True,
-        methods=['get']
-    )
-    def portfolio(self, request):
-        pass

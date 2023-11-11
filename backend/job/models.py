@@ -1,13 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
+
 from users.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
-
-
-MIN_AMOUNT = 1
-MAX_AMOUNT = 1000
-RESUME_STATUS_CHOICES = ((1, 'Ищу работу'), (2, 'Не ищу работу'))
 
 
 class Instrument(models.Model):
@@ -17,7 +12,7 @@ class Instrument(models.Model):
     """
 
     name = models.CharField(
-        max_length=200,
+        max_length=40,
         verbose_name='Название'
     )
 
@@ -50,6 +45,64 @@ class Skill(models.Model):
         return self.name
 
 
+class Sphere(models.Model):
+    """
+    Модель сферы деятельности.
+
+    """
+
+    name = models.CharField(
+        max_length=60,
+        verbose_name='Название деятельности'
+    )
+
+    class Meta:
+        verbose_name = 'Сфера деятельности'
+        verbose_name_plural = 'Сферы деятельности'
+        ordering = ['name',]
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Specialization(models.Model):
+    """
+    Модель специализации.
+
+    """
+    name = models.CharField(
+        max_length=25,
+        verbose_name='Название специализации'
+    )
+
+    class Meta:
+        verbose_name = 'Специализация'
+        verbose_name_plural = 'Специализации'
+        ordering = ['name',]
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Language(models.Model):
+    """
+    Модель языка.
+
+    """
+    name = models.CharField(
+        max_length=56,
+        verbose_name='Язык'
+    )
+
+    class Meta:
+        verbose_name = 'Язык'
+        verbose_name_plural = 'Языки'
+        ordering = ['name',]
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Case(models.Model):
     """
     Модель проекта.
@@ -64,40 +117,47 @@ class Case(models.Model):
     )
 
     title = models.CharField(
-        max_length=200,
+        max_length=50,
         verbose_name='Название'
     )
 
-    sphere = models.CharField(
-        max_length=200,
-        verbose_name='Сфера'
+    avatar = models.ImageField()
+    specialization = models.ForeignKey(
+        Specialization,
+        verbose_name='Специализация',
+        on_delete=models.CASCADE,
+        related_name='specialization',
+        blank=True,
+        null=True
+    )
+
+    sphere = models.ForeignKey(
+        Sphere,
+        verbose_name='Сфера',
+        on_delete=models.CASCADE,
+        related_name='sphere',
+        blank=True,
+        null=True
     )
 
     instruments = models.ManyToManyField(
         Instrument,
-        verbose_name='Список инструментов'
+        verbose_name='Список инструментов',
+        blank=True,
+        null=True
     )
 
-    skills = models.ManyToManyField(
-        Skill,
-        verbose_name='Список навыков'
-    )
-
-    working_term = models.PositiveSmallIntegerField(
-        verbose_name='Время изготовления (в часах)',
-        validators=[
-            MinValueValidator(
-                MIN_AMOUNT,
-                message='Время изготовления не менее 1 часа'),
-            MaxValueValidator(
-                MAX_AMOUNT,
-                message='Время изготовления не может быть бесконечным'
-            )
-        ]
+    working_term = models.CharField(
+        verbose_name='Время, затраченное на изготовление проекта',
+        max_length=50,
+        blank=True,
+        null=True
     )
 
     description = models.TextField(
-        verbose_name='Описание'
+        verbose_name='Описание',
+        blank=True,
+        null=True
     )
 
     pub_date = models.DateTimeField(
@@ -207,28 +267,19 @@ class CaseImage(models.Model):
     Модель изображения для кейса.
 
     """
-
     case = models.ForeignKey(
         Case,
         on_delete=models.CASCADE,
-        related_name='image_in_case',
+        related_name='images',
     )
-    is_avatar = models.BooleanField()
-    picture = models.ImageField()
-    name = models.CharField(
-        max_length=50,
-        verbose_name='Название изображения'
-    )
-    description = models.TextField(
-        max_length=300,
-    )
+    image = models.ImageField()
 
     class Meta:
         verbose_name = 'Изображение кейса'
         verbose_name_plural = 'Изображения кейса'
 
-    def __str__(self) -> str:
-        return self.name
+    def __str__(self):
+        return "%s" % (self.case.title)
 
 
 class Comment(models.Model):
@@ -259,23 +310,6 @@ class Comment(models.Model):
         return self.name
 
 
-class Sphere(models.Model):
-    """
-    Модель сферы деятельности.
-
-    """
-
-    name = models.CharField(
-        max_length=200,
-        verbose_name='Название деятельности'
-    )
-
-    class Meta:
-        verbose_name = 'Сфера деятельности'
-        verbose_name_plural = 'Сферы деятельности'
-        ordering = ['name',]
-
-
 class Resume(models.Model):
     """
     Модель резюме.
@@ -286,11 +320,7 @@ class Resume(models.Model):
     skills = models.ManyToManyField('Skill')
     instruments = models.ManyToManyField('Instrument')
     about = models.TextField()
-    status = models.CharField(
-        max_length=1,
-        choices=RESUME_STATUS_CHOICES,
-        default=1
-    )
+    status = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Резюме'
@@ -298,22 +328,6 @@ class Resume(models.Model):
 
     def __str__(self):
         return f'Резюме {self.user.email}'
-
-
-class Specialization(models.Model):
-    """
-    Модель специализации.
-
-    """
-
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name = 'Специализация'
-        verbose_name_plural = 'Специализации'
-
-    def __str__(self):
-        return self.name
 
 
 class Like(models.Model):

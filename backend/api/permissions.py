@@ -1,4 +1,8 @@
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions
+
+from job.models import Chat, Message
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -54,6 +58,21 @@ class IsInitiatorOrReceiverChatPermission(permissions.BasePermission):
 
     """
 
+    def has_permission(self, request, view):
+        if view.action == 'retrieve':
+            chat_id = view.kwargs['pk']
+            chat = Chat.objects.get(pk=chat_id)
+            return (
+                chat.initiator == request.user or chat.receiver == request.user
+            )
+        elif view.action == 'list':
+            user = request.user
+            return Chat.objects.filter(
+                Q(initiator=user) | Q(receiver=user)
+            ).exists()
+        elif request.method == 'POST':
+            return True
+
     def has_object_permission(self, request, view, obj):
         return obj.initiator == request.user or obj.receiver == request.user
 
@@ -63,6 +82,11 @@ class IsInitiatorOrReceiverMessagePermission(permissions.BasePermission):
     Права для работы с сообщениями чатов.
 
     """
+
+    def has_permission(self, request, view):
+        chat_id = view.kwargs['chat_id']
+        chat = Chat.objects.get(pk=chat_id)
+        return chat.initiator == request.user or chat.receiver == request.user
 
     def has_object_permission(self, request, view, obj):
         if request.method == 'DELETE':
