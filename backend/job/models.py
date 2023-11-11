@@ -60,7 +60,7 @@ class Sphere(models.Model):
         verbose_name = 'Сфера деятельности'
         verbose_name_plural = 'Сферы деятельности'
         ordering = ['name',]
-    
+
     def __str__(self) -> str:
         return self.name
 
@@ -79,7 +79,7 @@ class Specialization(models.Model):
         verbose_name = 'Специализация'
         verbose_name_plural = 'Специализации'
         ordering = ['name',]
-    
+
     def __str__(self) -> str:
         return self.name
 
@@ -101,6 +101,7 @@ class Language(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
 
 class Case(models.Model):
     """
@@ -273,11 +274,10 @@ class CaseImage(models.Model):
     )
     image = models.ImageField()
 
-
     class Meta:
         verbose_name = 'Изображение кейса'
         verbose_name_plural = 'Изображения кейса'
-    
+
     def __str__(self):
         return "%s" % (self.case.title)
 

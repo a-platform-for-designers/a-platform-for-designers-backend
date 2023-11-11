@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'api',
     'job',
 
-    
+
 ]
 
 MIDDLEWARE = [

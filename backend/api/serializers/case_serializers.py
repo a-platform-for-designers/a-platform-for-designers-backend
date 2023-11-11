@@ -86,20 +86,20 @@ class CaseCreateSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
         )
-            
+
     @staticmethod
     def add_images(case, images):
         CaseImage.objects.bulk_create(
             [
                 CaseImage(
                     image=image['image'],
-                    case=case,                    
+                    case=case,
                 ) for image in images
             ]
         )
 
     @transaction.atomic
-    def create(self, validated_data):        
+    def create(self, validated_data):
         images = validated_data.pop('images')
         instruments = validated_data.pop('instruments')
         case = Case.objects.create(**validated_data)

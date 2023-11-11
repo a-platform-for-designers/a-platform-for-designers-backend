@@ -10,8 +10,6 @@ from api.serializers.resume_serializers import ResumeReadSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from users.models import ProfileCustomer, ProfileDesigner
 from job.models import Case, Specialization, Language
-from django_countries.serializers import CountryFieldMixin
-from django_countries.serializer_fields import CountryField
 
 
 User = get_user_model()
@@ -32,9 +30,8 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ProfileDesignerSerializer(serializers.ModelSerializer, CountryFieldMixin):
+class ProfileDesignerSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer()
-    country = CountryField()
 
     class Meta:
         model = ProfileDesigner
