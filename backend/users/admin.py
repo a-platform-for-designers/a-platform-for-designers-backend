@@ -17,7 +17,7 @@ class UserAdmin(UserAdmin):
         'first_name',
         'last_name',
         'photo',
-        'description',
+        'date_joined',
         'is_customer',
     )
     list_filter = ('email', 'first_name')
@@ -35,7 +35,6 @@ class UserAdmin(UserAdmin):
             'first_name',
             'last_name',
             'photo',
-            'description',
             'is_customer',
         )}),
         ('Permissions', {'fields': (
@@ -60,7 +59,6 @@ class UserAdmin(UserAdmin):
                 'first_name',
                 'last_name',
                 'photo',
-                'description',
                 'is_customer',
             ),
         }),
@@ -88,7 +86,6 @@ class ProfileDesignerAdmin(admin.ModelAdmin):
         'country',
         'specialization',
         'hobby',
-        'language',
     )
 
 

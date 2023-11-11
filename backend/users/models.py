@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django_countries.fields import CountryField
 from django.db import models
 
 
@@ -22,6 +23,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_customer', False)
         return self.create_user(email, password, **extra_fields)
 
 
@@ -38,12 +40,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(
         'Имя',
         max_length=40,
-        blank=False,
     )
     last_name = models.CharField(
         'Фамилия',
         max_length=40,
-        blank=False,
     )
     photo = models.ImageField(
         'Фото',
@@ -51,14 +51,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True
     )
-    description = models.TextField(
-        'Описание',
-        null=True,
-        blank=True
+    date_joined = models.DateTimeField(
+        'Дата регистрации',
+        auto_now_add=True
     )
     is_customer = models.BooleanField(
         'Покупатель',
-        default=True,
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -100,13 +98,21 @@ class ProfileDesigner(models.Model):
     Модель профиля дизайнера.
 
     """
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    education = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
-    specialization = models.IntegerField()
-    hobby = models.CharField(max_length=255)
-    language = models.CharField(max_length=255)
+    education = models.CharField(blank=True, null=True, max_length=50)
+    country = CountryField(blank=True, null=True,)
+    specialization = models.ForeignKey(
+        to='job.Specialization',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    hobby = models.CharField(blank=True, null=True, max_length=200)
+    language = models.ManyToManyField(
+        to='job.Language',
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         ordering = ['id']

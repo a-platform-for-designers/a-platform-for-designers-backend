@@ -5,7 +5,9 @@
 
 # Выполняем миграции и загружаем данные
 python manage.py makemigrations users
+python manage.py makemigrations job
 python manage.py migrate
+python manage.py load_data
 python manage.py collectstatic --no-input
 
 # Запускаем сервер

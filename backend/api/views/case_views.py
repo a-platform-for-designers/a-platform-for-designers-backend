@@ -1,9 +1,11 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 
+from api.filters import CaseFilter
 from api.pagination import LimitPageNumberPagination
 from api.serializers.caseimage_serializers import CaseImageSerializer
 from api.serializers.case_serializers import (CaseSerializer,
@@ -22,6 +24,8 @@ class CaseViewSet(ModelViewSet):
     queryset = Case.objects.all()
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = CaseFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -62,10 +66,3 @@ class CaseViewSet(ModelViewSet):
                 {'errors': 'Проект не найден в избранном.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-    @action(detail=True, methods=['get', 'post'])
-    def caseimages(self, request, pk):
-        case = get_object_or_404(Case, pk=pk)
-        queryset = CaseImage.objects.filter(case=case)
-        serializer = CaseImageSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -46,18 +46,16 @@ class CaseAdmin(admin.ModelAdmin):
         'title',
         'author',
         'sphere',
-        # 'instruments',
-        # 'skills',
         'working_term',
         'description',
+        'specialization',
     )
     fields = (
         ('title', 'working_term',),
-        ('description', 'skills', 'author'),
+        ('description', 'author'),
     )
-    # list_editable = ('skills',)
     search_fields = ('title',)
-    list_filter = ('sphere', 'title', 'skills',)
+    list_filter = ('sphere', 'title', )
     empty_value_display = '-пусто-'
 
 
@@ -98,18 +96,6 @@ class OrderAdmin(admin.ModelAdmin):
         'currency',
         'sphere',
         'description'
-    )
-
-
-@admin.register(CaseImage)
-class CaseImageAdmin(admin.ModelAdmin):
-    list_display = (
-        'case',
-        'picture',
-        'name',
-        'description',
-        'is_avatar',
-        'id'
     )
 
 

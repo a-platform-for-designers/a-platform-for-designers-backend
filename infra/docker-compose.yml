@@ -12,8 +12,8 @@ services:
     restart: on-failure
 
   backend:
-    build: ../backend
-    # image: carkazm/designcollab_backend:latest
+    # image: ../backend
+    image: carkazm/designcollab_backend:latest
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
