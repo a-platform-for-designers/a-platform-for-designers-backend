@@ -108,7 +108,7 @@ class UserProfileViewSet(UserViewSet):
         if self.action == 'list':
             queryset = User.objects.annotate(
                 num_cases=Count('case')
-            ).filter(num_cases__gte=2, is_customer=False)
+            ).filter(num_cases__gte=1, is_customer=False)
             if self.request.user.is_authenticated:
                 queryset = queryset.exclude(pk=self.request.user.pk)
             return queryset
