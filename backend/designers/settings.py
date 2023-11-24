@@ -15,6 +15,8 @@ if not SECRET_KEY:
     raise ValueError('SECRET_KEY не установлен')
 
 DEBUG = os.getenv('DEBUG', True)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600 # 100 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880 # 5 MB
 
 ALLOWED_HOSTS = [
     'localhost',
