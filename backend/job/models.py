@@ -272,7 +272,7 @@ class CaseImage(models.Model):
         on_delete=models.CASCADE,
         related_name='images',
     )
-    image = models.ImageField(max_size)
+    image = models.ImageField()
 
     class Meta:
         verbose_name = 'Изображение кейса'
