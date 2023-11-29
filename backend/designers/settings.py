@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     'corsheaders',
+    'drf_api_logger',
 
     # Local apps
     'users',
