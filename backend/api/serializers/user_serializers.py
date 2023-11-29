@@ -145,6 +145,7 @@ class UserProfileSerializer(UserSerializer):
         cases = Case.objects.filter(author=obj)
         return PortfolioSerializer(cases, many=True).data
 
+
     # def get_profilecustomer(self, obj):
     #     obj=ProfileCustomer.objects.filter(user=obj)
     #     if obj.exists():
