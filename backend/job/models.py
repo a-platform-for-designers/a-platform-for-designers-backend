@@ -144,7 +144,6 @@ class Case(models.Model):
         Instrument,
         verbose_name='Список инструментов',
         blank=True,
-        # null=True
     )
 
     working_term = models.CharField(
