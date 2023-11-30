@@ -29,6 +29,7 @@ MONTHS = {
     12: "декабря"
 }
 
+
 class TokenResponseSerializer(serializers.Serializer):
     auth_token = serializers.CharField()
 
@@ -105,7 +106,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(UserSerializer):
-   
+
     profilecustomer = ProfileCustomerSerializer(read_only=True)
     profiledesigner = ProfileDesignerSerializer(read_only=True)
     is_subscribed = SerializerMethodField(read_only=True)
@@ -131,9 +132,11 @@ class UserProfileSerializer(UserSerializer):
         )
 
     def get_date_joined(self, obj):
-        return f'На сайте с {obj.date_joined.strftime("%d")} \
-                {MONTHS.get(int(obj.date_joined.strftime("%m")))} \
-                {obj.date_joined.strftime("%Y")}'
+        return (
+            f'На сайте с {obj.date_joined.strftime("%d")}'
+            f'{MONTHS.get(int(obj.date_joined.strftime("%m")))}'
+            f'{obj.date_joined.strftime("%Y")}'
+        )
 
     def get_is_subscribed(self, obj: User) -> bool:
         user = self.context.get('request').user
@@ -144,7 +147,6 @@ class UserProfileSerializer(UserSerializer):
     def get_portfolio(self, obj):
         cases = Case.objects.filter(author=obj)
         return PortfolioSerializer(cases, many=True).data
-
 
     # def get_profilecustomer(self, obj):
     #     obj=ProfileCustomer.objects.filter(user=obj)
