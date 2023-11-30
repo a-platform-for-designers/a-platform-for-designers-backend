@@ -16,7 +16,7 @@ class CaseModelTest(TestCase):
         # он стал более 100 символов
         # (буква "ж" транслитерируется в два символа: "zh")
         cls.case = Case.objects.create(
-            title='Ж'*50,
+            title='Ж' * 50,
             description='Тестовый текст'
         )
 
