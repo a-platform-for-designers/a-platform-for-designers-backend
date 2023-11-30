@@ -10,6 +10,7 @@ on:
 
 jobs:
   tests:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +32,7 @@ jobs:
         python -m flake8
         
   build_and_push_backend_to_docker_hub:
+    if: github.ref == 'refs/heads/main'
     name: Push backend Docker image to Docker Hub
     runs-on: ubuntu-latest
     needs: tests
@@ -74,6 +76,7 @@ jobs:
 #         tags: ${{ secrets.DOCKER_USERNAME }}/designcollab_frontend:latest
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: 
       - build_and_push_backend_to_docker_hub
@@ -87,8 +90,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo systemctl stop nginx
-            sudo docker-compose down -v
-            sudo docker rmi $(docker images -q)
+            sudo docker-compose down
             sudo docker pull carkazm/designcollab_backend:latest
             sudo touch .env
             sudo bash -c 'echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env'
@@ -99,3 +101,4 @@ jobs:
             sudo bash -c 'echo DB_HOST=${{ secrets.DB_HOST }} >> .env'
             sudo bash -c 'echo DB_PORT=${{ secrets.DB_PORT }} >> .env'
             sudo docker-compose up -d --force-recreate
+
