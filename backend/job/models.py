@@ -7,7 +7,7 @@ from users.models import User
 
 class Instrument(models.Model):
     """
-    Модель инструментов.
+    Модель инструментов
 
     """
 
@@ -27,7 +27,7 @@ class Instrument(models.Model):
 
 class Skill(models.Model):
     """
-    Модель навыков.
+    Модель навыков
 
     """
 
@@ -47,7 +47,7 @@ class Skill(models.Model):
 
 class Sphere(models.Model):
     """
-    Модель сферы деятельности.
+    Модель сферы деятельности
 
     """
 
@@ -67,7 +67,7 @@ class Sphere(models.Model):
 
 class Specialization(models.Model):
     """
-    Модель специализации.
+    Модель специализации
 
     """
     name = models.CharField(
@@ -86,7 +86,7 @@ class Specialization(models.Model):
 
 class Language(models.Model):
     """
-    Модель языка.
+    Модель языка
 
     """
     name = models.CharField(
@@ -105,7 +105,7 @@ class Language(models.Model):
 
 class Case(models.Model):
     """
-    Модель проекта.
+    Модель проекта
 
     """
 
@@ -125,7 +125,7 @@ class Case(models.Model):
     specialization = models.ForeignKey(
         Specialization,
         verbose_name='Специализация',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='specialization',
         blank=True,
         null=True
@@ -134,7 +134,7 @@ class Case(models.Model):
     sphere = models.ForeignKey(
         Sphere,
         verbose_name='Сфера',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='sphere',
         blank=True,
         null=True
@@ -176,20 +176,20 @@ class Case(models.Model):
 
 class FavoriteCase(models.Model):
     """
-    Модель избранных проектов.
+    Модель избранных проектов
 
     """
 
     case = models.ForeignKey(
         Case,
         on_delete=models.CASCADE,
-        related_name='is_favorited',
+        related_name='favorite_cases',
     )
 
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorites',
+        related_name='favorite_cases',
 
     )
 
@@ -205,7 +205,7 @@ class FavoriteCase(models.Model):
 
 class Chat(models.Model):
     """
-    Модель чата.
+    Модель чата
 
     """
 
@@ -236,7 +236,7 @@ class Chat(models.Model):
 
 class Message(models.Model):
     """
-    Модель сообщения чата.
+    Модель сообщения чата
 
     """
 
@@ -264,7 +264,7 @@ class Message(models.Model):
 
 class CaseImage(models.Model):
     """
-    Модель изображения для кейса.
+    Модель изображения для кейса
 
     """
     case = models.ForeignKey(
@@ -284,7 +284,7 @@ class CaseImage(models.Model):
 
 class Comment(models.Model):
     """
-    Модель комментария.
+    Модель комментария
 
     """
 
@@ -295,8 +295,9 @@ class Comment(models.Model):
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='comment',
+        null=True
     )
     comment_text = models.TextField(
         max_length=300,
@@ -312,7 +313,7 @@ class Comment(models.Model):
 
 class Resume(models.Model):
     """
-    Модель резюме.
+    Модель резюме
 
     """
 
@@ -332,14 +333,15 @@ class Resume(models.Model):
 
 class Like(models.Model):
     """
-    Модель лайков.
+    Модель лайков
 
     """
 
     liker = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        related_name='likes'
+        on_delete=models.SET_NULL,
+        related_name='likes',
+        null=True
     )
     author = models.ForeignKey(
         User,
@@ -357,53 +359,78 @@ class Like(models.Model):
 
 class Order(models.Model):
     """
-    Модель резюме...
+    Модель заказа
 
     """
 
     customer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='orders'
+        related_name='published_orders'
+    )
+    executor = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='executed_orders'
     )
     title = models.CharField(max_length=150)
     specialization = models.ForeignKey(
         Specialization,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True
     )
-    price_min = models.PositiveIntegerField(blank=True, null=True)
-    price_max = models.PositiveIntegerField(blank=True, null=True)
-    currency = models.CharField(max_length=20)
+    payment = models.PositiveIntegerField(blank=True, null=True)
     sphere = models.ForeignKey(Sphere, on_delete=models.SET_NULL, null=True)
-    skills = models.ManyToManyField(Skill)
-    instruments = models.ManyToManyField(Instrument)
     description = models.TextField()
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return f'Резюме {self.customer.email}'
+        return f'{self.title} '
+
+
+class OrderResponse(models.Model):
+    """
+    Общая модель для отклика на заказ и избранного заказа 
+
+    """
+
+    user = user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='order_responses',
+    )
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='order_responses',
+    )
+
+    class Meta:
+        verbose_name = 'Отклик'
+        verbose_name_plural = 'Отклики'
 
 
 class FavoriteOrder(models.Model):
     """
-    Модель избранного заказа.
+    Модель избранного заказа
 
     """
 
-    user = models.ForeignKey(
+    user = user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorite_order',
+        related_name='favorite_orders',
     )
-
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        related_name='favorite_order',
+        related_name='favorite_orders',
     )
 
     class Meta:

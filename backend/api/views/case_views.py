@@ -48,7 +48,7 @@ class CaseViewSet(ModelViewSet):
             )
             if not created:
                 return Response(
-                    {'errors': 'Ошибка при создании записи.'},
+                    {'errors': 'Ошибка при создании записи'},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             serializer = CaseShortSerializer(case_obj,

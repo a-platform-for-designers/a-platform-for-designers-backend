@@ -1,25 +1,25 @@
 from djoser.serializers import UserSerializer
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import ModelSerializer
-from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from rest_framework.fields import SerializerMethodField, IntegerField
+from rest_framework.validators import UniqueTogetherValidator
 
-from api.serializers.instrument_serializers import InstrumentSerializer
-from api.serializers.skill_serializers import SkillSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from api.serializers.sphere_serializers import SphereSerializer
+from api.serializers.user_serializers import AuthorListSerializer
 from job.models import (
-    FavoriteOrder, Instrument, Order, Skill, Specialization, Sphere
+    FavoriteOrder, Order, OrderResponse, Specialization, Sphere
 )
+from users.models import User
 
 
 class OrderReadSerializer(ModelSerializer):
     specialization = SpecializationSerializer()
     customer = UserSerializer()
     sphere = SphereSerializer()
-    skills = SkillSerializer(many=True)
-    instruments = InstrumentSerializer(many=True)
+    is_responded_order = SerializerMethodField()
     is_favorited_order = SerializerMethodField()
+    pub_date = SerializerMethodField()
 
     class Meta:
         model = Order
@@ -28,16 +28,25 @@ class OrderReadSerializer(ModelSerializer):
             'customer',
             'title',
             'specialization',
-            'price_min',
-            'price_max',
-            'currency',
+            'payment',
             'sphere',
-            'skills',
-            'instruments',
             'description',
+            'pub_date',
+            'is_responded_order',
             'is_favorited_order'
         )
 
+    def get_pub_date(self, obj):
+        return f'Published {obj.pub_date.strftime("%d %B %Y")}'
+
+    def get_is_responded_order(self, obj):
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
+            return False
+        return OrderResponse.objects.filter(
+            user=request.user, order=obj
+        ).exists()
+    
     def get_is_favorited_order(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
@@ -47,42 +56,73 @@ class OrderReadSerializer(ModelSerializer):
         ).exists()
 
 
-class OrderWriteSerializer(ModelSerializer):
-    specialization = PrimaryKeyRelatedField(
-        queryset=Specialization.objects.all()
-    )
-    sphere = PrimaryKeyRelatedField(queryset=Sphere.objects.all())
-    skills = PrimaryKeyRelatedField(queryset=Skill.objects.all(), many=True)
-    instruments = PrimaryKeyRelatedField(
-        queryset=Instrument.objects.all(),
-        many=True
-    )
+class OrderAuthorReadSerializer(OrderReadSerializer):
+    applicants = SerializerMethodField()
 
     class Meta:
         model = Order
         fields = (
             'id',
+            'customer',
             'title',
             'specialization',
-            'price_min',
-            'price_max',
-            'currency',
+            'payment',
             'sphere',
-            'skills',
-            'instruments',
+            'description',
+            'pub_date',
+            'applicants',
+        )
+    
+    def get_applicants(self, obj):
+        responses = OrderResponse.objects.filter(order=obj).all()
+        users = User.objects.filter(id__in=responses.values('user'))
+        return AuthorListSerializer(
+            users, many=True, context=self.context
+        ).data
+
+
+class OrderWriteSerializer(ModelSerializer):
+    id = IntegerField(read_only=True)
+    specialization = PrimaryKeyRelatedField(
+        queryset=Specialization.objects.all()
+    )
+    customer = UserSerializer(read_only=True)
+    sphere = PrimaryKeyRelatedField(queryset=Sphere.objects.all())
+
+    class Meta:
+        model = Order
+        fields = (
+            'id',
+            'customer',
+            'title',
+            'specialization',
+            'payment',
+            'sphere',
             'description',
         )
 
-    def validate_skills(self, value):
-        if not value:
-            raise ValidationError('Укажите хотя бы один навык')
-        if len(set(value)) != len(value):
-            raise ValidationError('Навыки не должны повторяться')
-        return value
 
-    def validate_instruments(self, value):
-        if not value:
-            raise ValidationError('Укажите хотя бы один инструмент')
-        if len(set(value)) != len(value):
-            raise ValidationError('Инструменты не должны повторяться')
-        return value
+class OrderResponseSerializer(ModelSerializer):
+    class Meta:
+        model = OrderResponse
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=OrderResponse.objects.all(),
+                fields=['user', 'order'],
+                message='Отклик уже сделан'
+            )
+        ]
+
+
+class FavoriteOrderSerializer(ModelSerializer):
+    class Meta:
+        model = FavoriteOrder
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=FavoriteOrder.objects.all(),
+                fields=['user', 'order'],
+                message='Заказ уже добавлен в избранное'
+            )
+        ]

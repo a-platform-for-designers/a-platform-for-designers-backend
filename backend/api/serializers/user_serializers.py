@@ -6,6 +6,7 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import PrimaryKeyRelatedField
 from drf_extra_fields.fields import Base64ImageField
 
+from api.serializers.language_serializers import LanguageSerializer
 from api.serializers.resume_serializers import ResumeReadSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from users.models import ProfileCustomer, ProfileDesigner
@@ -20,19 +21,27 @@ class TokenResponseSerializer(serializers.Serializer):
 
 
 class ProfileCustomerSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = ProfileCustomer
         fields = ('id', 'post')
 
-    def partial_update(self, instance, validated_data):
-        instance.post = validated_data.get('post', instance.post)
-        instance.save()
-        return instance
+    def create(self, validated_data):
+        user = self.context.get('request').user
+        try:
+            profilecustomer = user.profilecustomer
+            for attr, value in validated_data.items():
+                setattr(profilecustomer, attr, value)
+            profilecustomer.save()
+            return profilecustomer
+        except ProfileCustomer.DoesNotExist:
+            return super().create(validated_data)
 
 
 class ProfileDesignerSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer()
-
+    language = LanguageSerializer(many=True)
     class Meta:
         model = ProfileDesigner
         fields = (
