@@ -47,15 +47,15 @@ class ProfileCustomerViewSet(
         if not request.user.is_customer:
             return Response({"detail": "Вы не являетесь заказчиком"},
                             status=status.HTTP_403_FORBIDDEN)
-        if (
-            not request.user.is_staff
-            and request.user.id != request.data.get('user')
-        ):
-            return Response({"detail": "Нет разрешения."},
-                            status=status.HTTP_403_FORBIDDEN)
-        if ProfileCustomer.objects.filter(user=request.user).exists():
-            return Response({"detail": "Профиль уже существует"},
-                            status=status.HTTP_400_BAD_REQUEST)
+        # if (
+        #     not request.user.is_staff
+        #     and request.user.id != request.data.get('user')
+        # ):
+        #     return Response({"detail": "Нет разрешения."},
+        #                     status=status.HTTP_403_FORBIDDEN)
+        # if ProfileCustomer.objects.filter(user=request.user).exists():
+        #     return Response({"detail": "Профиль уже существует"},
+        #                     status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):

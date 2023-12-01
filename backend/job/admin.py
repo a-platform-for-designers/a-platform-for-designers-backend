@@ -91,9 +91,7 @@ class OrderAdmin(admin.ModelAdmin):
         'customer',
         'title',
         'specialization',
-        'price_min',
-        'price_max',
-        'currency',
+        'payment',
         'sphere',
         'description'
     )
