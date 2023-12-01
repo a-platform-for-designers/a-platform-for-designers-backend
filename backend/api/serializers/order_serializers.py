@@ -46,7 +46,7 @@ class OrderReadSerializer(ModelSerializer):
         return OrderResponse.objects.filter(
             user=request.user, order=obj
         ).exists()
-    
+
     def get_is_favorited_order(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
@@ -72,7 +72,7 @@ class OrderAuthorReadSerializer(OrderReadSerializer):
             'pub_date',
             'applicants',
         )
-    
+
     def get_applicants(self, obj):
         responses = OrderResponse.objects.filter(order=obj).all()
         users = User.objects.filter(id__in=responses.values('user'))

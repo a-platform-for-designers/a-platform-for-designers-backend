@@ -9,7 +9,7 @@ from api.permissions import IsAuthorOrReadOnly
 from api.serializers.order_serializers import (
     OrderReadSerializer, OrderAuthorReadSerializer, OrderWriteSerializer,
     FavoriteOrderSerializer, OrderResponseSerializer
-    
+
 )
 from job.models import FavoriteOrder, Order, OrderResponse
 from users.models import User
@@ -30,7 +30,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                     return OrderAuthorReadSerializer
                 return OrderReadSerializer
         return OrderWriteSerializer
-    
+
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
             return super().create(request, *args, **kwargs)
@@ -76,14 +76,14 @@ class OrderViewSet(viewsets.ModelViewSet):
                 return Response(
                     {'errors': 'Заказчик не может откликаться на вакансии'},
                     status=status.HTTP_403_FORBIDDEN
-                )  
+                )
             return self.create_object(OrderResponseSerializer, pk, request)
         return self.delete_object(OrderResponse, request.user, pk)
-    
+
     @action(
         detail=True,
         methods=['patch'],
-        url_path='approve_customer/(?P<designer_id>\d+)'
+        url_path=r'approve_customer/(?P<designer_id>\d+)'
     )
     def approve_customer(self, request, pk, designer_id):
         order = get_object_or_404(Order, id=pk)
@@ -98,7 +98,10 @@ class OrderViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            response = OrderResponse.objects.get(user=designer_id, order=order.id)
+            response = OrderResponse.objects.get(
+                user=designer_id,
+                order=order.id
+            )
             order.executor = response.user
             order.save()
             return Response(
