@@ -57,6 +57,7 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 class ProfileDesignerSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer()
     language = LanguageSerializer(many=True)
+
     class Meta:
         model = ProfileDesigner
         fields = (
