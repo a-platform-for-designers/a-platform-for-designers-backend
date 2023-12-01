@@ -11,7 +11,7 @@ from api.serializers.user_serializers import UserSerializer, AuthorSerializer
 
 class CaseSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Case."""
-    author = AuthorSerializer(read_only=True)
+    author = AuthorSerializer()
     instruments = InstrumentSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()

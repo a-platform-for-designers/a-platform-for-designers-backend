@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
-    Specialization, Order, CaseImage, FavoriteOrder, Resume
+    Specialization, Order, CaseImage, FavoriteOrder, Resume, Language
 )
 
 
@@ -17,6 +17,14 @@ class ResumeAdmin(admin.ModelAdmin):
 
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'id',
+    )
+
+
+@admin.register(Language)
+class LanguageAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'id',
@@ -91,9 +99,7 @@ class OrderAdmin(admin.ModelAdmin):
         'customer',
         'title',
         'specialization',
-        'price_min',
-        'price_max',
-        'currency',
+        'payment',
         'sphere',
         'description'
     )
