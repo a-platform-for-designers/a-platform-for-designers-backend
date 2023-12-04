@@ -15,6 +15,21 @@ from job.models import Case, Specialization, Language
 
 User = get_user_model()
 
+MONTHS = {
+    1: "января",
+    2: "февраля",
+    3: "марта",
+    4: "апреля",
+    5: "мая",
+    6: "июня",
+    7: "июля",
+    8: "августа",
+    9: "сентября",
+    10: "октября",
+    11: "ноября",
+    12: "декабря"
+}
+
 
 class TokenResponseSerializer(serializers.Serializer):
     auth_token = serializers.CharField()
@@ -101,18 +116,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(UserSerializer):
-    """
-    Сериализатор профиля пользователя.
 
-    Атрибуты:
-        is_subscribed (SerializerMethodField): поле, указывающее,
-        подписан ли текущий пользователь на автора.
-
-    Методы:
-        get_is_subscribed(obj: User) -> bool: возвращает True,
-        если текущий пользователь подписан на автора, иначе False.
-
-    """
     profilecustomer = ProfileCustomerSerializer(read_only=True)
     profiledesigner = ProfileDesignerSerializer(read_only=True)
     is_subscribed = SerializerMethodField(read_only=True)
@@ -138,7 +142,11 @@ class UserProfileSerializer(UserSerializer):
         )
 
     def get_date_joined(self, obj):
-        return f'Joined {obj.date_joined.strftime("%d %B %Y")}'
+        return (
+            f'На сайте с {obj.date_joined.strftime("%d")}'
+            f'{MONTHS.get(int(obj.date_joined.strftime("%m")))}'
+            f'{obj.date_joined.strftime("%Y")}'
+        )
 
     def get_is_subscribed(self, obj: User) -> bool:
         user = self.context.get('request').user
