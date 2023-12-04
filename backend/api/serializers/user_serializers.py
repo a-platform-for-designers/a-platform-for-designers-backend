@@ -78,6 +78,7 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
         queryset=Language.objects.all(),
         many=True
     )
+    photo = Base64ImageField()
 
     class Meta:
         model = ProfileDesigner
@@ -87,7 +88,8 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
             'country',
             'specialization',
             'hobby',
-            'language'
+            'language',
+            'photo'
         )
 
     def create(self, validated_data):
@@ -99,6 +101,8 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
                 setattr(profiledesigner, attr, value)
             profiledesigner.language.set(language)
             profiledesigner.save()
+            # проверить, что фото есть
+            # если есть - загрузить - в какое именно поле? - вот тут надо подумать, но пока нет ресурса
             return profiledesigner
         except ProfileDesigner.DoesNotExist:
             return super().create(validated_data)
