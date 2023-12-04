@@ -149,10 +149,11 @@ class UserProfileSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj: User) -> bool:
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.subscriber.filter(author=obj).exists()
+        # user = self.context.get('request').user
+        # if user.is_anonymous:
+        #     return False
+        # return user.subscriber.filter(author=obj).exists()
+        return True
 
     def get_portfolio(self, obj):
         cases = Case.objects.filter(author=obj)

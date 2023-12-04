@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from api.views.case_views import CaseViewSet
 from api.views.caseimage_views import CaseImageViewSet
-from api.views.chat_views import ChatViewSet
+from api.views.chat_views import conversations, get_conversation, start_convo
 from api.views.comment_views import CommentViewSet
 from api.views.instrument_views import InstrumentViewSet
 from api.views.language_views import LanguageViewSet
@@ -35,11 +35,11 @@ router.register(
 )
 router.register('cases', CaseViewSet, basename='cases')
 # router.register('chats', ChatViewSet, basename='chats')
-# router.register(
-#     r'chats/(?P<chat_id>\d+)/messages',
-#     MessageViewSet,
-#     basename='messages'
-# )
+router.register(
+    r'chats/(?P<chat_id>\d+)/messages',
+    MessageViewSet,
+    basename='messages'
+)
 router.register(
     'specializations',
     SpecializationViewSet,
@@ -51,9 +51,13 @@ router.register('instruments', InstrumentViewSet, basename='instruments')
 router.register('skills', SkillViewSet, basename='skills')
 router.register('languages', LanguageViewSet, basename='languages')
 
+
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/token/login/', TokenCreateView.as_view(), name='login'),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
+    path('chat_start/', start_convo, name='start_convo'),
+    path('chat/<int:convo_id>/', get_conversation, name='get_conversation'),
+    path('chats/', conversations, name='conversations')
 ]
