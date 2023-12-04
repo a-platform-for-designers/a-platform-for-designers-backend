@@ -33,7 +33,8 @@ class OrderReadSerializer(ModelSerializer):
             'description',
             'pub_date',
             'is_responded_order',
-            'is_favorited_order'
+            'is_favorited_order',
+            'is_published'
         )
 
     def get_pub_date(self, obj):

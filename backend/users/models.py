@@ -101,11 +101,8 @@ class ProfileDesigner(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     education = models.CharField(blank=True, null=True, max_length=50)
     country = CountryField(blank=True, null=True,)
-    specialization = models.ForeignKey(
+    specialization = models.ManyToManyField(
         to='job.Specialization',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
     )
     hobby = models.CharField(blank=True, null=True, max_length=200)
     language = models.ManyToManyField(
