@@ -14,7 +14,7 @@ class CaseSerializer(serializers.ModelSerializer):
     author = AuthorSerializer()
     instruments = InstrumentSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
-    is_like = serializers.SerializerMethodField()
+    # is_like = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
     avatar = Base64ImageField()
     sphere = SphereSerializer()
@@ -32,7 +32,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
-            'is_like'
+            # 'is_like'
         ]
 
     def get_is_favorited(self, obj) -> bool:
@@ -43,13 +43,13 @@ class CaseSerializer(serializers.ModelSerializer):
         return FavoriteCase.objects.filter(
             case=obj, user=request.user).exists()
 
-    def get_is_like(self, obj) -> bool:
-        """проверка на добавление проекта в лайки."""
-        request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
-        return Like.objects.filter(
-            author=obj.author).exists()
+    # def get_is_like(self, obj) -> bool:
+    #     """проверка на добавление проекта в лайки."""
+    #     request = self.context.get('request')
+    #     if request.user.is_anonymous:
+    #         return False
+    #     return Like.objects.filter(
+    #         author=obj.author).exists()
 
 
 class CaseShortSerializer(serializers.ModelSerializer):
