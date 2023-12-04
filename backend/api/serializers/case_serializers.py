@@ -5,7 +5,7 @@ from django.db import transaction
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.sphere_serializers import SphereSerializer
 from api.serializers.caseimage_serializers import CaseImageSerializer
-from job.models import Case, FavoriteCase, CaseImage, Like
+from job.models import Case, FavoriteCase, CaseImage
 from api.serializers.user_serializers import UserSerializer, AuthorSerializer
 
 
