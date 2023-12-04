@@ -108,7 +108,6 @@ class ProfileDesigner(models.Model):
     language = models.ManyToManyField(
         to='job.Language',
         blank=True,
-        null=True,
     )
 
     class Meta:
