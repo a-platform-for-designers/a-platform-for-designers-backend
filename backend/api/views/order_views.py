@@ -31,7 +31,6 @@ class OrderViewSet(viewsets.ModelViewSet):
                 return OrderReadSerializer
         return OrderWriteSerializer
 
-
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
             return super().create(request, *args, **kwargs)
