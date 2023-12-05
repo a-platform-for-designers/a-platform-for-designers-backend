@@ -31,19 +31,36 @@ MONTHS = {
 }
 
 
+def check_photo(validated_data, email):
+    if 'photo' in validated_data:
+        photo = validated_data.pop('photo')
+        User.objects.filter(email=email).update(photo=photo)
+    else:
+        User.objects.filter(email=email).update(photo=None)
+
+
 class TokenResponseSerializer(serializers.Serializer):
     auth_token = serializers.CharField()
 
 
 class ProfileCustomerSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = ProfileCustomer
         fields = ('id', 'post')
 
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError("Нужны хоть какие-то данные.")
+        return data
+
     def create(self, validated_data):
         user = self.context.get('request').user
+
+        check_photo(validated_data, user)
+
         try:
             profilecustomer = user.profilecustomer
             for attr, value in validated_data.items():
@@ -55,7 +72,7 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 
 
 class ProfileDesignerSerializer(serializers.ModelSerializer):
-    specialization = SpecializationSerializer()
+    specialization = SpecializationSerializer(many=True)
     language = LanguageSerializer(many=True)
 
     class Meta:
@@ -72,32 +89,47 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
 
 class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
     specialization = PrimaryKeyRelatedField(
-        queryset=Specialization.objects.all()
+        queryset=Specialization.objects.all(),
+        many=True,
+        required=False,
     )
     language = PrimaryKeyRelatedField(
         queryset=Language.objects.all(),
-        many=True
+        many=True,
+        required=False,
     )
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = ProfileDesigner
         fields = (
             'id',
             'education',
-            'country',
+            # 'country',
             'specialization',
             'hobby',
-            'language'
+            'language',
+            'photo'
         )
+
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError("Нужны хоть какие-то данные!")
+        return data
 
     def create(self, validated_data):
         user = self.context.get('request').user
+
+        check_photo(validated_data, user)
+
         try:
             profiledesigner = user.profiledesigner
             language = validated_data.pop('language')
+            specialization = validated_data.pop('specialization')
             for attr, value in validated_data.items():
                 setattr(profiledesigner, attr, value)
             profiledesigner.language.set(language)
+            profiledesigner.specialization.set(specialization)
             profiledesigner.save()
             return profiledesigner
         except ProfileDesigner.DoesNotExist:
