@@ -42,6 +42,10 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileCustomer
         fields = ('id', 'post')
+    
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError("Нам нужны хоть какие-то данные!")
 
     def create(self, validated_data):
         user = self.context.get('request').user
@@ -81,11 +85,13 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
 class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
     specialization = PrimaryKeyRelatedField(
         queryset=Specialization.objects.all(),
-        many=True
+        many=True,
+        required=False,
     )
     language = PrimaryKeyRelatedField(
         queryset=Language.objects.all(),
-        many=True
+        many=True,
+        required=False,
     )
     photo = Base64ImageField(required=False)
 
@@ -100,6 +106,10 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
             'language',
             'photo'
         )
+    
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError("Нам нужны хоть какие-то данные!")
 
     def create(self, validated_data):
         user = self.context.get('request').user
@@ -111,11 +121,9 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
             User.objects.filter(email=user).update(photo=None)        
 
         try:
-
             profiledesigner = user.profiledesigner
             language = validated_data.pop('language')
             specialization = validated_data.pop('specialization')
-            # photo = validated_data.pop('photo')
             for attr, value in validated_data.items():
                 setattr(profiledesigner, attr, value)
             profiledesigner.language.set(language)
