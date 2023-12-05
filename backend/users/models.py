@@ -103,6 +103,7 @@ class ProfileDesigner(models.Model):
     country = CountryField(blank=True, null=True,)
     specialization = models.ManyToManyField(
         to='job.Specialization',
+        blank=True,
     )
     hobby = models.CharField(blank=True, null=True, max_length=200)
     language = models.ManyToManyField(
