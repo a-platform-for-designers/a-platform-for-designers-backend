@@ -30,6 +30,13 @@ MONTHS = {
     12: "декабря"
 }
 
+def check_photo(validated_data, email):
+    if 'photo' in validated_data:
+        photo = validated_data.pop('photo')
+        User.objects.filter(email=email).update(photo=photo)
+    else:
+        User.objects.filter(email=email).update(photo=None)
+
 
 class TokenResponseSerializer(serializers.Serializer):
     auth_token = serializers.CharField()
@@ -42,19 +49,16 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileCustomer
         fields = ('id', 'post')
-    
+
     def validate(self, data):
         if not data:
-            raise serializers.ValidationError("Нам нужны хоть какие-то данные!")
+            raise serializers.ValidationError("Нужны хоть какие-то данные.")
+        return data
 
     def create(self, validated_data):
         user = self.context.get('request').user
 
-        try:
-            photo = validated_data.pop('photo')
-            User.objects.filter(email=user).update(photo=photo)
-        except:
-            User.objects.filter(email=user).update(photo=None)
+        check_photo(validated_data, user)
 
         try:
             profilecustomer = user.profilecustomer
@@ -100,25 +104,22 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'education',
-            'country',
+            # 'country',
             'specialization',
             'hobby',
             'language',
             'photo'
         )
-    
+
     def validate(self, data):
         if not data:
-            raise serializers.ValidationError("Нам нужны хоть какие-то данные!")
+            raise serializers.ValidationError("Нужны хоть какие-то данные!")
+        return data
 
     def create(self, validated_data):
         user = self.context.get('request').user
 
-        try:
-            photo = validated_data.pop('photo')
-            User.objects.filter(email=user).update(photo=photo)
-        except:
-            User.objects.filter(email=user).update(photo=None)        
+        check_photo(validated_data, user)
 
         try:
             profiledesigner = user.profiledesigner
