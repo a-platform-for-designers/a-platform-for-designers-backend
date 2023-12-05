@@ -108,7 +108,7 @@ class ProfileDesigner(models.Model):
     hobby = models.CharField(blank=True, null=True, max_length=200)
     language = models.ManyToManyField(
         to='job.Language',
-        blank=True,        
+        blank=True,
     )
 
     class Meta:

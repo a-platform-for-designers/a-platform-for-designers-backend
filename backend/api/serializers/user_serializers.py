@@ -30,6 +30,7 @@ MONTHS = {
     12: "декабря"
 }
 
+
 def check_photo(validated_data, email):
     if 'photo' in validated_data:
         photo = validated_data.pop('photo')
