@@ -149,11 +149,10 @@ class UserProfileSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj: User) -> bool:
-        # user = self.context.get('request').user
-        # if user.is_anonymous:
-        #     return False
-        # return user.subscriber.filter(author=obj).exists()
-        return True
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return user.subscriber.filter(author=obj).exists()
 
     def get_portfolio(self, obj):
         cases = Case.objects.filter(author=obj)
@@ -278,3 +277,19 @@ class AuthorListSerializer(AuthorSerializer):
             context={'request': self.context['request']},
             many=True
         ).data
+
+
+class UserChatAndMessageSerializer(UserSerializer):
+    """
+    Сериализатор для отображения пользователя в чатах и сообщениях
+    """
+
+    class Meta:
+        ordering = ['id']
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'photo',
+        )

@@ -222,6 +222,7 @@ class Chat(models.Model):
     class Meta:
         verbose_name = 'Чат'
         verbose_name_plural = 'Чаты'
+        ordering = ['-id']
         constraints = [
             UniqueConstraint(
                 fields=['initiator', 'receiver'],

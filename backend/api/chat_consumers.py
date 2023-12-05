@@ -2,6 +2,8 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from django.conf import settings
+from django.core.paginator import Paginator
 
 from api.serializers.message_serializers import MessageSerializer
 from job.models import Chat, Message
@@ -18,20 +20,26 @@ class ChatConsumer(WebsocketConsumer):
         if 'user' not in self.scope:
             self.close()
 
-        self.chat_id = self.scope["url_route"]["kwargs"]["chat_id"]
-        self.chat_group = f"chat_{self.chat_id}"
+        self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+        self.chat_group = f'chat_{self.chat_id}'
 
-        async_to_sync(self.channel_layer.group_add)(
-            self.chat_group, self.channel_name
-        )
-        self.accept()
-
+        user = self.scope['user']
         chat = Chat.objects.get(id=int(self.chat_id))
-        messages = Message.objects.filter(chat=chat).order_by('pub_date')
 
-        for message in messages:
-            serializer = MessageSerializer(instance=message)
-            self.send(text_data=json.dumps(serializer.data))
+        if chat.initiator == user or chat.receiver == user:
+            async_to_sync(self.channel_layer.group_add)(
+                self.chat_group, self.channel_name
+            )
+            self.accept()
+
+            messages = Message.objects.filter(chat=chat).order_by('-pub_date')
+            paginator = Paginator(messages, settings.MESSAGES_PAGE_SIZE)
+
+            for message in paginator.page(1):
+                serializer = MessageSerializer(instance=message)
+                self.send(text_data=json.dumps(serializer.data))
+        else: 
+            self.close()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
@@ -40,21 +48,34 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
         chat = Chat.objects.get(id=int(self.chat_id))
-        self.sender = self.scope["user"]
+        self.sender = self.scope['user']
 
-        message_create = Message.objects.create(
-            sender=self.sender,
-            text=message,
-            chat=chat,
-        )
-        self.message_id = message_create.id
+        if 'action' in text_data_json:
+            action = text_data_json['action']
+            if action == 'load_more':
+                page_number = text_data_json['page_number']
+                messages = Message.objects.filter(chat=chat).order_by('-pub_date')
+                paginator = Paginator(messages, settings.MESSAGES_PAGE_SIZE)
+                page = paginator.page(page_number)
+                
+                for message in page:
+                    serializer = MessageSerializer(instance=message)
+                    self.send(text_data=json.dumps(serializer.data))
 
-        async_to_sync(self.channel_layer.group_send)(
-            self.chat_group,
-            {"type": "chat_message", "message": message}
-        )
+        else:
+            message = text_data_json['message']
+            message_create = Message.objects.create(
+                sender=self.sender,
+                text=message,
+                chat=chat,
+            )
+            self.message_id = message_create.id
+
+            async_to_sync(self.channel_layer.group_send)(
+                self.chat_group,
+                {'type': 'chat_message', 'message': message}
+            )
 
     def chat_message(self, event):
         if self.message_id:

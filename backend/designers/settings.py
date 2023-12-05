@@ -19,15 +19,13 @@ DEBUG = os.getenv('DEBUG', True)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
 
-# ALLOWED_HOSTS = [
-#     'localhost',
-#     'backend',
-#     '127.0.0.1',
-#     '46.183.163.139',
-#     '91.226.81.209'
-# ]
-
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    'backend',
+    '127.0.0.1',
+    '46.183.163.139',
+    '91.226.81.209'
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
@@ -236,8 +234,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MESSAGE_STR = 30
-
 DRF_API_LOGGER_DATABASE = True  # Default to False
 
 
@@ -252,3 +248,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+MESSAGE_STR = 30
+
+MESSAGES_PAGE_SIZE = 50
