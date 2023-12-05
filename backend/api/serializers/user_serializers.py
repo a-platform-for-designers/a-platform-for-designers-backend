@@ -37,6 +37,7 @@ class TokenResponseSerializer(serializers.Serializer):
 
 class ProfileCustomerSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = ProfileCustomer
@@ -44,6 +45,13 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context.get('request').user
+
+        try:
+            photo = validated_data.pop('photo')
+            User.objects.filter(email=user).update(photo=photo)
+        except:
+            User.objects.filter(email=user).update(photo=None)
+
         try:
             profilecustomer = user.profilecustomer
             for attr, value in validated_data.items():
@@ -95,15 +103,24 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context.get('request').user
+
         try:
+            photo = validated_data.pop('photo')
+            User.objects.filter(email=user).update(photo=photo)
+        except:
+            User.objects.filter(email=user).update(photo=None)        
+
+        try:
+
             profiledesigner = user.profiledesigner
             language = validated_data.pop('language')
+            specialization = validated_data.pop('specialization')
+            # photo = validated_data.pop('photo')
             for attr, value in validated_data.items():
                 setattr(profiledesigner, attr, value)
             profiledesigner.language.set(language)
+            profiledesigner.specialization.set(specialization)
             profiledesigner.save()
-            # проверить, что фото есть
-            # если есть - загрузить - в какое именно поле? - вот тут надо подумать, но пока нет ресурса
             return profiledesigner
         except ProfileDesigner.DoesNotExist:
             return super().create(validated_data)
