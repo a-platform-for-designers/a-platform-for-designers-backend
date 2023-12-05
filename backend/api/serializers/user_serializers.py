@@ -55,7 +55,7 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 
 
 class ProfileDesignerSerializer(serializers.ModelSerializer):
-    specialization = SpecializationSerializer()
+    specialization = SpecializationSerializer(many=True)
     language = LanguageSerializer(many=True)
 
     class Meta:
@@ -72,13 +72,14 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
 
 class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
     specialization = PrimaryKeyRelatedField(
-        queryset=Specialization.objects.all()
+        queryset=Specialization.objects.all(),
+        many=True
     )
     language = PrimaryKeyRelatedField(
         queryset=Language.objects.all(),
         many=True
     )
-    photo = Base64ImageField()
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = ProfileDesigner
