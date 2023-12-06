@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -8,7 +9,8 @@ from api.pagination import LimitPageNumberPagination
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers.order_serializers import (
     OrderReadSerializer, OrderAuthorReadSerializer, OrderWriteSerializer,
-    FavoriteOrderSerializer, OrderResponseSerializer
+    FavoriteOrderSerializer, OrderResponseSerializer,
+    OrderAuthorListReadSerializer
 
 )
 from job.models import FavoriteOrder, Order, OrderResponse
@@ -16,20 +18,25 @@ from users.models import User
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
 
+    def get_queryset(self):
+        base_queryset = Order.objects.all()
+        if self.action == 'list':
+            return base_queryset.filter(is_published=True)
+        return base_queryset
+
     def get_serializer_class(self):
-        if self.request.method == 'GET':
-            if self.action == 'list':
-                return OrderReadSerializer
-            elif self.action == 'retrieve':
-                order = self.get_object()
-                if self.request.user == order.customer:
-                    return OrderAuthorReadSerializer
-                return OrderReadSerializer
-        return OrderWriteSerializer
+        if self.action == 'list':
+            return OrderReadSerializer
+        elif self.action == 'retrieve':
+            order = self.get_object()
+            if self.request.user == order.customer:
+                return OrderAuthorReadSerializer
+            return OrderReadSerializer
+        elif self.action in ('create', 'partial_update'):
+            return OrderWriteSerializer
 
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
@@ -63,13 +70,21 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response({'errors': 'Заказ уже удален!'},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post', 'delete'])
-    def favorite(self, request, pk):
-        if request.method == 'POST':
-            return self.create_object(FavoriteOrderSerializer, pk, request)
-        return self.delete_object(FavoriteOrder, request.user, pk)
+    # @action(
+    #     detail=True,
+    #     methods=['post', 'delete'],
+    #     permission_classes=[IsAuthenticated]
+    # )
+    # def favorite(self, request, pk):
+    #     if request.method == 'POST':
+    #         return self.create_object(FavoriteOrderSerializer, pk, request)
+    #     return self.delete_object(FavoriteOrder, request.user, pk)
 
-    @action(detail=True, methods=['post', 'delete'])
+    @action(
+        detail=True,
+        methods=['post', 'delete'],
+        permission_classes=[IsAuthenticated]
+    )
     def respond(self, request, pk):
         if request.method == 'POST':
             if self.request.user.is_customer:
@@ -80,7 +95,11 @@ class OrderViewSet(viewsets.ModelViewSet):
             return self.create_object(OrderResponseSerializer, pk, request)
         return self.delete_object(OrderResponse, request.user, pk)
 
-    @action(detail=True, methods=['patch'])
+    @action(
+        detail=True,
+        methods=['patch'],
+        permission_classes=[IsAuthenticated]
+    )
     def publish(self, request, pk):
         order = get_object_or_404(Order, id=pk)
         if self.request.user != order.customer:
@@ -98,16 +117,20 @@ class OrderViewSet(viewsets.ModelViewSet):
         order.is_published = True
         order.save()
         return Response(
-            {'message': 'Заказ успешно снят с публикации'},
+            {'message': 'Заказ успешно опубликован'},
             status=status.HTTP_200_OK
         )
 
-    @action(detail=False, methods=['get'])
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
     def my_orders(self, request):
         user = self.request.user
         if user.is_customer:
             orders = user.orders.all()
-            serializer = OrderReadSerializer(orders, many=True)
+            serializer = OrderAuthorListReadSerializer(orders, many=True)
             return Response(serializer.data)
         responses = user.order_responses.values_list('order').all()
         orders = Order.objects.filter(id__in=responses)

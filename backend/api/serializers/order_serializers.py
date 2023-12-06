@@ -6,7 +6,9 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from api.serializers.specialization_serializers import SpecializationSerializer
 from api.serializers.sphere_serializers import SphereSerializer
-from api.serializers.user_serializers import AuthorListSerializer
+from api.serializers.user_serializers import (
+    ApplicantSerializer, CustomerSerializer
+)
 from job.models import (
     FavoriteOrder, Order, OrderResponse, Specialization, Sphere
 )
@@ -15,7 +17,7 @@ from users.models import User
 
 class OrderReadSerializer(ModelSerializer):
     specialization = SpecializationSerializer()
-    customer = UserSerializer()
+    customer = CustomerSerializer()
     sphere = SphereSerializer()
     is_responded_order = SerializerMethodField()
     is_favorited_order = SerializerMethodField()
@@ -59,6 +61,7 @@ class OrderReadSerializer(ModelSerializer):
 
 class OrderAuthorReadSerializer(OrderReadSerializer):
     applicants = SerializerMethodField()
+    customer = CustomerSerializer()
 
     class Meta:
         model = Order
@@ -77,9 +80,31 @@ class OrderAuthorReadSerializer(OrderReadSerializer):
     def get_applicants(self, obj):
         responses = OrderResponse.objects.filter(order=obj).all()
         users = User.objects.filter(id__in=responses.values('user'))
-        return AuthorListSerializer(
+        return ApplicantSerializer(
             users, many=True, context=self.context
         ).data
+
+
+class OrderAuthorListReadSerializer(OrderReadSerializer):
+    responses = SerializerMethodField()
+    customer = CustomerSerializer()
+
+    class Meta:
+        model = Order
+        fields = (
+            'id',
+            'customer',
+            'title',
+            'specialization',
+            'payment',
+            'sphere',
+            'description',
+            'pub_date',
+            'responses',
+        )
+
+    def get_responses(self, obj):
+        return OrderResponse.objects.filter(order=obj).count()
 
 
 class OrderWriteSerializer(ModelSerializer):

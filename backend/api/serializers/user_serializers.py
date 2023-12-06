@@ -15,21 +15,6 @@ from job.models import Case, Specialization, Language
 
 User = get_user_model()
 
-MONTHS = {
-    1: "января",
-    2: "февраля",
-    3: "марта",
-    4: "апреля",
-    5: "мая",
-    6: "июня",
-    7: "июля",
-    8: "августа",
-    9: "сентября",
-    10: "октября",
-    11: "ноября",
-    12: "декабря"
-}
-
 
 def check_photo(validated_data, email):
     if 'photo' in validated_data:
@@ -49,11 +34,11 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProfileCustomer
-        fields = ('id', 'post')
+        fields = ('id', 'post', 'photo')
 
     def validate(self, data):
         if not data:
-            raise serializers.ValidationError("Нужны хоть какие-то данные.")
+            raise serializers.ValidationError("Нужны хоть какие-то данные!")
         return data
 
     def create(self, validated_data):
@@ -105,7 +90,7 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'education',
-            # 'country',
+            'country',
             'specialization',
             'hobby',
             'language',
@@ -174,11 +159,7 @@ class UserProfileSerializer(UserSerializer):
         )
 
     def get_date_joined(self, obj):
-        return (
-            f'На сайте с {obj.date_joined.strftime("%d")}'
-            f'{MONTHS.get(int(obj.date_joined.strftime("%m")))}'
-            f'{obj.date_joined.strftime("%Y")}'
-        )
+        return f'Published {obj.date_joined.strftime("%d %B %Y")}'
 
     def get_is_subscribed(self, obj: User) -> bool:
         user = self.context.get('request').user
@@ -253,7 +234,10 @@ class AuthorSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в кейсе
     """
-    specialization = SerializerMethodField(read_only=True)
+    specialization = SpecializationSerializer(
+        many=True,
+        source='profiledesigner.specialization'
+    )
 
     class Meta:
         model = User
@@ -265,17 +249,30 @@ class AuthorSerializer(UserSerializer):
             'specialization',
         )
 
-    def get_specialization(self, obj) -> int:
-        try:
-            profile = ProfileDesigner.objects.get(user=obj)
-            return profile.specialization.id
-        except ProfileDesigner.DoesNotExist:
-            return 0
+
+class ApplicantSerializer(AuthorSerializer):
+    """
+    Сериализатор для отображения пользователя в откликах
+    """
+    country = serializers.CharField(
+        source='profiledesigner.country'
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'photo',
+            'specialization',
+            'country'
+        )
 
 
 class AuthorListSerializer(AuthorSerializer):
     """
-    Сериализатор для отображения пользователя в кейсе
+    Сериализатор для отображения пользователя в списке юзеров
     """
 
     country = SerializerMethodField(read_only=True)
@@ -309,3 +306,20 @@ class AuthorListSerializer(AuthorSerializer):
             context={'request': self.context['request']},
             many=True
         ).data
+
+
+class CustomerSerializer(UserSerializer):
+    """
+    Сериализатор для отображения пользователя в откликах
+    """
+    post = serializers.CharField(source='profilecustomer.post')
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'photo',
+            'post'
+        )
