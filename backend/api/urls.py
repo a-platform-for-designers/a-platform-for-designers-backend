@@ -13,15 +13,16 @@ from api.views.skill_views import SkillViewSet
 from api.views.specialization_views import SpecializationViewSet
 from api.views.sphere_views import SphereViewSet
 from api.views.message_views import MessageViewSet
-from api.views.user_views import ProfileCustomerViewSet, ProfileDesignerViewSet
-from api.views.user_views import UserProfileViewSet
-from api.views.user_views import TokenCreateView
+from api.views.user_views import (
+    ProfileCustomerViewSet, ProfileDesignerViewSet, UserProfileViewSet,
+    MentorViewSet
+)
 
 
 router = routers.DefaultRouter()
 
 router.register('users', UserProfileViewSet, basename='users')
-# router.register('comments', CommentViewSet, basename='comments')
+router.register('mentors', MentorViewSet, basename='mentors')
 router.register('spheres', SphereViewSet, basename='spheres')
 router.register(
     'profile_customer',
@@ -53,7 +54,7 @@ router.register('languages', LanguageViewSet, basename='languages')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('auth/token/login/', TokenCreateView.as_view(), name='login'),
+    # path('auth/token/login/', TokenCreateView.as_view(), name='login'),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]
