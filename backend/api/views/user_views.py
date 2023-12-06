@@ -82,21 +82,6 @@ class ProfileDesignerViewSet(
 class UserProfileViewSet(UserViewSet):
     """"
     Класс UserProfileViewSet для работы с профилями пользователей.
-    Добавляет дополнительные функции для управления подписками.
-
-    Методы:
-        subscribe: обрабатывает POST и DELETE запросы
-        для создания и удаления подписок на авторов.
-        manage_subscription: метод для создания и удаления подписок.
-        subscriptions: возвращает список авторов,
-        на которых подписан пользователь.
-
-    Эндпоинты:
-        POST /api/users/{id}/subscribe/
-        DELETE /api/users/{id}/subscribe/
-        GET /api/users/subscriptions/
-    Внимание! Код картинки для регистрации пользователя через json:
-    iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC
     """
 
     permission_classes = (AllowAny,)
@@ -121,72 +106,89 @@ class UserProfileViewSet(UserViewSet):
             return UserProfileCreateSerializer
         return UserProfileSerializer
 
-    @action(
-        detail=True,
-        methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated]
-    )
-    def subscribe(self, request, **kwargs):
-        current_user = request.user
-        target_author_id = self.kwargs.get('id')
-        target_author = get_object_or_404(User, id=target_author_id)
+    # @action(
+    #     detail=True,
+    #     methods=['post', 'delete'],
+    #     permission_classes=[IsAuthenticated]
+    # )
+    # def subscribe(self, request, **kwargs):
+    #     current_user = request.user
+    #     target_author_id = self.kwargs.get('id')
+    #     target_author = get_object_or_404(User, id=target_author_id)
 
-        if request.method == 'POST':
-            return self.manage_subscription(
-                request,
-                current_user,
-                target_author,
-                action_type='create'
-            )
+    #     if request.method == 'POST':
+    #         return self.manage_subscription(
+    #             request,
+    #             current_user,
+    #             target_author,
+    #             action_type='create'
+    #         )
 
-        if request.method == 'DELETE':
-            return self.manage_subscription(
-                request,
-                current_user,
-                target_author,
-                action_type='delete'
-            )
+    #     if request.method == 'DELETE':
+    #         return self.manage_subscription(
+    #             request,
+    #             current_user,
+    #             target_author,
+    #             action_type='delete'
+    #         )
 
-    def manage_subscription(
-            self,
-            request,
-            current_user,
-            target_author,
-            action_type
-    ):
-        if action_type == 'create':
-            serializer = SubscriptionCreateSerializer(
-                data={
-                    'user': current_user.id,
-                    'author': target_author.id
-                },
-            )
-            serializer.is_valid(raise_exception=True)
-            Subscription.objects.create(
-                user=current_user,
-                author=target_author
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif action_type == 'delete':
-            subscription_instance = get_object_or_404(
-                Subscription,
-                user=current_user,
-                author=target_author
-            )
-            subscription_instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+    # def manage_subscription(
+    #         self,
+    #         request,
+    #         current_user,
+    #         target_author,
+    #         action_type
+    # ):
+    #     if action_type == 'create':
+    #         serializer = SubscriptionCreateSerializer(
+    #             data={
+    #                 'user': current_user.id,
+    #                 'author': target_author.id
+    #             },
+    #         )
+    #         serializer.is_valid(raise_exception=True)
+    #         Subscription.objects.create(
+    #             user=current_user,
+    #             author=target_author
+    #         )
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     elif action_type == 'delete':
+    #         subscription_instance = get_object_or_404(
+    #             Subscription,
+    #             user=current_user,
+    #             author=target_author
+    #         )
+    #         subscription_instance.delete()
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(
-        detail=False,
-        permission_classes=[IsAuthenticated]
-    )
-    def subscriptions(self, request):
-        current_user = request.user
-        queryset = User.objects.filter(subscribing__user=current_user)
-        paginated_queryset = self.paginate_queryset(queryset)
-        serializer = SubscriptionSerializer(
-            paginated_queryset,
-            many=True,
-            context={'request': request}
-        )
-        return self.get_paginated_response(serializer.data)
+    # @action(
+    #     detail=False,
+    #     permission_classes=[IsAuthenticated]
+    # )
+    # def subscriptions(self, request):
+    #     current_user = request.user
+    #     queryset = User.objects.filter(subscribing__user=current_user)
+    #     paginated_queryset = self.paginate_queryset(queryset)
+    #     serializer = SubscriptionSerializer(
+    #         paginated_queryset,
+    #         many=True,
+    #         context={'request': request}
+    #     )
+    #     return self.get_paginated_response(serializer.data)
+
+
+class MentorViewSet(mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
+    """"
+    Класс MentorViewSet включает в себя только list-метод
+    для отображения дизайнеров-менторов.
+    """
+
+    permission_classes = (AllowAny,)
+    pagination_class = LimitPageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = DesignersFilter
+    queryset = User.objects.filter(
+        profiledesigner__specialization__name='Менторство'
+    ).distinct()
+    serializer_class = AuthorListSerializer
