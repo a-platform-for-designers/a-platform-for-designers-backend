@@ -3,7 +3,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.conf import settings
-from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage, Paginator
 
 from api.serializers.message_serializers import MessageSerializer
 from job.models import Chat, Message
@@ -35,10 +35,13 @@ class ChatConsumer(WebsocketConsumer):
             messages = Message.objects.filter(chat=chat).order_by('-pub_date')
             paginator = Paginator(messages, settings.MESSAGES_PAGE_SIZE)
 
-            for message in paginator.page(1):
+            for message in reversed(paginator.page(1)):
                 serializer = MessageSerializer(instance=message)
-                self.send(text_data=json.dumps(serializer.data))
-        else: 
+                self.send(text_data=json.dumps(
+                    serializer.data,
+                    ensure_ascii=False
+                ))
+        else:
             self.close()
 
     def disconnect(self, close_code):
@@ -53,15 +56,26 @@ class ChatConsumer(WebsocketConsumer):
 
         if 'action' in text_data_json:
             action = text_data_json['action']
+
             if action == 'load_more':
                 page_number = text_data_json['page_number']
-                messages = Message.objects.filter(chat=chat).order_by('-pub_date')
+                messages = Message.objects.filter(
+                    chat=chat,
+                ).order_by('-pub_date')
                 paginator = Paginator(messages, settings.MESSAGES_PAGE_SIZE)
-                page = paginator.page(page_number)
-                
+
+                try:
+                    page = reversed(paginator.page(page_number))
+                except EmptyPage:
+                    self.send(text_data="Нет более ранних сообщений")
+                    return
+
                 for message in page:
                     serializer = MessageSerializer(instance=message)
-                    self.send(text_data=json.dumps(serializer.data))
+                    self.send(text_data=json.dumps(
+                        serializer.data,
+                        ensure_ascii=False
+                    ))
 
         else:
             message = text_data_json['message']
@@ -82,7 +96,10 @@ class ChatConsumer(WebsocketConsumer):
             message = Message.objects.filter(id=self.message_id)
             serializer = MessageSerializer(instance=message[0])
 
-            self.send(text_data=json.dumps(serializer.data))
+            self.send(text_data=json.dumps(
+                serializer.data,
+                ensure_ascii=False
+            ))
 
             self.sender = None
             self.message_id = None
@@ -95,4 +112,7 @@ class ChatConsumer(WebsocketConsumer):
 
             if last_message:
                 serializer = MessageSerializer(instance=last_message)
-                self.send(text_data=json.dumps(serializer.data))
+                self.send(text_data=json.dumps(
+                    serializer.data,
+                    ensure_ascii=False
+                ))
