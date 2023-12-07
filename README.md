@@ -83,7 +83,7 @@ http://localhost/api/schema/
  Если после сборки контейнер не видит их, вы можете использовать утилиту dos2unix для конвертации файлов в формат Unix. Если у вас установлен Git Bash или WSL на Windows, вы можете выполнить следующую команду:
   - [ ] Git Bash из папки backend:
 ```
- dos2unix entrypoint.sh wait-for-it.sh
+ dos2unix entrypoint.sh wait-for-it.sh entrypoint_daphne.sh
 ```
  - Ответ должен быть:
 
@@ -91,6 +91,7 @@ http://localhost/api/schema/
 MINGW64 ~/a-platform-for-designers-backend/backend (main)   
 dos2unix entrypoint.sh wait-for-it.sh
 dos2unix: converting file entrypoint.sh to Unix format...
+dos2unix: converting file entrypoint_daphne.sh to Unix format...
 dos2unix: converting file wait-for-it.sh to Unix format...
 
 ```
