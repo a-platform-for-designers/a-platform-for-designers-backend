@@ -20,8 +20,6 @@ def check_photo(validated_data, email):
     if 'photo' in validated_data:
         photo = validated_data.pop('photo')
         User.objects.filter(email=email).update(photo=photo)
-    else:
-        User.objects.filter(email=email).update(photo=None)
 
 
 class TokenResponseSerializer(serializers.Serializer):
