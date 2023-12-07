@@ -1,11 +1,11 @@
 from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
 from django.contrib.auth.models import AnonymousUser
-from rest_framework.authtoken.models import Token
 
 
 @database_sync_to_async
 def get_user(token_key):
+    from rest_framework.authtoken.models import Token
     try:
         token = Token.objects.get(key=token_key)
         return token.user
