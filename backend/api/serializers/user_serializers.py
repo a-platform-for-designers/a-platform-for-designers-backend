@@ -320,6 +320,7 @@ class UserChatAndMessageSerializer(UserSerializer):
             'first_name',
             'last_name',
             'photo',
+        )
 
           
 class CustomerSerializer(UserSerializer):
