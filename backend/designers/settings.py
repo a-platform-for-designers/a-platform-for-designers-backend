@@ -15,6 +15,7 @@ if not SECRET_KEY:
     raise ValueError('SECRET_KEY не установлен')
 
 DEBUG = os.getenv('DEBUG', True)
+
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
 
@@ -39,6 +40,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 INSTALLED_APPS = [
 
+    'daphne',
+
     # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,12 +59,12 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'corsheaders',
     'drf_api_logger',
+    'channels',
 
     # Local apps
     'users',
     'api',
     'job',
-
 
 ]
 
@@ -99,29 +102,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'designers.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+ASGI_APPLICATION = 'designers.asgi.application'
+
 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': os.getenv(
-#             'DB_ENGINE',
-#             default='django.db.backends.postgresql'
-#         ),
-#         'NAME': os.getenv('DB_NAME', default='postgres'),
-#         'USER': os.getenv('POSTGRES_USER', default='postgres'),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
-#         'HOST': os.getenv('DB_HOST', default='db'),
-#         'PORT': os.getenv('DB_PORT', default='5432'),
-#         'OPTIONS': {
-#             'client_encoding': 'UTF8'
-#         },
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv(
+            'DB_ENGINE',
+            default='django.db.backends.postgresql'
+        ),
+        'NAME': os.getenv('DB_NAME', default='postgres'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='db'),
+        'PORT': os.getenv('DB_PORT', default='5432'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8'
+        },
+    }
+}
 
 # Password validation
 
@@ -228,6 +234,21 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DRF_API_LOGGER_DATABASE = True  # Default to False
+
+
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}
+
 MESSAGE_STR = 30
 
-DRF_API_LOGGER_DATABASE = True  # Default to False
+MESSAGES_PAGE_SIZE = 50

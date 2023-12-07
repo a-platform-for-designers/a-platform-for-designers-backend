@@ -35,7 +35,7 @@ router.register(
     basename='profile_designer'
 )
 router.register('cases', CaseViewSet, basename='cases')
-# router.register('chats', ChatViewSet, basename='chats')
+router.register('chats', ChatViewSet, basename='chats')
 # router.register(
 #     r'chats/(?P<chat_id>\d+)/messages',
 #     MessageViewSet,
@@ -51,6 +51,7 @@ router.register('resume', ResumeViewSet, basename='resume')
 router.register('instruments', InstrumentViewSet, basename='instruments')
 router.register('skills', SkillViewSet, basename='skills')
 router.register('languages', LanguageViewSet, basename='languages')
+
 
 urlpatterns = [
     path('', include(router.urls)),

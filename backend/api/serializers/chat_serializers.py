@@ -1,19 +1,29 @@
+from django.conf import settings
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 
-from api.serializers.user_serializers import UserProfileSerializer
+from api.serializers.user_serializers import UserChatAndMessageSerializer
 from job.models import Chat
 
 
 class ChatReadSerializer(serializers.ModelSerializer):
     """Сериализатор для метода get для чатов."""
 
-    initiator = UserProfileSerializer(read_only=True)
-    receiver = UserProfileSerializer(read_only=True)
+    initiator = UserChatAndMessageSerializer(read_only=True)
+    receiver = UserChatAndMessageSerializer(read_only=True)
+    last_message = serializers.SerializerMethodField()
 
     class Meta:
         model = Chat
-        fields = ('id', 'initiator', 'receiver')
+        fields = ('id', 'initiator', 'receiver', 'last_message')
+
+    def get_last_message(self, obj):
+        last_message = obj.messages.order_by('-pub_date').first()
+        if last_message:
+            return (f'{last_message.sender.email}: '
+                    f'{last_message.text[:settings.MESSAGE_STR]}')
+        else:
+            return ''
 
 
 class ChatCreateSerializer(serializers.ModelSerializer):
