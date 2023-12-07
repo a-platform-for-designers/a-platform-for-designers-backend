@@ -107,12 +107,17 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
 
         try:
             profiledesigner = user.profiledesigner
-            language = validated_data.pop('language')
-            specialization = validated_data.pop('specialization')
+            language, specialization = 0, 0
+            if validated_data.get('language'):
+                language = validated_data.pop('language')
+            if validated_data.get('specialization'):
+                specialization = validated_data.pop('specialization')
             for attr, value in validated_data.items():
                 setattr(profiledesigner, attr, value)
-            profiledesigner.language.set(language)
-            profiledesigner.specialization.set(specialization)
+            if language:
+                profiledesigner.language.set(language)
+            if specialization:
+                profiledesigner.specialization.set(specialization)
             profiledesigner.save()
             return profiledesigner
         except ProfileDesigner.DoesNotExist:
