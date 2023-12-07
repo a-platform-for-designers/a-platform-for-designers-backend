@@ -20,8 +20,6 @@ def check_photo(validated_data, email):
     if 'photo' in validated_data:
         photo = validated_data.pop('photo')
         User.objects.filter(email=email).update(photo=photo)
-    else:
-        User.objects.filter(email=email).update(photo=None)
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -109,12 +107,17 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
 
         try:
             profiledesigner = user.profiledesigner
-            language = validated_data.pop('language')
-            specialization = validated_data.pop('specialization')
+            language, specialization = 0, 0
+            if validated_data.get('language'):
+                language = validated_data.pop('language')
+            if validated_data.get('specialization'):
+                specialization = validated_data.pop('specialization')
             for attr, value in validated_data.items():
                 setattr(profiledesigner, attr, value)
-            profiledesigner.language.set(language)
-            profiledesigner.specialization.set(specialization)
+            if language:
+                profiledesigner.language.set(language)
+            if specialization:
+                profiledesigner.specialization.set(specialization)
             profiledesigner.save()
             return profiledesigner
         except ProfileDesigner.DoesNotExist:
@@ -306,6 +309,22 @@ class AuthorListSerializer(AuthorSerializer):
             context={'request': self.context['request']},
             many=True
         ).data
+
+
+class UserChatAndMessageSerializer(UserSerializer):
+    """
+    Сериализатор для отображения пользователя в чатах и сообщениях
+    """
+
+    class Meta:
+        ordering = ['id']
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'photo',
+        )
 
 
 class CustomerSerializer(UserSerializer):

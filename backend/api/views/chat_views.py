@@ -1,7 +1,8 @@
 from django.db.models import Q
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
+from api.pagination import LimitPageNumberPagination
 from api.permissions import IsInitiatorOrReceiverChatPermission
 from api.serializers.chat_serializers import ChatCreateSerializer
 from api.serializers.chat_serializers import ChatReadSerializer
@@ -19,13 +20,14 @@ class ChatViewSet(viewsets.ModelViewSet):
         IsAuthenticated,
         IsInitiatorOrReceiverChatPermission
     ]
+    pagination_class = LimitPageNumberPagination
 
     def get_queryset(self):
         user = self.request.user
         return Chat.objects.filter(Q(initiator=user) | Q(receiver=user))
 
     def get_serializer_class(self):
-        if self.request.method in ('POST'):
+        if self.request.method in ('POST',):
             return ChatCreateSerializer
         return ChatReadSerializer
 

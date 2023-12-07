@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django_countries.fields import CountryField
 from django.db import models
 
 
@@ -100,7 +99,7 @@ class ProfileDesigner(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     education = models.CharField(blank=True, null=True, max_length=50)
-    country = CountryField(blank=True, null=True,)
+    country = models.CharField(blank=True, null=True, max_length=50)
     specialization = models.ManyToManyField(
         to='job.Specialization',
         blank=True,

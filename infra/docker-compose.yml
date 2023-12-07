@@ -11,19 +11,49 @@ services:
       - ./.env
     restart: on-failure
 
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+    restart: on-failure
+
   backend:
     # build: ../backend
     image: carkazm/designcollab_backend:latest
+    entrypoint: /app/entrypoint.sh
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
       - redoc:/app/docs/
     depends_on:
       - db
+      - redis
     env_file:
       - ./.env
+    environment:
+      - DJANGO_SETTINGS_MODULE=designers.settings
     restart: on-failure
-  
+
+  daphne:
+    # build: ../backend
+    image: carkazm/designcollab_backend:latest
+    entrypoint: /app/entrypoint_daphne.sh
+    command: daphne -b 0.0.0.0 -p 8001 designers.asgi:application
+    volumes:
+      - static_value:/app/static/
+      - media_value:/app/media/
+      - redoc:/app/docs/
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./.env
+    environment:
+      - DJANGO_SETTINGS_MODULE=designers.settings
+    ports:
+      - "8001:8001"
+    restart: on-failure
+
   # frontend:
   #   # build: ../frontend
   #   image: carkazm/designcollab_frontend:latest
@@ -41,6 +71,7 @@ services:
       - media_value:/var/html/media/
     depends_on:
       - backend
+      - daphne
     restart: on-failure
 
 volumes:
@@ -48,3 +79,5 @@ volumes:
   static_value:
   media_value:
   redoc:
+  redis_data:
+
