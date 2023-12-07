@@ -282,33 +282,33 @@ class CaseImage(models.Model):
         return "%s" % (self.case.title)
 
 
-class Comment(models.Model):
-    """
-    Модель комментария
+# class Comment(models.Model):
+#     """
+#     Модель комментария
 
-    """
+#     """
 
-    case = models.ForeignKey(
-        Case,
-        on_delete=models.CASCADE,
-        related_name='comment',
-    )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        related_name='comment',
-        null=True
-    )
-    comment_text = models.TextField(
-        max_length=300,
-    )
+#     case = models.ForeignKey(
+#         Case,
+#         on_delete=models.CASCADE,
+#         related_name='comment',
+#     )
+#     user = models.ForeignKey(
+#         User,
+#         on_delete=models.SET_NULL,
+#         related_name='comment',
+#         null=True
+#     )
+#     comment_text = models.TextField(
+#         max_length=300,
+#     )
 
-    class Meta:
-        verbose_name = 'Комментарий'
-        verbose_name_plural = 'Комментарии'
+#     class Meta:
+#         verbose_name = 'Комментарий'
+#         verbose_name_plural = 'Комментарии'
 
-    def __str__(self) -> str:
-        return self.name
+#     def __str__(self) -> str:
+#         return self.name
 
 
 class Resume(models.Model):
@@ -331,30 +331,30 @@ class Resume(models.Model):
         return f'Резюме {self.user.email}'
 
 
-class Like(models.Model):
-    """
-    Модель лайков
+# class Like(models.Model):
+#     """
+#     Модель лайков
 
-    """
+#     """
 
-    liker = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        related_name='likes',
-        null=True
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='likers'
-    )
+#     liker = models.ForeignKey(
+#         User,
+#         on_delete=models.SET_NULL,
+#         related_name='likes',
+#         null=True
+#     )
+#     author = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name='likers'
+#     )
 
-    class Meta:
-        verbose_name = 'Лайк'
-        verbose_name_plural = 'Лайки'
+#     class Meta:
+#         verbose_name = 'Лайк'
+#         verbose_name_plural = 'Лайки'
 
-    def __str__(self):
-        return f'{self.liker} лайкнул {self.author}'
+#     def __str__(self):
+#         return f'{self.liker} лайкнул {self.author}'
 
 
 class Order(models.Model):
@@ -366,15 +366,15 @@ class Order(models.Model):
     customer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='published_orders'
+        related_name='orders'
     )
-    executor = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='executed_orders'
-    )
+    # executor = models.ForeignKey(
+    #     User,
+    #     on_delete=models.SET_NULL,
+    #     blank=True,
+    #     null=True,
+    #     related_name='executed_orders'
+    # )
     title = models.CharField(max_length=150)
     specialization = models.ForeignKey(
         Specialization,
@@ -384,9 +384,11 @@ class Order(models.Model):
     payment = models.PositiveIntegerField(blank=True, null=True)
     sphere = models.ForeignKey(Sphere, on_delete=models.SET_NULL, null=True)
     description = models.TextField()
-    pub_date = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(auto_now=True)
+    is_published = models.BooleanField(default=True)
 
     class Meta:
+        ordering = ['-pub_date']
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
