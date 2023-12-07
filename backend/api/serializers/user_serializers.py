@@ -306,7 +306,6 @@ class AuthorListSerializer(AuthorSerializer):
         ).data
 
 
-
 class UserChatAndMessageSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в чатах и сообщениях
@@ -322,7 +321,7 @@ class UserChatAndMessageSerializer(UserSerializer):
             'photo',
         )
 
-          
+
 class CustomerSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в откликах
