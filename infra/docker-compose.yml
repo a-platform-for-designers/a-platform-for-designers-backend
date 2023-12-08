@@ -74,6 +74,7 @@ services:
       - backend
       - daphne
       - frontend
+    command: sh -c "chmod -R 755 /usr/share/nginx/html && exec nginx -g 'daemon off;'"
     restart: on-failure
 
 volumes:
