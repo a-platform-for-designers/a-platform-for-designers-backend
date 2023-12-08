@@ -20,11 +20,12 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
 
 ALLOWED_HOSTS = [
-    'localhost',
-    'backend',
-    '127.0.0.1',
-    '46.183.163.139',
-    '91.226.81.209'
+    '*'
+    # 'localhost',
+    # 'backend',
+    # '127.0.0.1',
+    # '46.183.163.139',
+    # '91.226.81.209'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
