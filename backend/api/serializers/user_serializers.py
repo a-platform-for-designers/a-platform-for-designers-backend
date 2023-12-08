@@ -15,20 +15,11 @@ from job.models import Case, Specialization, Language
 
 User = get_user_model()
 
-MONTHS = {
-    1: "января",
-    2: "февраля",
-    3: "марта",
-    4: "апреля",
-    5: "мая",
-    6: "июня",
-    7: "июля",
-    8: "августа",
-    9: "сентября",
-    10: "октября",
-    11: "ноября",
-    12: "декабря"
-}
+
+def check_photo(validated_data, email):
+    if 'photo' in validated_data:
+        photo = validated_data.pop('photo')
+        User.objects.filter(email=email).update(photo=photo)
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -37,13 +28,22 @@ class TokenResponseSerializer(serializers.Serializer):
 
 class ProfileCustomerSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = ProfileCustomer
-        fields = ('id', 'post')
+        fields = ('id', 'post', 'photo')
+
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError("Нужны хоть какие-то данные!")
+        return data
 
     def create(self, validated_data):
         user = self.context.get('request').user
+
+        check_photo(validated_data, user)
+
         try:
             profilecustomer = user.profilecustomer
             for attr, value in validated_data.items():
@@ -55,7 +55,7 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 
 
 class ProfileDesignerSerializer(serializers.ModelSerializer):
-    specialization = SpecializationSerializer()
+    specialization = SpecializationSerializer(many=True)
     language = LanguageSerializer(many=True)
 
     class Meta:
@@ -72,12 +72,16 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
 
 class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
     specialization = PrimaryKeyRelatedField(
-        queryset=Specialization.objects.all()
+        queryset=Specialization.objects.all(),
+        many=True,
+        required=False,
     )
     language = PrimaryKeyRelatedField(
         queryset=Language.objects.all(),
-        many=True
+        many=True,
+        required=False,
     )
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = ProfileDesigner
@@ -87,17 +91,28 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
             'country',
             'specialization',
             'hobby',
-            'language'
+            'language',
+            'photo'
         )
+
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError("Нужны хоть какие-то данные!")
+        return data
 
     def create(self, validated_data):
         user = self.context.get('request').user
+
+        check_photo(validated_data, user)
+
         try:
             profiledesigner = user.profiledesigner
             language = validated_data.pop('language')
+            specialization = validated_data.pop('specialization')
             for attr, value in validated_data.items():
                 setattr(profiledesigner, attr, value)
             profiledesigner.language.set(language)
+            profiledesigner.specialization.set(specialization)
             profiledesigner.save()
             return profiledesigner
         except ProfileDesigner.DoesNotExist:
@@ -142,11 +157,7 @@ class UserProfileSerializer(UserSerializer):
         )
 
     def get_date_joined(self, obj):
-        return (
-            f'На сайте с {obj.date_joined.strftime("%d")}'
-            f'{MONTHS.get(int(obj.date_joined.strftime("%m")))}'
-            f'{obj.date_joined.strftime("%Y")}'
-        )
+        return f'Published {obj.date_joined.strftime("%d %B %Y")}'
 
     def get_is_subscribed(self, obj: User) -> bool:
         user = self.context.get('request').user
@@ -221,7 +232,10 @@ class AuthorSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в кейсе
     """
-    specialization = SerializerMethodField(read_only=True)
+    specialization = SpecializationSerializer(
+        many=True,
+        source='profiledesigner.specialization'
+    )
 
     class Meta:
         model = User
@@ -233,17 +247,30 @@ class AuthorSerializer(UserSerializer):
             'specialization',
         )
 
-    def get_specialization(self, obj) -> int:
-        try:
-            profile = ProfileDesigner.objects.get(user=obj)
-            return profile.specialization.id
-        except ProfileDesigner.DoesNotExist:
-            return 0
+
+class ApplicantSerializer(AuthorSerializer):
+    """
+    Сериализатор для отображения пользователя в откликах
+    """
+    country = serializers.CharField(
+        source='profiledesigner.country'
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'photo',
+            'specialization',
+            'country'
+        )
 
 
 class AuthorListSerializer(AuthorSerializer):
     """
-    Сериализатор для отображения пользователя в кейсе
+    Сериализатор для отображения пользователя в списке юзеров
     """
 
     country = SerializerMethodField(read_only=True)
@@ -279,6 +306,7 @@ class AuthorListSerializer(AuthorSerializer):
         ).data
 
 
+
 class UserChatAndMessageSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в чатах и сообщениях
@@ -292,4 +320,20 @@ class UserChatAndMessageSerializer(UserSerializer):
             'first_name',
             'last_name',
             'photo',
+
+          
+class CustomerSerializer(UserSerializer):
+    """
+    Сериализатор для отображения пользователя в откликах
+    """
+    post = serializers.CharField(source='profilecustomer.post')
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'photo',
+            'post'
         )

@@ -84,7 +84,6 @@ class ProfileDesignerAdmin(admin.ModelAdmin):
         'user',
         'education',
         'country',
-        'specialization',
         'hobby',
     )
 
