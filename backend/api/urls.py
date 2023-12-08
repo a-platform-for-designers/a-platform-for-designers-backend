@@ -36,11 +36,7 @@ router.register(
 )
 router.register('cases', CaseViewSet, basename='cases')
 router.register('chats', ChatViewSet, basename='chats')
-# router.register(
-#     r'chats/(?P<chat_id>\d+)/messages',
-#     MessageViewSet,
-#     basename='messages'
-# )
+router.register('send_message', MessageViewSet, basename='send_message')
 router.register(
     'specializations',
     SpecializationViewSet,

@@ -11,7 +11,12 @@ class MessageSerializer(serializers.ModelSerializer):
 
     sender = UserChatAndMessageSerializer(read_only=True)
     chat = ChatReadSerializer(read_only=True)
+    receiver = serializers.IntegerField(required=True, write_only=True)
 
     class Meta:
         model = Message
-        fields = ('id', 'chat', 'sender', 'text', 'pub_date')
+        fields = ('id', 'chat', 'sender', 'receiver', 'text', 'pub_date')
+
+    def create(self, validated_data):
+        validated_data.pop('receiver', None)
+        return super().create(validated_data)
