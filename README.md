@@ -39,6 +39,8 @@ DB_HOST=localhost/db
 DB_PORT=5432
 SECRET_KEY='secretgenerate'
 DEBUG = True
+REDIS_HOST=redis
+REDIS_PORT=6379
 ```
 
 > Генератор секретного ключа: infra/secretgenerate.py
