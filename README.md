@@ -113,7 +113,6 @@ dos2unix: converting file wait-for-it.sh to Unix format...
  - Список полезных команд:
 
 
-
 ```
 docker-compose up -d
 docker-compose exec backend python manage.py makemigrations users
