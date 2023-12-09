@@ -102,4 +102,5 @@ jobs:
             sudo bash -c 'echo DB_PORT=${{ secrets.DB_PORT }} >> .env'
             sudo bash -c 'echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env'
             sudo bash -c 'echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env'
-            sudo docker-compose up -d --force-recreate
+            cd infra
+            sudo docker-compose up -d
