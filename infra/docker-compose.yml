@@ -70,6 +70,7 @@ services:
     depends_on:
       - backend
       - daphne
+      - frontend
     restart: on-failure
 
 volumes:
