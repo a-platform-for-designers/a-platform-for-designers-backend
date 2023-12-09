@@ -92,14 +92,15 @@ jobs:
             sudo systemctl stop nginx
             sudo docker-compose down --remove-orphans
             sudo docker pull carkazm/designcollab_backend:latest
+            sudo docker pull annakharatova/design-collab:latest
             sudo touch .env
-            sudo bash -c 'echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env'
-            sudo bash -c 'echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env'
-            sudo bash -c 'echo DB_NAME=${{ secrets.DB_NAME }} >> .env'
-            sudo bash -c 'echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env'
-            sudo bash -c 'echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env'
-            sudo bash -c 'echo DB_HOST=${{ secrets.DB_HOST }} >> .env'
-            sudo bash -c 'echo DB_PORT=${{ secrets.DB_PORT }} >> .env'
-            sudo bash -c 'echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env'
-            sudo bash -c 'echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env'
+            sudo bash -c 'echo SECRET_KEY=${{ secrets.SECRET_KEY }} > .env'
+            sudo bash -c 'echo DB_ENGINE=${{ secrets.DB_ENGINE }} > .env'
+            sudo bash -c 'echo DB_NAME=${{ secrets.DB_NAME }} > .env'
+            sudo bash -c 'echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} > .env'
+            sudo bash -c 'echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} > .env'
+            sudo bash -c 'echo DB_HOST=${{ secrets.DB_HOST }} > .env'
+            sudo bash -c 'echo DB_PORT=${{ secrets.DB_PORT }} > .env'
+            sudo bash -c 'echo REDIS_HOST=${{ secrets.REDIS_HOST }} > .env'
+            sudo bash -c 'echo REDIS_PORT=${{ secrets.REDIS_PORT }} > .env'
             sudo docker-compose up -d
