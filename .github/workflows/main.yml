@@ -91,6 +91,7 @@ jobs:
           script: |
             sudo systemctl stop nginx
             sudo docker-compose down --remove-orphans
+            sudo docker rmi $(docker images -q)
             sudo docker pull carkazm/designcollab_backend:latest
             sudo docker pull annakharatova/design-collab:latest
             sudo touch .env

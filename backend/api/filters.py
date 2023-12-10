@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from job.models import Case
+from job.models import Case, Order
 from users.models import User
 
 
@@ -38,3 +38,16 @@ class DesignersFilter(filters.FilterSet):
     class Meta:
         model = User
         fields = ('specialization', 'resume', 'skills', 'instruments')
+
+
+class OrdersFilter(filters.FilterSet):
+    """
+    Фильтрация заказов по специализации и сфере.
+    """
+
+    specialization = filters.AllValuesMultipleFilter()
+    sphere = filters.AllValuesMultipleFilter()
+
+    class Meta:
+        model = Order
+        fields = ('specialization', 'sphere')
