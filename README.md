@@ -4,6 +4,7 @@
 ## Описание проекта:
 
 DesignCollab - веб-платформа для дизайнеров.
+Сайт - http://46.183.163.139/
 Swagger - http://46.183.163.139/api/schema/swagger-ui/ 
 
 ## Технологии:
@@ -88,7 +89,7 @@ http://localhost/api/schema/
 ```
  dos2unix entrypoint.sh entrypoint_daphne.sh wait-for-it.sh
 ```
- - Ответ должен быть:7
+ - Ответ должен быть:
 
 ``` 
 MINGW64 ~/a-platform-for-designers-backend/backend (main)   
