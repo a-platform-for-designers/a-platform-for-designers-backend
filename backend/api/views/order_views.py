@@ -1,10 +1,12 @@
 from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework import status
 
+from api.filters import OrdersFilter
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers.order_serializers import (
@@ -20,6 +22,8 @@ from users.models import User
 class OrderViewSet(viewsets.ModelViewSet):
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = OrdersFilter
 
     def get_queryset(self):
         base_queryset = Order.objects.all()
