@@ -47,6 +47,12 @@ class SkillAdmin(admin.ModelAdmin):
     )
 
 
+class CaseImageInline(admin.TabularInline):
+
+    model = CaseImage
+    extra = 1
+
+
 @admin.register(Case)
 class CaseAdmin(admin.ModelAdmin):
     list_display = (
@@ -60,8 +66,12 @@ class CaseAdmin(admin.ModelAdmin):
     )
     fields = (
         ('title', 'working_term',),
-        ('description', 'author'),
+        ('description', 'author', 'avatar'),
+        'specialization',
+        'sphere',
+        'instruments',
     )
+    inlines = [CaseImageInline]
     search_fields = ('title',)
     list_filter = ('sphere', 'title', )
     empty_value_display = '-пусто-'
