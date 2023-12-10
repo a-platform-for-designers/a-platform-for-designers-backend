@@ -4,6 +4,7 @@
 ## Описание проекта:
 
 DesignCollab - веб-платформа для дизайнеров.
+Сайт - http://46.183.163.139/
 Swagger - http://46.183.163.139/api/schema/swagger-ui/ 
 
 ## Технологии:
@@ -92,7 +93,7 @@ http://localhost/api/schema/
 
 ``` 
 MINGW64 ~/a-platform-for-designers-backend/backend (main)   
-dos2unix entrypoint.sh wait-for-it.sh
+dos2unix entrypoint.sh entrypoint_daphne.sh wait-for-it.sh
 dos2unix: converting file entrypoint.sh to Unix format...
 dos2unix: converting file entrypoint_daphne.sh to Unix format...
 dos2unix: converting file wait-for-it.sh to Unix format...
