@@ -88,7 +88,7 @@ http://localhost/api/schema/
 ```
  dos2unix entrypoint.sh entrypoint_daphne.sh wait-for-it.sh
 ```
- - Ответ должен быть:
+ - Ответ должен быть:7
 
 ``` 
 MINGW64 ~/a-platform-for-designers-backend/backend (main)   
