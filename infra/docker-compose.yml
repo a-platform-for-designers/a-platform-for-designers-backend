@@ -53,14 +53,14 @@ services:
     restart: on-failure
 
   frontend:
-    image: annakharatova/design-collab:latest
+    image: nick0901/frontend-designcollab:latest
     volumes:
       - frontend:/app/build/
 
   nginx:
     image: nginx:1.25.0-alpine
     ports:
-      - 80:80
+      - 8000:80
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - frontend:/usr/share/nginx/html/
