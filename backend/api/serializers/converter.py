@@ -1,6 +1,6 @@
 import base64
 
-file_path = '' 
+file_path = ''
 
 
 with open(file_path, 'rb') as image_file:
