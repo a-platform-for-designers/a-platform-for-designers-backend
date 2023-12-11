@@ -70,7 +70,6 @@ jobs:
           script: |
             sudo systemctl stop nginx
             sudo docker-compose down --remove-orphans
-            sudo docker rmi -f $(sudo docker images -q annakharatova/design-collab:latest)
             sudo docker volume rm -f root_frontend root_redoc root_static_value
             sudo docker pull carkazm/designcollab_backend:latest
             sudo docker pull annakharatova/design-collab:latest
