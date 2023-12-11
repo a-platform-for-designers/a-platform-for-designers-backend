@@ -100,8 +100,12 @@ class CaseCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        instruments = validated_data.pop('instruments', [])
+        if len(instruments) > 5:
+            raise serializers.ValidationError("Количество инструментов не "
+                                              "должно превышать 5.")
+
         images = validated_data.pop('images')
-        instruments = validated_data.pop('instruments')
         case = Case.objects.create(**validated_data)
         case.instruments.set(instruments)
         self.add_images(case=case, images=images)

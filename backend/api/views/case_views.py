@@ -35,6 +35,15 @@ class CaseViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        if request.user.is_customer:
+            return Response(
+                {"detail": "Заказчик не может создавать кейс"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        else:
+            return super().create(request, *args, **kwargs)
+
     # @action(
     #     detail=True,
     #     methods=['POST', 'DELETE'],
