@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
@@ -24,8 +25,8 @@ class CaseViewSet(ModelViewSet):
     queryset = Case.objects.all()
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = CaseFilter
+    # filter_backends = (DjangoFilterBackend,)
+    # filterset_class = CaseFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -34,6 +35,17 @@ class CaseViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        values = dict(self.request.query_params.lists())
+        if values:
+            specialization_ids = values['specialization']
+            q_object = Q()
+            for id in specialization_ids:
+                q_object |= Q(specialization__pk=int(id))
+            return queryset.filter(q_object)
+        return queryset
 
     # @action(
     #     detail=True,
