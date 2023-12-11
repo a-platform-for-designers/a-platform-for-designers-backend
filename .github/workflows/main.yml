@@ -69,8 +69,9 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo systemctl stop nginx
-            sudo docker-compose down -v
-            sudo docker rmi $(docker images -q)
+            sudo docker-compose down --remove-orphans
+            sudo docker rmi -f $(sudo docker images -q annakharatova/design-collab:latest)
+            sudo docker volume rm -f root_frontend root_redoc root_static_value
             sudo docker pull carkazm/designcollab_backend:latest
             sudo docker pull annakharatova/design-collab:latest
             sudo touch .env
@@ -83,4 +84,6 @@ jobs:
             sudo bash -c 'echo DB_PORT=${{ secrets.DB_PORT }} >> .env'
             sudo bash -c 'echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env'
             sudo bash -c 'echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env'
-            sudo docker-compose up -d --force-recreate
+            sudo docker-compose up -d --force-recreate            
+            # Удаление контейнеров фронта
+            sudo docker rm -f $(sudo docker ps -a -q -f name=root-frontend-1)
