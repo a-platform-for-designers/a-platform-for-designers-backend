@@ -145,3 +145,4 @@ docker-compose exec backend python manage.py collectstatic --noinput
     psycopg2-binary==2.9.3
     python-dotenv==0.21.0
     zipp==3.15.0
+    ////
