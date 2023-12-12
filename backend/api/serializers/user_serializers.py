@@ -16,10 +16,11 @@ from job.models import Case, Specialization, Language
 User = get_user_model()
 
 
-def check_photo(validated_data, email):
+def check_photo(validated_data, user):
     if 'photo' in validated_data:
         photo = validated_data.pop('photo')
-        User.objects.filter(email=email).update(photo=photo)
+        user.photo = photo
+        user.save()
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -57,6 +58,7 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 class ProfileDesignerSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer(many=True)
     language = LanguageSerializer(many=True)
+    photo = Base64ImageField(required=False)
 
     class Meta:
         model = ProfileDesigner
@@ -66,7 +68,8 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
             'country',
             'specialization',
             'hobby',
-            'language'
+            'language',
+            'photo'
         )
 
 
