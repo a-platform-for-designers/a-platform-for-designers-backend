@@ -252,6 +252,11 @@ class Message(models.Model):
     )
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
+    file = models.FileField(
+        upload_to='messages/',
+        blank=True,
+        null=True
+    )
 
     class Meta:
         verbose_name = 'Сообщение'

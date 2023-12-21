@@ -38,5 +38,6 @@ class MessageViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(
             sender=self.request.user,
-            chat=self.get_chat()
+            chat=self.get_chat(),
+            file=self.request.FILES.get('file')
         )

@@ -96,7 +96,7 @@ class ChatAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'chat', 'sender', 'text', 'pub_date')
+    list_display = ('id', 'chat', 'sender', 'text', 'pub_date', 'file')
     search_fields = ('chat', 'sender', 'text')
     list_filter = ('chat', 'sender', 'pub_date')
     empty_value_display = '-пусто-'
