@@ -4,7 +4,8 @@
 
 python manage.py makemigrations users
 python manage.py makemigrations job
-python manage.py migrate
+python manage.py migrate users
+python manage.py migrate job
 # python manage.py load_data
 python manage.py collectstatic --no-input
 
