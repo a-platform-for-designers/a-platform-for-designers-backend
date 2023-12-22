@@ -1,8 +1,12 @@
+import base64
 import json
+import re
+import time
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.core.paginator import EmptyPage, Paginator
 
 from api.serializers.message_serializers import MessageSerializer
@@ -78,18 +82,50 @@ class ChatConsumer(WebsocketConsumer):
                     ))
 
         else:
-            message = text_data_json['message']
-            message_create = Message.objects.create(
-                sender=self.sender,
-                text=message,
-                chat=chat,
-            )
-            self.message_id = message_create.id
+            if 'file' in text_data_json:
+                message = text_data_json['message']
+                file_data = text_data_json['file']
+                match = re.search(r'data:(.*?);base64,', file_data)
 
-            async_to_sync(self.channel_layer.group_send)(
-                self.chat_group,
-                {'type': 'chat_message', 'message': message}
-            )
+                if match:
+                    file_format = match.group(1).split('/')[-1]
+                    file_data = file_data.split(',')[1]
+                    padding = len(file_data) % 4
+                    file_data += '=' * padding
+                    file_data = base64.b64decode(file_data)
+
+                    filename = (f"{self.sender.last_name}_"
+                                f"{time.time()}.{file_format}")
+                    file = ContentFile(file_data, name=filename)
+
+                    message_create = Message.objects.create(
+                        sender=self.sender,
+                        text=message,
+                        chat=chat,
+                        file=file,
+                    )
+
+                    self.message_id = message_create.id
+
+                    async_to_sync(self.channel_layer.group_send)(
+                        self.chat_group,
+                        {'type': 'chat_message', 'message': message}
+                    )
+                else:
+                    self.send(text_data="Неверный формат файла")
+            else:
+                message = text_data_json['message']
+                message_create = Message.objects.create(
+                    sender=self.sender,
+                    text=message,
+                    chat=chat,
+                )
+                self.message_id = message_create.id
+
+                async_to_sync(self.channel_layer.group_send)(
+                    self.chat_group,
+                    {'type': 'chat_message', 'message': message}
+                )
 
     def chat_message(self, event):
         if self.message_id:

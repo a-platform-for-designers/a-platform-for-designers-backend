@@ -12,10 +12,13 @@ class MessageSerializer(serializers.ModelSerializer):
     sender = UserChatAndMessageSerializer(read_only=True)
     chat = ChatReadSerializer(read_only=True)
     receiver = serializers.IntegerField(required=True, write_only=True)
+    file = serializers.FileField(required=False)
 
     class Meta:
         model = Message
-        fields = ('id', 'chat', 'sender', 'receiver', 'text', 'pub_date')
+        fields = (
+            'id', 'chat', 'sender', 'receiver', 'text', 'pub_date', 'file'
+        )
 
     def create(self, validated_data):
         validated_data.pop('receiver', None)
