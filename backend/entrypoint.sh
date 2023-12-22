@@ -2,10 +2,10 @@
 
 ./wait-for-it.sh db:5432 --timeout=30
 
-python manage.py makemigrations users
-python manage.py makemigrations job
-python manage.py migrate users --fake
-python manage.py migrate job --fake
+# python manage.py makemigrations users
+# python manage.py makemigrations job
+# python manage.py migrate users --fake
+# python manage.py migrate job --fake
 # python manage.py load_data
 python manage.py collectstatic --no-input
 
