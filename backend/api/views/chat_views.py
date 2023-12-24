@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Max
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -24,7 +24,12 @@ class ChatViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Chat.objects.filter(Q(initiator=user) | Q(receiver=user))
+        queryset = Chat.objects.filter(
+            Q(initiator=user) | Q(receiver=user)
+        ).annotate(
+            last_message_date=Max('messages__pub_date')
+        ).order_by('-last_message_date', '-id')
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method in ('POST',):

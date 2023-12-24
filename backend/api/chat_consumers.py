@@ -13,6 +13,9 @@ from api.serializers.message_serializers import MessageSerializer
 from job.models import Chat, Message
 
 
+ALLOWED_TYPES = ['pdf', 'docx', 'doc', 'jpg', 'jpeg', 'png']
+
+
 class ChatConsumer(WebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
@@ -71,7 +74,7 @@ class ChatConsumer(WebsocketConsumer):
                 try:
                     page = reversed(paginator.page(page_number))
                 except EmptyPage:
-                    self.send(text_data="Нет более ранних сообщений")
+                    self.send(text_data='Нет более ранних сообщений')
                     return
 
                 for message in page:
@@ -89,30 +92,45 @@ class ChatConsumer(WebsocketConsumer):
 
                 if match:
                     file_format = match.group(1).split('/')[-1]
-                    file_data = file_data.split(',')[1]
-                    padding = len(file_data) % 4
-                    file_data += '=' * padding
-                    file_data = base64.b64decode(file_data)
+                    if (
+                        file_format == ('vnd.openxmlformats-officedocument.'
+                                        'wordprocessingml.document')
+                        or file_format == 'msword'
+                    ):
+                        file_format = 'docx'
+                    if file_format not in ALLOWED_TYPES:
+                        self.send(
+                            text_data=('Можно отправлять файлы в формате '
+                                       f'{ALLOWED_TYPES}')
+                        )
+                    else:
+                        file_data = file_data.split(',')[1]
+                        padding = len(file_data) % 4
+                        file_data += '=' * padding
+                        file_data = base64.b64decode(file_data)
 
-                    filename = (f"{self.sender.last_name}_"
-                                f"{time.time()}.{file_format}")
-                    file = ContentFile(file_data, name=filename)
+                        filename = (f"{self.sender.last_name}_"
+                                    f"{time.time()}.{file_format}")
+                        file = ContentFile(file_data, name=filename)
 
-                    message_create = Message.objects.create(
-                        sender=self.sender,
-                        text=message,
-                        chat=chat,
-                        file=file,
-                    )
+                        message_create = Message.objects.create(
+                            sender=self.sender,
+                            text=message,
+                            chat=chat,
+                            file=file,
+                        )
 
-                    self.message_id = message_create.id
+                        self.message_id = message_create.id
 
-                    async_to_sync(self.channel_layer.group_send)(
-                        self.chat_group,
-                        {'type': 'chat_message', 'message': message}
-                    )
+                        async_to_sync(self.channel_layer.group_send)(
+                            self.chat_group,
+                            {'type': 'chat_message', 'message': message}
+                        )
                 else:
-                    self.send(text_data="Неверный формат файла")
+                    self.send(
+                        text_data=('Можно отправлять файлы в формате '
+                                   f'{ALLOWED_TYPES}')
+                    )
             else:
                 message = text_data_json['message']
                 message_create = Message.objects.create(
