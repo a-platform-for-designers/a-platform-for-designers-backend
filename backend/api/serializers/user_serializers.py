@@ -30,10 +30,12 @@ class TokenResponseSerializer(serializers.Serializer):
 class ProfileCustomerSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     photo = Base64ImageField(required=False)
+    country = serializers.CharField()
+    about = serializers.CharField()
 
     class Meta:
         model = ProfileCustomer
-        fields = ('id', 'post', 'photo')
+        fields = ('id', 'post', 'photo', 'country', 'about')
 
     def validate(self, data):
         if not data:

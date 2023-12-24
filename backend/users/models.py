@@ -82,6 +82,8 @@ class ProfileCustomer(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     post = models.CharField(max_length=255)
+    country = models.CharField(max_length=100)
+    about = models.TextField()
 
     class Meta:
         ordering = ['id']
