@@ -12,17 +12,10 @@ class ChatReadSerializer(serializers.ModelSerializer):
     initiator = UserChatAndMessageSerializer(read_only=True)
     receiver = UserChatAndMessageSerializer(read_only=True)
     last_message = serializers.SerializerMethodField()
-    last_message_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Chat
-        fields = (
-            'id',
-            'initiator',
-            'receiver',
-            'last_message',
-            'last_message_date'
-        )
+        fields = ('id', 'initiator', 'receiver', 'last_message')
 
     def get_last_message(self, obj):
         last_message = obj.messages.order_by('-pub_date').first()
@@ -31,13 +24,6 @@ class ChatReadSerializer(serializers.ModelSerializer):
                     f'{last_message.text[:settings.MESSAGE_STR]}')
         else:
             return ''
-
-    def get_last_message_date(self, obj):
-        last_message = obj.messages.order_by('-pub_date').first()
-        if last_message:
-            return last_message.pub_date
-        else:
-            return None
 
 
 class ChatCreateSerializer(serializers.ModelSerializer):
