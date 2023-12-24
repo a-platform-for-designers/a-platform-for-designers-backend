@@ -6,11 +6,13 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import PrimaryKeyRelatedField
 from drf_extra_fields.fields import Base64ImageField
 
+from api.serializers.instrument_serializers import InstrumentSerializer
+from api.serializers.skill_serializers import SkillSerializer
 from api.serializers.language_serializers import LanguageSerializer
 from api.serializers.resume_serializers import ResumeReadSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from users.models import ProfileCustomer, ProfileDesigner
-from job.models import Case, Specialization, Language
+from job.models import Case, Specialization, Language, Instrument, Skill
 
 
 User = get_user_model()
@@ -60,6 +62,8 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 class ProfileDesignerSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer(many=True)
     language = LanguageSerializer(many=True)
+    instruments = InstrumentSerializer(many=True)
+    skills = SkillSerializer(many=True)
 
     class Meta:
         model = ProfileDesigner
@@ -68,8 +72,10 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
             'education',
             'country',
             'specialization',
-            'hobby',
-            'language'
+            'language',
+            'instruments',
+            'skills',
+            'about',
         )
 
 
@@ -84,6 +90,16 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
         many=True,
         required=False,
     )
+    instruments = PrimaryKeyRelatedField(
+        queryset=Instrument.objects.all(),
+        many=True,
+        required=False,
+    )
+    skills = PrimaryKeyRelatedField(
+        queryset=Skill.objects.all(),
+        many=True,
+        required=False,
+    )
     photo = Base64ImageField(required=False)
 
     class Meta:
@@ -93,9 +109,11 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
             'education',
             'country',
             'specialization',
-            'hobby',
             'language',
-            'photo'
+            'instruments',
+            'skills',
+            'about',
+            'photo',
         )
 
     def validate(self, data):
@@ -110,19 +128,26 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
 
         try:
             profiledesigner = user.profiledesigner
-            language, specialization = 0, 0
-            if validated_data.get('language'):
-                language = validated_data.pop('language')
-            if validated_data.get('specialization'):
-                specialization = validated_data.pop('specialization')
+            language = validated_data.pop('language', [])
+            specialization = validated_data.pop('specialization', [])
+            instruments = validated_data.pop('instruments', [])
+            skills = validated_data.pop('skills', [])
+
             for attr, value in validated_data.items():
                 setattr(profiledesigner, attr, value)
+
             if language:
                 profiledesigner.language.set(language)
             if specialization:
                 profiledesigner.specialization.set(specialization)
+            if instruments:
+                profiledesigner.instruments.set(instruments)
+            if skills:
+                profiledesigner.skills.set(skills)
+
             profiledesigner.save()
             return profiledesigner
+
         except ProfileDesigner.DoesNotExist:
             return super().create(validated_data)
 
@@ -239,6 +264,7 @@ class UserProfileCreateSerializer(UserCreateSerializer):
 class AuthorSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в кейсе
+
     """
     specialization = SpecializationSerializer(
         many=True,
@@ -259,6 +285,7 @@ class AuthorSerializer(UserSerializer):
 class ApplicantSerializer(AuthorSerializer):
     """
     Сериализатор для отображения пользователя в откликах
+
     """
     country = serializers.CharField(
         source='profiledesigner.country'
@@ -279,8 +306,8 @@ class ApplicantSerializer(AuthorSerializer):
 class AuthorListSerializer(AuthorSerializer):
     """
     Сериализатор для отображения пользователя в списке юзеров
-    """
 
+    """
     country = SerializerMethodField(read_only=True)
     last_cases = SerializerMethodField(read_only=True)
 
@@ -317,8 +344,8 @@ class AuthorListSerializer(AuthorSerializer):
 class UserChatAndMessageSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в чатах и сообщениях
-    """
 
+    """
     class Meta:
         ordering = ['id']
         model = User
@@ -333,6 +360,7 @@ class UserChatAndMessageSerializer(UserSerializer):
 class CustomerSerializer(UserSerializer):
     """
     Сериализатор для отображения пользователя в откликах
+
     """
     post = serializers.CharField(source='profilecustomer.post')
 

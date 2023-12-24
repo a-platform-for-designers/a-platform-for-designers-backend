@@ -9,7 +9,6 @@ class UserManager(BaseUserManager):
     созданием и обработкой пользователей.
 
     """
-
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Требуется Email')
@@ -79,7 +78,6 @@ class ProfileCustomer(models.Model):
     Модель профиля покупателя.
 
     """
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     post = models.CharField(max_length=255)
     country = models.CharField(max_length=100)
@@ -101,12 +99,14 @@ class ProfileDesigner(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     education = models.CharField(blank=True, null=True, max_length=50)
-    country = models.CharField(blank=True, null=True, max_length=50)
+    country = models.CharField(blank=True, null=True, max_length=100)
+    instruments = models.ManyToManyField('job.Instrument', blank=True)
+    skills = models.ManyToManyField('job.Skill', blank=True)
+    about = models.TextField(blank=True, null=True)
     specialization = models.ManyToManyField(
         to='job.Specialization',
         blank=True,
     )
-    hobby = models.CharField(blank=True, null=True, max_length=200)
     language = models.ManyToManyField(
         to='job.Language',
         blank=True,
@@ -126,7 +126,6 @@ class Subscription(models.Model):
     Модель, представляющая подписку между двумя пользователями.
 
     """
-
     user = models.ForeignKey(
         User,
         related_name='subscriber',

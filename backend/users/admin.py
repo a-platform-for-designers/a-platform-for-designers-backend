@@ -69,23 +69,54 @@ class UserAdmin(UserAdmin):
 class ProfileCustomerAdmin(admin.ModelAdmin):
     """
     Класс администратора профилей покупателей.
-    """
 
-    list_display = ('user', 'post',)
+    """
+    list_display = (
+        'user',
+        'country',
+        'about',
+        'post',
+    )
 
 
 @admin.register(ProfileDesigner)
 class ProfileDesignerAdmin(admin.ModelAdmin):
     """
     Класс администратора профилей дизайнеров.
-    """
 
+    """
     list_display = (
         'user',
         'education',
         'country',
-        'hobby',
+        'get_instruments',
+        'get_skills',
+        'about',
+        'get_specialization',
+        'get_language'
     )
+
+    def get_instruments(self, obj):
+        return ", ".join(
+            instrument.name
+            for instrument in obj.instruments.all()
+        )
+    get_instruments.short_description = 'Instruments'
+
+    def get_skills(self, obj):
+        return ", ".join([skill.name for skill in obj.skills.all()])
+    get_skills.short_description = 'Skills'
+
+    def get_specialization(self, obj):
+        return ", ".join(
+            specialization.name
+            for specialization in obj.specialization.all()
+        )
+    get_specialization.short_description = 'Specialization'
+
+    def get_language(self, obj):
+        return ", ".join([language.name for language in obj.language.all()])
+    get_language.short_description = 'Language'
 
 
 @admin.register(Subscription)
@@ -94,5 +125,4 @@ class SubscriptionAdmin(admin.ModelAdmin):
     Класс администратора подписок.
 
     """
-
     list_display = ('user', 'author',)
