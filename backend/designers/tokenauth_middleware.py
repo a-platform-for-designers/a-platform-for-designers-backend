@@ -3,6 +3,7 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework.authtoken.models import Token
 from urllib.parse import parse_qs
 
+
 @database_sync_to_async
 def get_user(token_key):
     try:
@@ -10,6 +11,7 @@ def get_user(token_key):
         return token.user
     except Token.DoesNotExist:
         return AnonymousUser()
+
 
 class TokenAuthMiddleware:
     def __init__(self, inner):
