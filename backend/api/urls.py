@@ -55,7 +55,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
     path(
-        'users/set_password/',
+        'auth/users/set_password/',
         CustomPasswordChangeView.as_view(),
         name='set_password'),
 ]
