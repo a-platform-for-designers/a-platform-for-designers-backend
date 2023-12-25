@@ -4,12 +4,13 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from djoser.views import UserViewSet
+from djoser.views import SetPasswordView
 from djoser.views import TokenCreateView as DjoserTokenCreateView
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from users.models import Subscription
 from api.filters import DesignersFilter
@@ -20,7 +21,8 @@ from api.serializers.subscription_serializers import (
 from api.serializers.user_serializers import (
     AuthorListSerializer, UserProfileSerializer,
     ProfileCustomerSerializer, ProfileDesignerCreateSerializer,
-    TokenResponseSerializer, UserProfileCreateSerializer
+    TokenResponseSerializer, UserProfileCreateSerializer,
+    ChangePasswordSerializer
 )
 from api.permissions import IsAuthorOrReadOnly
 
@@ -32,13 +34,52 @@ User = get_user_model()
     responses=TokenResponseSerializer(many=False)
 )
 class TokenCreateView(DjoserTokenCreateView):
+    """
+    Создает и возвращает токен аутентификации для пользователя.
+
+    Требуется предоставление корректных учетных данных пользователя.
+    При успешной аутентификации возвращается токен, который должен
+    использоваться для аутентификации в последующих запросах.
+
+    """
     pass
 
 
+@extend_schema(
+    tags=['profiles'],
+    operation_id='create_customer_profile',
+    summary='Создание профиля заказчика',
+    description=(
+        'Эндпоинт для создания профиля заказчика. '
+        'Доступ ограничен для пользователей с ролью "заказчик".'
+    ),
+    responses={
+        201: OpenApiResponse(
+            description='Успешное создание профиля заказчика.'
+        ),
+        400: OpenApiResponse(
+            description='Некорректный запрос или данные. '
+            'Проверьте предоставленные данные.'
+        ),
+        403: OpenApiResponse(
+            description='Доступ запрещен. '
+            'Требуется статус заказчика для создания профиля.'
+        )
+    }
+)
 class ProfileCustomerViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    """
+    Создает профиль для пользователя с ролью заказчика.
+
+    Пользователь должен иметь статус заказчика, чтобы создать профиль.
+    В случае, если пользователь не имеет статуса заказчика, будет возвращен
+    статус ошибки 403.
+
+    """
+
     serializer_class = ProfileCustomerSerializer
     permission_classes = (IsAuthorOrReadOnly,)
 
@@ -61,10 +102,32 @@ class ProfileCustomerViewSet(
         serializer.save(user=self.request.user)
 
 
+@extend_schema(
+    tags=['profiles'],
+    operation_id='create_designer_profile',
+    summary='Создание профиля дизайнера',
+    description='Эндпоинт для создания профиля дизайнера.',
+    responses={
+        201: OpenApiResponse(description='Профиль дизайнера успешно создан'),
+        400: OpenApiResponse(description='Ошибка создания профиля'),
+        403: OpenApiResponse(
+            description='Доступ запрещен. Пользователь является заказчиком'
+        ),
+    }
+)
 class ProfileDesignerViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    """
+    Создает профиль для пользователя с ролью дизайнера.
+
+    Пользователь не должен иметь статус заказчика,
+    чтобы создать профиль дизайнера.
+    В случае, если пользователь является заказчиком,
+    будет возвращен статус ошибки 403.
+
+    """
     serializer_class = ProfileDesignerCreateSerializer
     permission_classes = (IsAuthorOrReadOnly,)
 
@@ -78,9 +141,54 @@ class ProfileDesignerViewSet(
         serializer.save(user=self.request.user)
 
 
+@extend_schema(
+    tags=['user_profiles'],
+    operation_id='list_user_profiles',
+    summary='Список профилей пользователей',
+    description=(
+        'Получение списка профилей пользователей с возможностью фильтрации '
+        'по параметрам, включая количество кейсов и статус работы.'
+    ),
+    responses={
+        200: UserProfileSerializer(
+            many=True,
+            description='Список профилей пользователей успешно получен.'
+        ),
+        404: OpenApiResponse(description='Профили пользователей не найдены.')
+    }
+)
+@extend_schema(
+    methods=['create'],
+    summary='Создание профиля пользователя',
+    description=(
+        'Эндпоинт для создания профиля пользователя. '
+        'Доступен только для аутентифицированных пользователей.'
+    ),
+    responses={
+        201: UserProfileSerializer(
+            description='Профиль пользователя успешно создан.'
+        ),
+        400: OpenApiResponse(
+            description='Ошибка в данных запроса. '
+            'Невозможно создать профиль с предоставленными данными.'
+        ),
+        403: OpenApiResponse(
+            description='Доступ запрещён. '
+            'Требуется аутентификация пользователя.'
+        )
+    }
+)
 class UserProfileViewSet(UserViewSet):
-    """"
-    Класс UserProfileViewSet для работы с профилями пользователей.
+    """
+    Предоставляет операции для работы с профилями пользователей,
+    включая создание, просмотр, обновление и удаление профилей.
+
+    list:
+    Возвращает список всех профилей пользователей с дополнительной информацией.
+
+    create:
+    Позволяет аутентифицированным пользователям создать
+    новый профиль пользователя.
 
     """
     permission_classes = (AllowAny,)
@@ -206,3 +314,13 @@ class MentorViewSet(mixins.ListModelMixin,
         profiledesigner__specialization__name='Менторство'
     ).distinct()
     serializer_class = AuthorListSerializer
+
+
+class CustomPasswordChangeView(SetPasswordView):
+    serializer_class = ChangePasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self._set_password(serializer)
+        return Response(status=status.HTTP_204_NO_CONTENT)
