@@ -97,7 +97,7 @@ class UserProfileViewSet(UserViewSet):
             queryset = queryset.annotate(
                 num_cases=Count('case')
             ).filter(
-                num_cases__gte=1, 
+                num_cases__gte=1,
                 is_customer=False
             )
 
