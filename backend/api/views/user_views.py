@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from djoser.views import UserViewSet
-from djoser.views import SetPasswordView
 from djoser.views import TokenCreateView as DjoserTokenCreateView
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
@@ -22,7 +21,6 @@ from api.serializers.user_serializers import (
     AuthorListSerializer, UserProfileSerializer,
     ProfileCustomerSerializer, ProfileDesignerCreateSerializer,
     TokenResponseSerializer, UserProfileCreateSerializer,
-    ChangePasswordSerializer
 )
 from api.permissions import IsAuthorOrReadOnly
 
@@ -314,13 +312,3 @@ class MentorViewSet(mixins.ListModelMixin,
         profiledesigner__specialization__name='Менторство'
     ).distinct()
     serializer_class = AuthorListSerializer
-
-
-class CustomPasswordChangeView(SetPasswordView):
-    serializer_class = ChangePasswordSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self._set_password(serializer)
-        return Response(status=status.HTTP_204_NO_CONTENT)

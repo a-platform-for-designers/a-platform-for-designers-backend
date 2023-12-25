@@ -15,7 +15,7 @@ from api.views.sphere_views import SphereViewSet
 from api.views.message_views import MessageViewSet
 from api.views.user_views import (
     ProfileCustomerViewSet, ProfileDesignerViewSet, UserProfileViewSet,
-    MentorViewSet, CustomPasswordChangeView
+    MentorViewSet
 )
 
 
@@ -54,8 +54,4 @@ urlpatterns = [
     # path('auth/token/login/', TokenCreateView.as_view(), name='login'),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-    path(
-        'auth/users/set_password/',
-        CustomPasswordChangeView.as_view(),
-        name='set_password'),
 ]

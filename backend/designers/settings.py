@@ -177,6 +177,7 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
+    'SET_PASSWORD_RETYPE': True,
     'SEND_ACTIVATION_EMAIL': False,
     'SEND_CONFIRMATION_EMAIL': False,
     'ACTIVATION_URL': 'activate/{uid}/{token}',
