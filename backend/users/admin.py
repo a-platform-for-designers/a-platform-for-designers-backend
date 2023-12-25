@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.html import format_html
 
 from .models import Subscription, User
 from .models import ProfileCustomer, ProfileDesigner
@@ -93,6 +94,7 @@ class ProfileDesignerAdmin(admin.ModelAdmin):
         'get_skills',
         'about',
         'get_specialization',
+        'get_work_status',
         'get_language'
     )
 
@@ -117,6 +119,11 @@ class ProfileDesignerAdmin(admin.ModelAdmin):
     def get_language(self, obj):
         return ", ".join([language.name for language in obj.language.all()])
     get_language.short_description = 'Language'
+
+    def get_work_status(self, obj):
+        color = 'green' if obj.work_status else 'red'
+        text = 'Ищет работу' if obj.work_status else 'Не ищет работу'
+        return format_html('<span style="color: {};">{}</span>', color, text)
 
 
 @admin.register(Subscription)

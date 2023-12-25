@@ -103,6 +103,10 @@ class ProfileDesigner(models.Model):
     instruments = models.ManyToManyField('job.Instrument', blank=True)
     skills = models.ManyToManyField('job.Skill', blank=True)
     about = models.TextField(blank=True, null=True)
+    work_status = models.BooleanField(
+        default=False,
+        verbose_name='Статус поиска работы'
+    )
     specialization = models.ManyToManyField(
         to='job.Specialization',
         blank=True,
