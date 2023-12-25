@@ -111,6 +111,7 @@ class UserProfileViewSet(UserViewSet):
                 queryset = queryset.filter(
                     profiledesigner__work_status=work_status
                 )
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':

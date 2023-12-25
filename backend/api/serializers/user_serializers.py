@@ -9,7 +9,6 @@ from drf_extra_fields.fields import Base64ImageField
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
 from api.serializers.language_serializers import LanguageSerializer
-from api.serializers.resume_serializers import ResumeReadSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from users.models import ProfileCustomer, ProfileDesigner
 from job.models import Case, Specialization, Language, Instrument, Skill
