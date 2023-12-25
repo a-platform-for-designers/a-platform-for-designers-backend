@@ -18,6 +18,15 @@ User = get_user_model()
 
 
 def check_photo(validated_data, user):
+    """
+    Проверяет наличие данных фотографии в проверенных данных и обновляет
+    фото пользователя, если оно присутствует.
+
+    Аргументы:
+        validated_data: Словарь, содержащий все данные поля.
+        user: Экземпляр пользователя, для которого нужно обновить фото.
+
+    """
     if 'photo' in validated_data:
         photo = validated_data.pop('photo')
         user.photo = photo
@@ -25,10 +34,19 @@ def check_photo(validated_data, user):
 
 
 class TokenResponseSerializer(serializers.Serializer):
+    """
+    Сериализатор для ответов с токеном аутентификации пользователя.
+
+    """
     auth_token = serializers.CharField()
 
 
 class ProfileCustomerSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для профилей заказчиков, включая поля,
+    такие как страна, фото и т.д.
+
+    """
     id = serializers.IntegerField(read_only=True)
     photo = Base64ImageField(required=False)
     country = serializers.CharField()
@@ -59,6 +77,11 @@ class ProfileCustomerSerializer(serializers.ModelSerializer):
 
 
 class ProfileDesignerSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для профилей дизайнеров, включающий образование,
+    страну, навыки и т.д.
+
+    """
     specialization = SpecializationSerializer(many=True)
     language = LanguageSerializer(many=True)
     instruments = InstrumentSerializer(many=True)
@@ -80,6 +103,11 @@ class ProfileDesignerSerializer(serializers.ModelSerializer):
 
 
 class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для создания профилей дизайнеров с вложенными отношениями
+    для специализаций, языков и т.д.
+
+    """
     specialization = PrimaryKeyRelatedField(
         queryset=Specialization.objects.all(),
         many=True,
@@ -154,6 +182,11 @@ class ProfileDesignerCreateSerializer(serializers.ModelSerializer):
 
 
 class PortfolioSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для элементов портфолио, специально обрабатывающий
+    аватары кейсов.
+
+    """
     avatar = Base64ImageField()
 
     class Meta:
@@ -165,6 +198,12 @@ class PortfolioSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(UserSerializer):
+    """
+    Сериализатор для профилей пользователей, расширяющий стандартный
+    сериализатор пользователя дополнительными полями, такими
+    как статус подписки, портфолио и т.д.
+
+    """
 
     profilecustomer = ProfileCustomerSerializer(read_only=True)
     profiledesigner = ProfileDesignerSerializer(read_only=True)

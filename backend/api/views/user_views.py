@@ -32,6 +32,14 @@ User = get_user_model()
     responses=TokenResponseSerializer(many=False)
 )
 class TokenCreateView(DjoserTokenCreateView):
+    """
+    Создает и возвращает токен аутентификации для пользователя.
+
+    Требуется предоставление корректных учетных данных пользователя.
+    При успешной аутентификации возвращается токен, который должен
+    использоваться для аутентификации в последующих запросах.
+
+    """
     pass
 
 
@@ -39,6 +47,14 @@ class ProfileCustomerViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    """
+    Создает профиль для пользователя с ролью заказчика.
+
+    Пользователь должен иметь статус заказчика, чтобы создать профиль.
+    В случае, если пользователь не имеет статуса заказчика, будет возвращен
+    статус ошибки 403.
+
+    """
     serializer_class = ProfileCustomerSerializer
     permission_classes = (IsAuthorOrReadOnly,)
 
@@ -46,15 +62,6 @@ class ProfileCustomerViewSet(
         if not request.user.is_customer:
             return Response({"detail": "Вы не являетесь заказчиком"},
                             status=status.HTTP_403_FORBIDDEN)
-        # if (
-        #     not request.user.is_staff
-        #     and request.user.id != request.data.get('user')
-        # ):
-        #     return Response({"detail": "Нет разрешения."},
-        #                     status=status.HTTP_403_FORBIDDEN)
-        # if ProfileCustomer.objects.filter(user=request.user).exists():
-        #     return Response({"detail": "Профиль уже существует"},
-        #                     status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
@@ -65,6 +72,15 @@ class ProfileDesignerViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    """
+    Создает профиль для пользователя с ролью дизайнера.
+
+    Пользователь не должен иметь статус заказчика,
+    чтобы создать профиль дизайнера.
+    В случае, если пользователь является заказчиком,
+    будет возвращен статус ошибки 403.
+
+    """
     serializer_class = ProfileDesignerCreateSerializer
     permission_classes = (IsAuthorOrReadOnly,)
 
@@ -79,8 +95,16 @@ class ProfileDesignerViewSet(
 
 
 class UserProfileViewSet(UserViewSet):
-    """"
-    Класс UserProfileViewSet для работы с профилями пользователей.
+    """
+    Предоставляет операции для работы с профилями пользователей,
+    включая создание, просмотр, обновление и удаление профилей.
+
+    list:
+    Возвращает список всех профилей пользователей с дополнительной информацией.
+
+    create:
+    Позволяет аутентифицированным пользователям создать
+    новый профиль пользователя.
 
     """
     permission_classes = (AllowAny,)
