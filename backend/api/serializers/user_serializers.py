@@ -187,7 +187,6 @@ class UserProfileSerializer(UserSerializer):
             'is_customer',
             'profilecustomer',
             'profiledesigner',
-            'resume',
             'portfolio'
         )
 
@@ -308,9 +307,10 @@ class ApplicantSerializer(AuthorSerializer):
 class AuthorListSerializer(AuthorSerializer):
     """
     Сериализатор для отображения пользователя в списке юзеров
-
     """
     country = SerializerMethodField(read_only=True)
+    work_status = SerializerMethodField(read_only=True)
+    about = SerializerMethodField(read_only=True)
     last_cases = SerializerMethodField(read_only=True)
 
     class Meta:
@@ -323,13 +323,27 @@ class AuthorListSerializer(AuthorSerializer):
             'photo',
             'specialization',
             'country',
-            'last_cases'
+            'work_status',
+            'about',
+            'last_cases',
         )
 
     def get_country(self, obj) -> str:
         try:
             profile = ProfileDesigner.objects.get(user=obj)
             return str(profile.country)
+        except ProfileDesigner.DoesNotExist:
+            return ''
+
+    def get_work_status(self, obj) -> bool:
+        try:
+            return obj.profiledesigner.work_status
+        except ProfileDesigner.DoesNotExist:
+            return False
+
+    def get_about(self, obj) -> str:
+        try:
+            return obj.profiledesigner.about
         except ProfileDesigner.DoesNotExist:
             return ''
 
