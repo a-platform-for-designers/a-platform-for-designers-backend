@@ -89,14 +89,28 @@ class UserProfileViewSet(UserViewSet):
     filterset_class = DesignersFilter
 
     def get_queryset(self):
+        # Начальный набор данных
+        queryset = User.objects.all()
+
         if self.action == 'list':
-            queryset = User.objects.annotate(
+            # Фильтрация по количеству кейсов и статусу заказчика
+            queryset = queryset.annotate(
                 num_cases=Count('case')
-            ).filter(num_cases__gte=1, is_customer=False)
+            ).filter(
+                num_cases__gte=1, 
+                is_customer=False
+            )
+
             if self.request.user.is_authenticated:
                 queryset = queryset.exclude(pk=self.request.user.pk)
-            return queryset
-        return User.objects.all()
+
+            # Фильтрация по статусу работы дизайнера
+            work_status = self.request.query_params.get('work_status')
+            if work_status is not None:
+                work_status = work_status.lower() in ['true', '1', 't']
+                queryset = queryset.filter(
+                    profiledesigner__work_status=work_status
+                )
 
     def get_serializer_class(self):
         if self.action == 'list':

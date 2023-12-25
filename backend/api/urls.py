@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from api.views.case_views import CaseViewSet
-from api.views.caseimage_views import CaseImageViewSet
+# from api.views.caseimage_views import CaseImageViewSet
 from api.views.chat_views import ChatViewSet
 # from api.views.comment_views import CommentViewSet
 from api.views.instrument_views import InstrumentViewSet
