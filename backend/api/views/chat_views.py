@@ -1,4 +1,7 @@
+import datetime
+
 from django.db.models import Q, Max
+from django.db.models.functions import Coalesce
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -24,10 +27,11 @@ class ChatViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        null_date = datetime.datetime.min
         queryset = Chat.objects.filter(
             Q(initiator=user) | Q(receiver=user)
         ).annotate(
-            last_message_date=Max('messages__pub_date')
+            last_message_date=Coalesce(Max('messages__pub_date'), null_date)
         ).order_by('-last_message_date', '-id')
         return queryset
 
