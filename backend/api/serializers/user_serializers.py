@@ -347,9 +347,12 @@ class AuthorListSerializer(AuthorSerializer):
 
     """
     country = SerializerMethodField(read_only=True)
+    skills = serializers.SerializerMethodField(read_only=True)
+    instruments = serializers.SerializerMethodField(read_only=True)
     work_status = SerializerMethodField(read_only=True)
     about = SerializerMethodField(read_only=True)
     last_cases = SerializerMethodField(read_only=True)
+
 
     class Meta:
         ordering = ['id']
