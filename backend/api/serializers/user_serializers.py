@@ -208,8 +208,8 @@ class UserProfileSerializer(UserSerializer):
     profilecustomer = ProfileCustomerSerializer(read_only=True)
     profiledesigner = ProfileDesignerSerializer(read_only=True)
     is_subscribed = SerializerMethodField(read_only=True)
-    date_joined = serializers.SerializerMethodField()
-    portfolio = serializers.SerializerMethodField()
+    date_joined = SerializerMethodField()
+    portfolio = SerializerMethodField()
 
     class Meta:
         ordering = ['id']

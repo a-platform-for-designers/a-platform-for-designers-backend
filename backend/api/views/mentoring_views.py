@@ -2,17 +2,17 @@ from rest_framework import mixins
 from rest_framework import viewsets
 
 from api.permissions import IsAuthorOrReadOnly
-from api.serializers.resume_serializers import ResumeWriteSerializer
-from job.models import Resume
+from api.serializers.mentoring_serializers import MentoringWriteSerializer
+from job.models import Mentoring
 
 
-class ResumeViewSet(
+class MentoringViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
     permission_classes = (IsAuthorOrReadOnly,)
-    queryset = Resume.objects.all()
-    serializer_class = ResumeWriteSerializer
+    queryset = Mentoring.objects.all()
+    serializer_class = MentoringWriteSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

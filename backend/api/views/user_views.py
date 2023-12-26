@@ -17,6 +17,7 @@ from api.pagination import LimitPageNumberPagination
 from api.serializers.subscription_serializers import (
     SubscriptionSerializer, SubscriptionCreateSerializer
 )
+from api.serializers.mentoring_serializers import MentorSerializer
 from api.serializers.user_serializers import (
     AuthorListSerializer, UserProfileSerializer,
     ProfileCustomerSerializer, ProfileDesignerCreateSerializer,
@@ -124,17 +125,8 @@ class UserProfileViewSet(UserViewSet):
                 num_cases__gte=1,
                 is_customer=False
             )
-
             if self.request.user.is_authenticated:
                 queryset = queryset.exclude(pk=self.request.user.pk)
-
-            # Фильтрация по статусу работы дизайнера
-            work_status = self.request.query_params.get('work_status')
-            if work_status is not None:
-                work_status = work_status.lower() in ['true', '1', 't']
-                queryset = queryset.filter(
-                    profiledesigner__work_status=work_status
-                )
         return queryset
 
     def get_serializer_class(self):
@@ -229,4 +221,4 @@ class MentorViewSet(mixins.ListModelMixin,
     queryset = User.objects.filter(
         profiledesigner__specialization__name='Менторство'
     ).distinct()
-    serializer_class = AuthorListSerializer
+    serializer_class = MentorSerializer

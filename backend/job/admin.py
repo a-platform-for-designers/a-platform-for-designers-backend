@@ -1,17 +1,19 @@
 from django.contrib import admin
 from .models import (
     Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
-    Specialization, Order, CaseImage, FavoriteOrder, Resume, Language
+    Specialization, Order, CaseImage, FavoriteOrder, Mentoring, Language
 )
 
 
-@admin.register(Resume)
-class ResumeAdmin(admin.ModelAdmin):
+@admin.register(Mentoring)
+class MentoringAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'id',
-        'about',
-        'status'
+        'experience',
+        'expertise',
+        'price',
+        'agreement_free'
     )
 
 

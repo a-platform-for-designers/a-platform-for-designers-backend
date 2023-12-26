@@ -8,10 +8,9 @@ from rest_framework.decorators import action
 from api.filters import CaseFilter
 from api.pagination import LimitPageNumberPagination
 from api.serializers.caseimage_serializers import CaseImageSerializer
-from api.serializers.case_serializers import (CaseSerializer,
-                                              CaseCreateSerializer,
-                                              CaseShortSerializer,
-                                              )
+from api.serializers.case_serializers import (
+    CaseSerializer, CaseCreateSerializer, CaseShortSerializer,
+)
 from job.models import Case, FavoriteCase, CaseImage
 from api.permissions import IsAuthorOrReadOnly
 
