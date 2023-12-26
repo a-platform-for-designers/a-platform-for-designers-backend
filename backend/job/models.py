@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 
@@ -316,24 +318,25 @@ class CaseImage(models.Model):
 #         return self.name
 
 
-class Resume(models.Model):
+class Mentoring(models.Model):
     """
-    Модель резюме
+    Модель менторства
 
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    skills = models.ManyToManyField('Skill')
-    instruments = models.ManyToManyField('Instrument')
-    about = models.TextField()
-    status = models.BooleanField(default=False)
+    experience = models.CharField(max_length=200)
+    expertise = models.TextField(validators=[
+        MaxLengthValidator(500, 'Поле должно содержать не более 500 символов')
+    ])
+    price = models.PositiveIntegerField(null=True, blank=True)
+    agreement_free = models.BooleanField(null=True, blank=True)
 
     class Meta:
-        verbose_name = 'Резюме'
-        verbose_name_plural = 'Резюме'
+        verbose_name = 'Менторство'
 
     def __str__(self):
-        return f'Резюме {self.user.email}'
+        return f'Менторство {self.user.email}'
 
 
 # class Like(models.Model):

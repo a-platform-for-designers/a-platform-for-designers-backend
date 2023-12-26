@@ -8,7 +8,7 @@ from api.views.chat_views import ChatViewSet
 from api.views.instrument_views import InstrumentViewSet
 from api.views.language_views import LanguageViewSet
 from api.views.order_views import OrderViewSet
-from api.views.resume_views import ResumeViewSet
+from api.views.mentoring_views import MentoringViewSet
 from api.views.skill_views import SkillViewSet
 from api.views.specialization_views import SpecializationViewSet
 from api.views.sphere_views import SphereViewSet
@@ -43,7 +43,7 @@ router.register(
     basename='specializations'
 )
 router.register('orders', OrderViewSet, basename='orders')
-router.register('resume', ResumeViewSet, basename='resume')
+router.register('mentoring', MentoringViewSet, basename='resume')
 router.register('instruments', InstrumentViewSet, basename='instruments')
 router.register('skills', SkillViewSet, basename='skills')
 router.register('languages', LanguageViewSet, basename='languages')

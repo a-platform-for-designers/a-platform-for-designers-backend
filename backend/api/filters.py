@@ -26,13 +26,13 @@ class DesignersFilter(filters.FilterSet):
         field_name='profiledesigner__specialization'
     )
     resume = filters.BooleanFilter(
-        field_name='resume__status',
+        field_name='profiledesigner__work_status',
     )
     skills = filters.AllValuesMultipleFilter(
-        field_name='resume__skills__id',
+        field_name='profiledesigner__skills__id',
     )
     instruments = filters.AllValuesMultipleFilter(
-        field_name='resume__instruments__id',
+        field_name='profiledesigner__instruments__id',
     )
 
     class Meta:
