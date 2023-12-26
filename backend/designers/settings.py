@@ -215,8 +215,9 @@ DJOSER = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'DesignCollab API',
     'DESCRIPTION': 'Схема API проекта DesignCollab',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False
+    'VERSION': '1.0.1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'HTTP_METHOD_NAMES': ['get', 'post', 'delete', 'head', 'options', 'trace']
 }
 
 AUTH_USER_MODEL = 'users.User'
