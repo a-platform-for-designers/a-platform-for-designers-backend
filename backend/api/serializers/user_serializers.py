@@ -353,7 +353,6 @@ class AuthorListSerializer(AuthorSerializer):
     about = SerializerMethodField(read_only=True)
     last_cases = SerializerMethodField(read_only=True)
 
-
     class Meta:
         ordering = ['id']
         model = User
