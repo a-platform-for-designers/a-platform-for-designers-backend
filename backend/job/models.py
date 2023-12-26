@@ -338,17 +338,6 @@ class Mentoring(models.Model):
     def __str__(self):
         return f'Менторство {self.user.email}'
 
-    def clean(self):
-        if self.price is None and self.agreement_free is None:
-            raise ValidationError(
-                "Цена и опции оплаты не могут быть пустыми одновременно"
-            )
-
-        if self.price and self.agreement_free:
-            raise ValidationError(
-                "Цена и опции оплаты не могут быть заполненными одновременно"
-            )
-
 
 # class Like(models.Model):
 #     """
