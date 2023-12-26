@@ -1,7 +1,7 @@
 [![Dave-YP-DesignCollab workflow](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml)
 # DesignCollab
 
-## Описание проекта:7
+## Описание проекта:
 
 DesignCollab - веб-платформа для дизайнеров.
 Сайт - http://46.183.163.139/

@@ -361,6 +361,8 @@ class AuthorListSerializer(AuthorSerializer):
             'photo',
             'specialization',
             'country',
+            'skills',
+            'instruments',
             'work_status',
             'about',
             'last_cases',
@@ -372,6 +374,24 @@ class AuthorListSerializer(AuthorSerializer):
             return str(profile.country)
         except ProfileDesigner.DoesNotExist:
             return ''
+
+    def get_skills(self, obj):
+        try:
+            return SkillSerializer(
+                obj.profiledesigner.skills.all(),
+                many=True
+            ).data
+        except ProfileDesigner.DoesNotExist:
+            return []
+
+    def get_instruments(self, obj):
+        try:
+            return InstrumentSerializer(
+                obj.profiledesigner.instruments.all(),
+                many=True
+            ).data
+        except ProfileDesigner.DoesNotExist:
+            return []
 
     def get_work_status(self, obj) -> bool:
         try:

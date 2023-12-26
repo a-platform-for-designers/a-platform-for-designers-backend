@@ -25,7 +25,7 @@ class DesignersFilter(filters.FilterSet):
     specialization = filters.AllValuesMultipleFilter(
         field_name='profiledesigner__specialization'
     )
-    resume = filters.BooleanFilter(
+    work_status = filters.BooleanFilter(
         field_name='profiledesigner__work_status',
     )
     skills = filters.AllValuesMultipleFilter(
@@ -37,7 +37,7 @@ class DesignersFilter(filters.FilterSet):
 
     class Meta:
         model = User
-        fields = ('specialization', 'resume', 'skills', 'instruments')
+        fields = ('specialization', 'work_status', 'skills', 'instruments')
 
 
 class OrdersFilter(filters.FilterSet):
