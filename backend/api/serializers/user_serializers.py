@@ -7,6 +7,7 @@ from rest_framework.serializers import PrimaryKeyRelatedField
 from drf_extra_fields.fields import Base64ImageField
 
 from api.serializers.instrument_serializers import InstrumentSerializer
+from api.serializers.mentoring_serializers import MentoringReadSerializer
 from api.serializers.skill_serializers import SkillSerializer
 from api.serializers.language_serializers import LanguageSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
@@ -207,6 +208,7 @@ class UserProfileSerializer(UserSerializer):
 
     profilecustomer = ProfileCustomerSerializer(read_only=True)
     profiledesigner = ProfileDesignerSerializer(read_only=True)
+    mentoring = MentoringReadSerializer()
     is_subscribed = SerializerMethodField(read_only=True)
     date_joined = SerializerMethodField()
     portfolio = SerializerMethodField()
@@ -224,6 +226,7 @@ class UserProfileSerializer(UserSerializer):
             'is_customer',
             'profilecustomer',
             'profiledesigner',
+            'mentoring',
             'portfolio'
         )
 
@@ -236,7 +239,7 @@ class UserProfileSerializer(UserSerializer):
             return False
         return user.subscriber.filter(author=obj).exists()
 
-    def get_portfolio(self, obj):
+    def get_portfolio(self, obj) -> PortfolioSerializer(Case, many=True):
         cases = Case.objects.filter(author=obj)
         return PortfolioSerializer(cases, many=True).data
 
