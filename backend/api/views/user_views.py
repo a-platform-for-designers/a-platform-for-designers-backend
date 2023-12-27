@@ -206,6 +206,14 @@ class UserProfileViewSet(UserViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
+    @extend_schema(exclude=True)
+    def update(self, request, *args, **kwargs):
+        raise NotImplementedError("PUT не разрешен.")
+
+    @extend_schema(exclude=True)
+    def partial_update(self, request, *args, **kwargs):
+        raise NotImplementedError("PATCH не разрешен.")
+
 
 class MentorViewSet(mixins.ListModelMixin,
                     viewsets.GenericViewSet):
