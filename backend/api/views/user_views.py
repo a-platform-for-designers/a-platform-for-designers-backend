@@ -113,12 +113,25 @@ class UserProfileViewSet(UserViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DesignersFilter
 
+    def create(self, request, *args, **kwargs):
+        return super(UserProfileViewSet, self).create(request, *args, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        return super(UserProfileViewSet, self).list(request, *args, **kwargs)
+
+    # Отключение или переопределение остальных методов
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def get_queryset(self):
         # Начальный набор данных
         queryset = User.objects.all()
 
         if self.action == 'list':
-            # Фильтрация по количеству кейсов и статусу заказчика
+            # Фильтрация по количеству кейсов
             queryset = queryset.annotate(
                 num_cases=Count('case')
             ).filter(
@@ -205,14 +218,6 @@ class UserProfileViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
-
-    @extend_schema(exclude=True)
-    def update(self, request, *args, **kwargs):
-        raise NotImplementedError("PUT не разрешен.")
-
-    @extend_schema(exclude=True)
-    def partial_update(self, request, *args, **kwargs):
-        raise NotImplementedError("PATCH не разрешен.")
 
 
 class MentorViewSet(mixins.ListModelMixin,
