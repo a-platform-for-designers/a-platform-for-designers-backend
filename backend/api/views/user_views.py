@@ -95,7 +95,10 @@ class ProfileDesignerViewSet(
         serializer.save(user=self.request.user)
 
 
-class UserProfileViewSet(UserViewSet):
+class UserProfileViewSet(mixins.CreateModelMixin,
+                         mixins.RetrieveModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
     """
     Предоставляет операции для работы с профилями пользователей,
     включая создание, просмотр, обновление и удаление профилей.
