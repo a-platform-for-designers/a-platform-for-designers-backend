@@ -1,11 +1,11 @@
-import base64
-import time
-
+from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 
 from api.serializers.message_serializers import MessageSerializer
@@ -40,27 +40,27 @@ class MessageViewSet(viewsets.ModelViewSet):
         return chat
 
     def perform_create(self, serializer):
-        file_data = self.request.data.get('file')
-        if file_data:
-            file_format, file_data = file_data.split(';base64,')
-            file_extension = file_format.split('/')[-1]
-            if (
-                file_extension == ('vnd.openxmlformats-officedocument.'
-                                   'wordprocessingml.document')
-                or file_extension == 'msword'
-            ):
-                file_extension = 'docx'
-            filename = (f"{self.request.user.last_name}_"
-                        f"{time.time()}.{file_extension}")
-            file = ContentFile(
-                base64.b64decode(file_data),
-                name=filename
-            )
-            serializer.save(
-                sender=self.request.user,
-                chat=self.get_chat(),
-                file=file
-            )
+        file = self.request.data.get('file')
+        if file:
+            try:
+                if isinstance(file, bytes):
+                    content_file = ContentFile(file)
+                else:
+                    content = file.read()
+                    content_file = ContentFile(content)
+                if content_file.size > settings.MAX_FILE_SIZE:
+                    raise APIException('Слишком большой размер файла')
+                file_path = default_storage.save(
+                    'messages/' + file.name,
+                    content_file
+                )
+                serializer.save(
+                    sender=self.request.user,
+                    chat=self.get_chat(),
+                    file=file_path
+                )
+            except AttributeError:
+                raise APIException('Неверный формат файла')
         else:
             serializer.save(
                 sender=self.request.user,

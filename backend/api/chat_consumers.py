@@ -1,19 +1,15 @@
-import base64
 import json
-import re
-import time
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.core.paginator import EmptyPage, Paginator
+from rest_framework.exceptions import APIException
 
 from api.serializers.message_serializers import MessageSerializer
 from job.models import Chat, Message
-
-
-ALLOWED_TYPES = ['pdf', 'docx', 'doc', 'jpg', 'jpeg', 'png']
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -85,54 +81,44 @@ class ChatConsumer(WebsocketConsumer):
                     ))
 
         else:
+            message = text_data_json['message']
+
             if 'file' in text_data_json:
-                message = text_data_json['message']
-                file_data = text_data_json['file']
-                match = re.search(r'data:(.*?);base64,', file_data)
-
-                if match:
-                    file_format = match.group(1).split('/')[-1]
-                    if (
-                        file_format == ('vnd.openxmlformats-officedocument.'
-                                        'wordprocessingml.document')
-                        or file_format == 'msword'
-                    ):
-                        file_format = 'docx'
-                    if file_format not in ALLOWED_TYPES:
-                        self.send(
-                            text_data=('Можно отправлять файлы в формате '
-                                       f'{ALLOWED_TYPES}')
-                        )
+                try:
+                    file = text_data_json['file']
+                    if isinstance(file, bytes):
+                        content_file = ContentFile(file)
                     else:
-                        file_data = file_data.split(',')[1]
-                        padding = len(file_data) % 4
-                        file_data += '=' * padding
-                        file_data = base64.b64decode(file_data)
+                        content = file.read()
+                        content_file = ContentFile(content)
 
-                        filename = (f"{self.sender.last_name}_"
-                                    f"{time.time()}.{file_format}")
-                        file = ContentFile(file_data, name=filename)
-
-                        message_create = Message.objects.create(
-                            sender=self.sender,
-                            text=message,
-                            chat=chat,
-                            file=file,
-                        )
-
-                        self.message_id = message_create.id
-
-                        async_to_sync(self.channel_layer.group_send)(
-                            self.chat_group,
-                            {'type': 'chat_message', 'message': message}
-                        )
-                else:
-                    self.send(
-                        text_data=('Можно отправлять файлы в формате '
-                                   f'{ALLOWED_TYPES}')
+                    if content_file.size > settings.MAX_FILE_SIZE:
+                        raise APIException('Слишком большой размер файла')
+                    file_path = default_storage.save(
+                        'messages/' + file.name,
+                        content_file
                     )
+
+                    message_create = Message.objects.create(
+                        sender=self.sender,
+                        text=message,
+                        chat=chat,
+                        file=file_path,
+                    )
+                    self.message_id = message_create.id
+
+                    async_to_sync(self.channel_layer.group_send)(
+                        self.chat_group,
+                        {
+                            'type': 'chat_message',
+                            'message': message,
+                            'file': file_path.url
+                        }
+                    )
+                except AttributeError:
+                    raise APIException('Неверный формат файла')
+
             else:
-                message = text_data_json['message']
                 message_create = Message.objects.create(
                     sender=self.sender,
                     text=message,
