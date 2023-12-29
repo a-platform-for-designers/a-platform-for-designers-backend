@@ -1,7 +1,3 @@
-import base64
-import time
-
-from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -61,29 +57,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         return chat
 
     def perform_create(self, serializer):
-        file_data = self.request.data.get('file')
-        if file_data:
-            file_format, file_data = file_data.split(';base64,')
-            file_extension = file_format.split('/')[-1]
-            if (
-                file_extension == ('vnd.openxmlformats-officedocument.'
-                                   'wordprocessingml.document')
-                or file_extension == 'msword'
-            ):
-                file_extension = 'docx'
-            filename = (f"{self.request.user.last_name}_"
-                        f"{time.time()}.{file_extension}")
-            file = ContentFile(
-                base64.b64decode(file_data),
-                name=filename
-            )
-            serializer.save(
-                sender=self.request.user,
-                chat=self.get_chat(),
-                file=file
-            )
-        else:
-            serializer.save(
-                sender=self.request.user,
-                chat=self.get_chat()
-            )
+        serializer.save(
+            sender=self.request.user,
+            chat=self.get_chat()
+        )
