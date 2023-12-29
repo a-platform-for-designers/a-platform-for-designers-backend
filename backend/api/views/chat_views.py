@@ -4,6 +4,7 @@ from django.db.models import Q, Max
 from django.db.models.functions import Coalesce
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
 
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsInitiatorOrReceiverChatPermission
@@ -13,8 +14,9 @@ from job.models import Chat
 
 
 class ChatViewSet(viewsets.ModelViewSet):
-    """"
-    Класс ChatViewSet для работы с чатами.
+    """
+    Вью для работы с чатами.
+    Также позволяет получать чат по ID.
 
     """
 
@@ -24,6 +26,28 @@ class ChatViewSet(viewsets.ModelViewSet):
         IsInitiatorOrReceiverChatPermission
     ]
     pagination_class = LimitPageNumberPagination
+
+    @extend_schema(
+        summary="Получение списка чатов",
+        description="Возвращает список всех чатов для данного пользователя, "
+                    "упорядоченных по дате последнего сообщения."
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Создание чата",
+        description="Создает новый чат с указанным пользователем."
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Получение деталей чата по ID",
+        description="Возвращает детали конкретного чата по его ID."
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user

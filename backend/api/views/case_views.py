@@ -1,25 +1,32 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
+# from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema
 
 from api.filters import CaseFilter
 from api.pagination import LimitPageNumberPagination
-from api.serializers.caseimage_serializers import CaseImageSerializer
+# from api.serializers.caseimage_serializers import CaseImageSerializer
 from api.serializers.case_serializers import (
-    CaseSerializer, CaseCreateSerializer, CaseShortSerializer,
+    CaseSerializer, CaseCreateSerializer
 )
-from job.models import Case, FavoriteCase, CaseImage
+from job.models import Case
 from api.permissions import IsAuthorOrReadOnly
 
 
 class CaseViewSet(ModelViewSet):
-    """"
-    Класс CaseViewSet для работы с проектами авторов.
+    """
+    Вью для работы с проектами авторов.
+
+    list/retrieve:
+    Возвращает список всех кейсов, упорядоченных
+    по дате создания и другим параметрам.
+    Также позволяет получать кейс по ID.
 
     """
+    http_method_names = ['get', 'post', 'delete']
     queryset = Case.objects.all()
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
@@ -34,14 +41,48 @@ class CaseViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    @extend_schema(
+        summary="Создание проекта.",
+        description="Создает новый проект. Доступ запрещен для заказчиков.",
+        responses={status.HTTP_403_FORBIDDEN: 'Вы не можете создавать кейс.'}
+    )
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
             return Response(
-                {"detail": "Заказчик не может создавать кейс"},
+                {"detail": "Заказчик не может создавать кейс."},
                 status=status.HTTP_403_FORBIDDEN
             )
         else:
             return super().create(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Получение списка проектов",
+        description=(
+            "Возвращает список всех проектов, упорядоченных по дате создания "
+            "и другим параметрам. Позволяет пользователям просматривать "
+            "проекты и искать их по различным критериям фильтрации."
+        )
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Получение деталей проекта по ID",
+        description=(
+            "Возвращает детали конкретного проекта по его ID. "
+            "Эта операция позволяет изучать полную информацию о проекте, "
+            "включая описание, автора и статус."
+        )
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Удаление кейса.",
+        description="Удаляет кейс."
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
     # @action(
     #     detail=True,

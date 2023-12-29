@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from rest_framework.fields import SerializerMethodField
-from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import PrimaryKeyRelatedField
+# from rest_framework.fields import SerializerMethodField
+# from rest_framework.exceptions import ValidationError
+# from rest_framework.serializers import PrimaryKeyRelatedField
 
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
-from job.models import Instrument, Mentoring, Skill
+from job.models import Mentoring
 from users.models import User
 
 

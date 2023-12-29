@@ -2,24 +2,54 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from drf_spectacular.utils import extend_schema
 
 from api.filters import OrdersFilter
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers.order_serializers import (
     OrderReadSerializer, OrderAuthorReadSerializer, OrderWriteSerializer,
-    FavoriteOrderSerializer, OrderResponseSerializer,
+    OrderResponseSerializer,
     OrderAuthorListReadSerializer
 
 )
-from job.models import FavoriteOrder, Order, OrderResponse
-from users.models import User
+from job.models import Order, OrderResponse
+# from users.models import User
+# FavoriteOrderSerializer, FavoriteOrder,
 
 
 class OrderViewSet(viewsets.ModelViewSet):
+    """
+    Для управления заказами. Поддерживает операции создания, чтения,
+    обновления и удаления заказов,
+    а также включает специализированные действия для управления публикацией
+    и откликами на заказы.
+
+    Основные методы:
+    - list: Возвращает список всех опубликованных заказов.
+    - create: Позволяет заказчикам создавать новые заказы.
+    - retrieve: Возвращает детали конкретного заказа.
+    - destroy: Удаляет заказ.
+
+    Специализированные действия:
+    - respond: Позволяет исполнителям откликаться на заказы
+    или отзывать свои отклики.
+    - publish: Позволяет заказчикам публиковать или снимать
+    с публикации свои заказы.
+    - my_orders: Возвращает заказы текущего пользователя,
+    различая заказчиков и исполнителей.
+
+    Фильтрация, пагинация и разрешения:
+    - Поддерживает фильтрацию заказов.
+    - Не использует пагинацию.
+    - Различные классы разрешений применяются в зависимости от действия
+    и роли пользователя.
+
+    """
+    http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -42,6 +72,17 @@ class OrderViewSet(viewsets.ModelViewSet):
         elif self.action in ('create', 'partial_update'):
             return OrderWriteSerializer
 
+    @extend_schema(
+        summary="Список заказов",
+        description="Возвращает список всех опубликованных заказов."
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Создание заказа",
+        description="Позволяет заказчикам создавать новые заказы."
+    )
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
             return super().create(request, *args, **kwargs)
@@ -51,8 +92,22 @@ class OrderViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
+    @extend_schema(
+        summary="Получение деталей заказа",
+        description="Возвращает детали конкретного заказа."
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user)
+
+    @extend_schema(
+        summary="Удаление заказа",
+        description="Удаляет заказ."
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
     @staticmethod
     def create_object(serializer, pk, request):
@@ -83,7 +138,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     #     if request.method == 'POST':
     #         return self.create_object(FavoriteOrderSerializer, pk, request)
     #     return self.delete_object(FavoriteOrder, request.user, pk)
-
+    @extend_schema(
+        summary="Отклик на заказ",
+        description="Позволяет дизайнерам откликаться на заказы."
+        "DELETE запрос используется для отмены уже существующего отклика,"
+        "что удаляет дизайнера из списка потенциальных "
+        "исполнителей заказа.",
+        methods=['post', 'delete'],
+    )
     @action(
         detail=True,
         methods=['post', 'delete'],
@@ -99,6 +161,11 @@ class OrderViewSet(viewsets.ModelViewSet):
             return self.create_object(OrderResponseSerializer, pk, request)
         return self.delete_object(OrderResponse, request.user, pk)
 
+    @extend_schema(
+        summary="Публикация заказа",
+        description="Позволяет публиковать/снимать с публикации свои заказы.",
+        methods=['patch']
+    )
     @action(
         detail=True,
         methods=['patch'],
@@ -125,6 +192,11 @@ class OrderViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+    @extend_schema(
+        summary="Заказы пользователя",
+        description="Возвращает заказы пользователя.",
+        methods=['get']
+    )
     @action(
         detail=False,
         methods=['get'],

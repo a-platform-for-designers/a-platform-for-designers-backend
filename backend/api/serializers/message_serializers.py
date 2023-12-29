@@ -11,8 +11,8 @@ from job.models import Message
 class MyCustomBase64FileField(Base64FileField):
     """
     Кастомный сериализатор для обработки файлов в base64 формате.
-    """
 
+    """
     ALLOWED_MIME_TYPES = {
         'image/jpeg': 'jpg',
         'image/png': 'png',
@@ -36,8 +36,10 @@ class MyCustomBase64FileField(Base64FileField):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    """Сериализатор сообщения."""
+    """
+    Сериализатор сообщения.
 
+    """
     sender = UserChatAndMessageSerializer(read_only=True)
     chat = ChatReadSerializer(read_only=True)
     receiver = serializers.IntegerField(required=True, write_only=True)

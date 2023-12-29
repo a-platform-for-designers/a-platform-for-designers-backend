@@ -7,8 +7,10 @@ from job.models import Chat
 
 
 class ChatReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для метода get для чатов."""
+    """
+    Сериализатор для метода get для чатов.
 
+   """
     initiator = UserChatAndMessageSerializer(read_only=True)
     receiver = UserChatAndMessageSerializer(read_only=True)
     last_message = serializers.SerializerMethodField()
@@ -26,7 +28,10 @@ class ChatReadSerializer(serializers.ModelSerializer):
 
 
 class ChatCreateSerializer(serializers.ModelSerializer):
-    """Сериализатор для создания чата."""
+    """
+    Сериализатор для создания чата.
+
+    """
 
     class Meta:
         model = Chat

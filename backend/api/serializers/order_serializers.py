@@ -1,5 +1,5 @@
 from djoser.serializers import UserSerializer
-from rest_framework.exceptions import ValidationError
+# from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 from rest_framework.fields import SerializerMethodField, IntegerField
 from rest_framework.validators import UniqueTogetherValidator

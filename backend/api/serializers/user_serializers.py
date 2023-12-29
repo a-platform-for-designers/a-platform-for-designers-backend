@@ -204,7 +204,6 @@ class UserProfileSerializer(UserSerializer):
     как статус подписки, портфолио и т.д.
 
     """
-
     profilecustomer = ProfileCustomerSerializer(read_only=True)
     profiledesigner = ProfileDesignerSerializer(read_only=True)
     is_subscribed = SerializerMethodField(read_only=True)
@@ -239,32 +238,6 @@ class UserProfileSerializer(UserSerializer):
     def get_portfolio(self, obj):
         cases = Case.objects.filter(author=obj)
         return PortfolioSerializer(cases, many=True).data
-
-    # def get_profilecustomer(self, obj):
-    #     obj=ProfileCustomer.objects.filter(user=obj)
-    #     if obj.exists():
-    #         return ProfileCustomerSerializer(obj).data
-    #     else:
-    #         return {'id':0, 'post': ''}
-
-    # def get_profiledesigner(self, obj):
-    #     obj=ProfileDesigner.objects.filter(user=obj)
-    #     if obj.exists():
-    #         return ProfileDesignerSerializer(obj).data
-    #     else:
-    #         return {
-    #                 'id':0, 'education': '',
-    #                 'country': '',
-    #                 'specialization': 0,
-    #                 'hobby': '',
-    #                 'language':[]
-    #          }
-
-    # def get_resume(self, obj):
-    #     if obj.resume:
-    #         return ResumeReadSerializer(obj.resume).data
-    #     else:
-    #         return {'id': 0, 'skills':[], 'instruments': [], 'about':[]}
 
 
 class UserProfileCreateSerializer(UserCreateSerializer):
