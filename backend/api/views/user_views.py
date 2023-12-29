@@ -293,8 +293,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     )
     @action(detail=True, methods=[
         'post', 'delete'],
-            permission_classes=[IsAuthenticated]
-        )
+        permission_classes=[IsAuthenticated]
+    )
     def subscribe(self, request, **kwargs):
         current_user = request.user
         target_author_id = kwargs.get('pk')
