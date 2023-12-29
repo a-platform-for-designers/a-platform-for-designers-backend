@@ -85,65 +85,20 @@ class ChatConsumer(WebsocketConsumer):
                     ))
 
         else:
-            if 'file' in text_data_json:
-                message = text_data_json['message']
-                file_data = text_data_json['file']
-                match = re.search(r'data:(.*?);base64,', file_data)
+            message = text_data_json['message']
+            file = text_data_json['file']
+            message_create = Message.objects.create(
+                sender=self.sender,
+                text=message,
+                chat=chat,
+                file=file,
+            )
+            self.message_id = message_create.id
 
-                if match:
-                    file_format = match.group(1).split('/')[-1]
-                    if (
-                        file_format == ('vnd.openxmlformats-officedocument.'
-                                        'wordprocessingml.document')
-                        or file_format == 'msword'
-                    ):
-                        file_format = 'docx'
-                    if file_format not in ALLOWED_TYPES:
-                        self.send(
-                            text_data=('Можно отправлять файлы в формате '
-                                       f'{ALLOWED_TYPES}')
-                        )
-                    else:
-                        file_data = file_data.split(',')[1]
-                        padding = len(file_data) % 4
-                        file_data += '=' * padding
-                        file_data = base64.b64decode(file_data)
-
-                        filename = (f"{self.sender.last_name}_"
-                                    f"{time.time()}.{file_format}")
-                        file = ContentFile(file_data, name=filename)
-
-                        message_create = Message.objects.create(
-                            sender=self.sender,
-                            text=message,
-                            chat=chat,
-                            file=file,
-                        )
-
-                        self.message_id = message_create.id
-
-                        async_to_sync(self.channel_layer.group_send)(
-                            self.chat_group,
-                            {'type': 'chat_message', 'message': message}
-                        )
-                else:
-                    self.send(
-                        text_data=('Можно отправлять файлы в формате '
-                                   f'{ALLOWED_TYPES}')
-                    )
-            else:
-                message = text_data_json['message']
-                message_create = Message.objects.create(
-                    sender=self.sender,
-                    text=message,
-                    chat=chat,
-                )
-                self.message_id = message_create.id
-
-                async_to_sync(self.channel_layer.group_send)(
-                    self.chat_group,
-                    {'type': 'chat_message', 'message': message}
-                )
+            async_to_sync(self.channel_layer.group_send)(
+                self.chat_group,
+                {'type': 'chat_message', 'message': message}
+            )
 
     def chat_message(self, event):
         if self.message_id:

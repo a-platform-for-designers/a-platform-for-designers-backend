@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Case, Instrument, Skill, FavoriteCase, Chat, Message, Sphere,
+    Case, Instrument, Skill, FavoriteCase, Chat, Message, File, Sphere,
     Specialization, Order, CaseImage, FavoriteOrder, Mentoring, Language
 )
 
@@ -101,6 +101,13 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ('id', 'chat', 'sender', 'text', 'pub_date', 'file')
     search_fields = ('chat', 'sender', 'text')
     list_filter = ('chat', 'sender', 'pub_date')
+    empty_value_display = '-пусто-'
+
+
+@admin.register(File)
+class FileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'file', 'chat', 'sender', 'pub_date')
+    list_filter = ('chat', 'sender')
     empty_value_display = '-пусто-'
 
 

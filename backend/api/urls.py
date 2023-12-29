@@ -5,6 +5,7 @@ from api.views.case_views import CaseViewSet
 # from api.views.caseimage_views import CaseImageViewSet
 from api.views.chat_views import ChatViewSet
 # from api.views.comment_views import CommentViewSet
+from api.views.files_views import FileViewSet
 from api.views.instrument_views import InstrumentViewSet
 from api.views.language_views import LanguageViewSet
 from api.views.order_views import OrderViewSet
@@ -37,6 +38,7 @@ router.register(
 router.register('cases', CaseViewSet, basename='cases')
 router.register('chats', ChatViewSet, basename='chats')
 router.register('send_message', MessageViewSet, basename='send_message')
+router.register('files', FileViewSet, basename='files')
 router.register(
     'specializations',
     SpecializationViewSet,

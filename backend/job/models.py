@@ -254,11 +254,7 @@ class Message(models.Model):
     )
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
-    file = models.FileField(
-        upload_to='messages/',
-        blank=True,
-        null=True
-    )
+    file = models.URLField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'Сообщение'
@@ -267,6 +263,33 @@ class Message(models.Model):
 
     def __str__(self):
         return f'{self.sender.email}: {self.text[:settings.MESSAGE_STR]}'
+
+
+class File(models.Model):
+    """
+    Модель файлов из сообщений
+
+    """
+    file = models.FileField(upload_to='messages/')
+    pub_date = models.DateTimeField(auto_now_add=True)
+    chat = models.ForeignKey(
+        Chat,
+        on_delete=models.CASCADE,
+        related_name='files',
+    )
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='file_sender',
+    )
+
+    class Meta:
+        verbose_name = 'Файл'
+        verbose_name_plural = 'Файлы'
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return f'{self.file}'
 
 
 class CaseImage(models.Model):
