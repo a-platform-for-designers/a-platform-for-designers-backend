@@ -12,9 +12,24 @@ jobs:
   tests:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
@@ -32,9 +47,16 @@ jobs:
         python -m flake8
 
     - name: Run Django Tests
+      env:
+        DB_HOST: localhost
+        DB_PORT: 5432
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        DB_NAME: postgres_test_db
       run: |
         cd backend/
         python manage.py test
+
 
         
   build_and_push_backend_to_docker_hub:
