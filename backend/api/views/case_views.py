@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 # from rest_framework.decorators import action
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from api.filters import CaseFilter
 from api.pagination import LimitPageNumberPagination
@@ -44,7 +44,17 @@ class CaseViewSet(ModelViewSet):
     @extend_schema(
         summary="Создание проекта.",
         description="Создает новый проект. Доступ запрещен для заказчиков.",
-        responses={status.HTTP_403_FORBIDDEN: 'Вы не можете создавать кейс.'}
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(
+                description="Проект успешно создан."
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ."
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Заказчик не может создавать кейс."
+            ),
+        }
     )
     def create(self, request, *args, **kwargs):
         if request.user.is_customer:
@@ -79,9 +89,28 @@ class CaseViewSet(ModelViewSet):
 
     @extend_schema(
         summary="Удаление кейса.",
-        description="Удаляет кейс."
+        description="Удаляет кейс.",
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Кейс успешно удален"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Доступ запрещен"
+            ),
+        }
     )
     def destroy(self, request, *args, **kwargs):
+        case = self.get_object()
+
+        if request.user != case.author:
+            return Response(
+                {"detail": "Только автор может удалить кейс."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         return super().destroy(request, *args, **kwargs)
 
     # @action(

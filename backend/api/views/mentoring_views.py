@@ -5,14 +5,10 @@ from api.serializers.mentoring_serializers import MentoringWriteSerializer
 from job.models import Mentoring
 
 
-class MentoringViewSet(
-    mixins.CreateModelMixin,
-    viewsets.GenericViewSet
-):
+class MentoringViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     Вью для управления менторингом.
-    Позволяет создавать дополнительную
-    информацию по менторингу для дизайнеров.
+    Позволяет создавать дополнительную информацию по менторингу для дизайнеров.
 
     """
     permission_classes = (IsAuthorOrReadOnly,)
@@ -25,10 +21,16 @@ class MentoringViewSet(
                 response=MentoringWriteSerializer,
                 description="Информация по менторингу успешно создана"
             ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Доступ запрещен"
+            ),
         },
         summary="Создание информации по менторингу",
         description="Позволяет пользователям создавать и отправлять "
-        "информацию по менторингу для дизайнеров."
+                    "информацию по менторингу для дизайнеров."
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)

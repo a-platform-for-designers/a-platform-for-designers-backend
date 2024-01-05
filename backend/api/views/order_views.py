@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from api.filters import OrdersFilter
 from api.pagination import LimitPageNumberPagination
@@ -81,10 +81,26 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Создание заказа",
-        description="Позволяет заказчикам создавать новые заказы."
+        description="Позволяет заказчикам создавать новые заказы.",
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(
+                description="Заказ успешно создан"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Создавать заказы могут только заказчики"
+            )
+        }
     )
     def create(self, request, *args, **kwargs):
-        if request.user.is_customer:
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Неавторизованный доступ"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        elif request.user.is_customer:
             return super().create(request, *args, **kwargs)
         else:
             return Response(
@@ -94,7 +110,18 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Получение деталей заказа",
-        description="Возвращает детали конкретного заказа."
+        description="Возвращает детали конкретного заказа.",
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Детали заказа предоставлены"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                description="Заказ не найден"
+            )
+        }
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
@@ -104,10 +131,49 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Удаление заказа",
-        description="Удаляет заказ."
+        description="Удаляет заказ.",
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Заказ успешно удален"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="У вас нет доступа удалять этот заказ"
+            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                description="Заказ не найден"
+            )
+        }
     )
     def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Неавторизованный доступ"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        order = get_object_or_404(Order, id=kwargs.get('pk'))
+        if request.user != order.customer:
+            return Response(
+                {"detail": "У вас нет доступа удалять этот заказ"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return self.delete_object(Order, request.user, kwargs.get('pk'))
+
+    @staticmethod
+    def delete_object(model, user, pk):
+        obj = model.objects.filter(user=user, order__id=pk)
+        if obj.exists():
+            obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(
+                {"errors": "Заказ уже удален или не существует."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
     @staticmethod
     def create_object(serializer, pk, request):
@@ -121,14 +187,6 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @staticmethod
-    def delete_object(model, user, pk):
-        obj = model.objects.filter(user=user, order__id=pk)
-        if obj.delete()[0]:
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response({'errors': 'Заказ уже удален!'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
     # @action(
     #     detail=True,
     #     methods=['post', 'delete'],
@@ -138,13 +196,27 @@ class OrderViewSet(viewsets.ModelViewSet):
     #     if request.method == 'POST':
     #         return self.create_object(FavoriteOrderSerializer, pk, request)
     #     return self.delete_object(FavoriteOrder, request.user, pk)
+
     @extend_schema(
         summary="Отклик на заказ",
-        description="Позволяет дизайнерам откликаться на заказы."
-        "DELETE запрос используется для отмены уже существующего отклика,"
-        "что удаляет дизайнера из списка потенциальных "
-        "исполнителей заказа.",
+        description="Позволяет дизайнерам откликаться на заказы "
+                    "и удалять свои отклики. "
+                    "DELETE запрос используется для отмены уже "
+                    "существующего отклика, "
+                    "что удаляет дизайнера из списка потенциальных "
+                    "исполнителей заказа.",
         methods=['post', 'delete'],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Отклик успешно создан или удален"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Доступ запрещен"
+            )
+        }
     )
     @action(
         detail=True,
@@ -152,6 +224,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def respond(self, request, pk):
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Неавторизованный доступ"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
         if request.method == 'POST':
             if self.request.user.is_customer:
                 return Response(
@@ -164,7 +241,21 @@ class OrderViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Публикация заказа",
         description="Позволяет публиковать/снимать с публикации свои заказы.",
-        methods=['patch']
+        methods=['patch'],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Заказ успешно опубликован или снят с публикации"
+            ),
+            status.HTTP_201_CREATED: OpenApiResponse(
+                description="Заказ успешно снят с публикации"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="У вас нет доступа корректировать заказ"
+            )
+        }
     )
     @action(
         detail=True,
@@ -195,7 +286,18 @@ class OrderViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Заказы пользователя",
         description="Возвращает заказы пользователя.",
-        methods=['get']
+        methods=['get'],
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Заказы пользователя успешно получены"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Доступ запрещен"
+            )
+        }
     )
     @action(
         detail=False,
@@ -204,11 +306,19 @@ class OrderViewSet(viewsets.ModelViewSet):
     )
     def my_orders(self, request):
         user = self.request.user
+
+        if not user.is_authenticated:
+            return Response(
+                {"detail": "Неавторизованный доступ"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         if user.is_customer:
             orders = user.orders.all()
             serializer = OrderAuthorListReadSerializer(orders, many=True)
             return Response(serializer.data)
-        responses = user.order_responses.values_list('order').all()
+
+        responses = user.order_responses.values_list('order', flat=True)
         orders = Order.objects.filter(id__in=responses)
         serializer = OrderReadSerializer(orders, many=True)
         return Response(serializer.data)

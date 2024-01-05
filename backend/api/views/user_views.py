@@ -72,6 +72,9 @@ class ProfileCustomerViewSet(
             ),
             status.HTTP_403_FORBIDDEN: OpenApiResponse(
                 description="Вы не являетесь заказчиком"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
             )
         }
     )
@@ -112,6 +115,9 @@ class ProfileDesignerViewSet(
             ),
             status.HTTP_403_FORBIDDEN: OpenApiResponse(
                 description="Вы не являетесь дизайнером."
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
             )
         }
     )
@@ -202,9 +208,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             200: OpenApiResponse(
                 response=AuthorListSerializer(many=True),
                 description="Список пользователей предоставлен."
-            ),
-            401: OpenApiResponse(
-                description="Неавторизованный доступ."
             )
         }
     )

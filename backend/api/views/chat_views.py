@@ -2,9 +2,10 @@ import datetime
 
 from django.db.models import Q, Max
 from django.db.models.functions import Coalesce
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsInitiatorOrReceiverChatPermission
@@ -30,23 +31,58 @@ class ChatViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Получение списка чатов",
         description="Возвращает список всех чатов для данного пользователя, "
-                    "упорядоченных по дате последнего сообщения."
+                    "упорядоченных по дате последнего сообщения.",
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Список чатов успешно получен"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+        }
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
     @extend_schema(
         summary="Создание чата",
-        description="Создает новый чат с указанным пользователем."
+        description="Создает новый чат с указанным пользователем.",
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(
+                description="Чат успешно создан"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+        }
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
     @extend_schema(
         summary="Получение деталей чата по ID",
-        description="Возвращает детали конкретного чата по его ID."
+        description="Возвращает детали конкретного чата по его ID.",
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Детали чата успешно получены"
+            ),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Доступ запрещен"
+            ),
+        }
     )
     def retrieve(self, request, *args, **kwargs):
+        chat = self.get_object()
+
+        if request.user != chat.initiator and request.user != chat.receiver:
+            return Response(
+                {"detail": "Вы не можете просматривать детали этого чата."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):
