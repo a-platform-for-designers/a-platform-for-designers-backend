@@ -44,21 +44,32 @@ jobs:
 
     - name: Test with flake8
       run: |
+        cd backend/
         python -m flake8
+
+    - name: Apply Migrations
+      env:
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_USER: postgres
+        DB_PASS: postgres
+        DB_NAME: postgres_test_db
+      run: |
+        cd backend/
+        python manage.py makemigrations
+        python manage.py migrate
 
     - name: Run Django Tests
       env:
         DB_HOST: localhost
         DB_PORT: 5432
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
+        DB_USER: postgres
+        DB_PASS: postgres
         DB_NAME: postgres_test_db
       run: |
         cd backend/
         python manage.py test
-
-
-        
+  
   build_and_push_backend_to_docker_hub:
     if: github.ref == 'refs/heads/main'
     name: Push backend Docker image to Docker Hub
