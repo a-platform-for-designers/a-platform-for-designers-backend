@@ -38,7 +38,7 @@ class ChatViewSet(viewsets.ModelViewSet):
                 name='id',
                 description='ID чата',
                 required=True, type=int
-                )
+            )
         ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(
