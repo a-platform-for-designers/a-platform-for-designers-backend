@@ -115,9 +115,6 @@ class OrderViewSet(viewsets.ModelViewSet):
             status.HTTP_200_OK: OpenApiResponse(
                 description="Детали заказа предоставлены"
             ),
-            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
-                description="Неавторизованный доступ"
-            ),
             status.HTTP_404_NOT_FOUND: OpenApiResponse(
                 description="Заказ не найден"
             )

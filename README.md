@@ -1,11 +1,16 @@
-[![Dave-YP-DesignCollab workflow](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml)
+![DesignCollab Logo](logo.png)
+
 # DesignCollab
+
+[![Dave-YP-DesignCollab workflow](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/a-platform-for-designers/a-platform-for-designers-backend/actions/workflows/main.yml)
 
 ## Описание проекта:
 
-DesignCollab - веб-платформа для дизайнеров.
-Сайт - http://46.183.163.139/
-Swagger - http://46.183.163.139/api/schema/swagger-ui/ 
+**DesignCollab** - это веб-платформа для дизайнеров, позволяющая сотрудничать, обмениваться идеями и создавать проекты. Платформа предлагает удобный интерфейс и инструменты для эффективной работы.
+
+- **Сайт**: [Посетите здесь](http://46.183.163.139/)
+- **Swagger**: [Интерфейс Swagger](http://46.183.163.139/api/schema/swagger-ui/)
+- **Redoc**: [Интерфейс Redoc](http://46.183.163.139/api/schema/redoc/)
 
 ## Технологии:
 Django - это мощный фреймворк для создания веб-приложений на Python. Он предоставляет широкий спектр инструментов, включая маршрутизацию, шаблонизацию, аутентификацию и многое другое, что значительно упрощает процесс разработки веб-приложений.
@@ -49,6 +54,7 @@ REDIS_PORT=6379
 ```
 
 > Генератор секретного ключа: infra/secretgenerate.py
+> Код, который преобразует изображение в строку в формате base64: infra/converter.py
 
  - [ ] Запустить Docker из папки infra:
 ```

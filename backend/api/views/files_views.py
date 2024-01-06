@@ -4,9 +4,9 @@ import os
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 
@@ -36,7 +36,12 @@ class FileViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Загрузка файла",
         description="Загружает файл в /media/messages/ и выдает "
-        "ссылку на него для последующей отправки в сообщениях."
+        "ссылку на него для последующей отправки в сообщениях.",
+        responses={
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Неавторизованный доступ"
+            )
+        }
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
