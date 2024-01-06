@@ -16,7 +16,7 @@ from api.views.sphere_views import SphereViewSet
 from api.views.message_views import MessageViewSet
 from api.views.user_views import (
     ProfileCustomerViewSet, ProfileDesignerViewSet, UserProfileViewSet,
-    MentorViewSet, CustomUserViewSet, TokenCreateView
+    MentorViewSet, CustomUserViewSet
 )
 
 
@@ -54,6 +54,6 @@ router.register('languages', LanguageViewSet, basename='languages')
 urlpatterns = [
     path('', include(router.urls)),
     # path('auth/token/login', TokenCreateView.as_view(), name='login'),
-    path('auth/', include('djoser.urls')),
+    # path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]

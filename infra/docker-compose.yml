@@ -18,7 +18,7 @@ services:
     restart: on-failure
 
   backend:
-    build: ../backend
+    # build: ../backend
     image: carkazm/designcollab_backend:latest
     entrypoint: /app/entrypoint.sh
     volumes:
@@ -35,7 +35,7 @@ services:
     restart: on-failure
 
   daphne:
-    build: ../backend
+    # build: ../backend
     image: carkazm/designcollab_backend:latest
     entrypoint: /app/entrypoint_daphne.sh
     command: daphne -b 0.0.0.0 -p 8001 designers.asgi:application
