@@ -24,7 +24,7 @@ router = routers.DefaultRouter()
 router.register('auth/users', CustomUserViewSet, basename='auth_users')
 router.register('users', UserProfileViewSet, basename='users')
 router.register('mentors', MentorViewSet, basename='mentors')
-router.register('spheres', SphereViewSet, basename='spheres')
+# router.register('spheres', SphereViewSet, basename='spheres')
 router.register(
     'profile_customer',
     ProfileCustomerViewSet,
