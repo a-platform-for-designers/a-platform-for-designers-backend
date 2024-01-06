@@ -140,7 +140,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 description="У вас нет доступа удалять этот заказ"
             ),
             status.HTTP_404_NOT_FOUND: OpenApiResponse(
-                description="Заказ не найден"
+                description="Заказ не найден!"
             )
         }
     )
