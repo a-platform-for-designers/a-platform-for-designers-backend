@@ -71,6 +71,8 @@ class OrderViewSet(viewsets.ModelViewSet):
             return OrderReadSerializer
         elif self.action in ('create', 'partial_update'):
             return OrderWriteSerializer
+        else:
+            return OrderReadSerializer
 
     @extend_schema(
         summary="Список заказов",

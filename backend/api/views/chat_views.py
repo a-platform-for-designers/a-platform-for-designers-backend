@@ -1,5 +1,6 @@
 import datetime
 
+from django.http import Http404
 from django.db.models import Q, Max
 from django.db.models.functions import Coalesce
 from rest_framework import viewsets, status
@@ -15,6 +16,18 @@ from api.serializers.chat_serializers import ChatReadSerializer
 from job.models import Chat
 
 
+@extend_schema(
+    # ... другие параметры extend_schema ...
+    parameters=[
+        OpenApiParameter(
+            name='id',
+            description='ID чата',
+            required=True,
+            type=int
+        ),
+        # Добавьте другие параметры здесь, если они есть
+    ]
+)
 class ChatViewSet(viewsets.ModelViewSet):
     """
     Вью для работы с чатами.
@@ -80,17 +93,29 @@ class ChatViewSet(viewsets.ModelViewSet):
             status.HTTP_403_FORBIDDEN: OpenApiResponse(
                 description="Доступ запрещен"
             ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                description="Чат не найден"
+            ),
         }
     )
     def retrieve(self, request, *args, **kwargs):
-        chat = self.get_object()
+        try:
+            chat = self.get_object()
+        except Http404:
+            # Возвращает 404 ошибку, если чат не найден
+            return Response(
+                {"detail": "Чат не найден."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
+        # Проверка, участник ли пользователь в чате
         if request.user != chat.initiator and request.user != chat.receiver:
             return Response(
                 {"detail": "Вы не можете просматривать детали этого чата."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        # Если пользователь участник, вернуть детали чата
         return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):

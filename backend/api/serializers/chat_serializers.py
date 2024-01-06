@@ -19,7 +19,7 @@ class ChatReadSerializer(serializers.ModelSerializer):
         model = Chat
         fields = ('id', 'initiator', 'receiver', 'last_message')
 
-    def get_last_message(self, obj):
+    def get_last_message(self, obj) -> str:
         last_message = obj.messages.order_by('-pub_date').first()
         if last_message:
             return (f'{last_message.text[:settings.MESSAGE_STR]}')
