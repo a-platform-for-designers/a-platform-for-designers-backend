@@ -32,17 +32,20 @@ User = get_user_model()
 
 
 @extend_schema(
-    responses=TokenResponseSerializer(many=False)
-)
-class TokenCreateView(DjoserTokenCreateView):
-    """
+    summary="Создание токена аутентификации",
+    description="""
     Создает и возвращает токен аутентификации для пользователя.
 
     Требуется предоставление корректных учетных данных пользователя.
     При успешной аутентификации возвращается токен, который должен
     использоваться для аутентификации в последующих запросах.
-
-    """
+    """,
+    responses={
+        200: TokenResponseSerializer(many=False),
+        401: OpenApiResponse(description="Неавторизованный доступ или неверные учетные данные")
+    }
+)
+class TokenCreateView(DjoserTokenCreateView):
     pass
 
 
