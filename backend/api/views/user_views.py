@@ -42,7 +42,9 @@ User = get_user_model()
     """,
     responses={
         200: TokenResponseSerializer(many=False),
-        401: OpenApiResponse(description="Неавторизованный доступ или неверные учетные данные")
+        401: OpenApiResponse(
+            description="Неавторизованный доступ или неверные учетные данные"
+        )
     }
 )
 class TokenCreateView(DjoserTokenCreateView):
