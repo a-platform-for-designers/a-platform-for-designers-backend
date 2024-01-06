@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import PrimaryKeyRelatedField
 from drf_extra_fields.fields import Base64ImageField
+from typing import List, Dict, Any
 
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.mentoring_serializers import MentoringReadSerializer
@@ -229,7 +230,7 @@ class UserProfileSerializer(UserSerializer):
             'portfolio'
         )
 
-    def get_date_joined(self, obj):
+    def get_date_joined(self, obj) -> str:
         return f'Published {obj.date_joined.strftime("%d %B %Y")}'
 
     def get_is_subscribed(self, obj: User) -> bool:
@@ -353,7 +354,7 @@ class AuthorListSerializer(AuthorSerializer):
         except ProfileDesigner.DoesNotExist:
             return ''
 
-    def get_skills(self, obj):
+    def get_skills(self, obj) -> List[Dict[str, Any]]:
         try:
             return SkillSerializer(
                 obj.profiledesigner.skills.all(),
@@ -362,7 +363,7 @@ class AuthorListSerializer(AuthorSerializer):
         except ProfileDesigner.DoesNotExist:
             return []
 
-    def get_instruments(self, obj):
+    def get_instruments(self, obj) -> List[Dict[str, Any]]:
         try:
             return InstrumentSerializer(
                 obj.profiledesigner.instruments.all(),

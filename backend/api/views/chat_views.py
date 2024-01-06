@@ -6,6 +6,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.utils import OpenApiParameter
 
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsInitiatorOrReceiverChatPermission
@@ -32,6 +33,13 @@ class ChatViewSet(viewsets.ModelViewSet):
         summary="Получение списка чатов",
         description="Возвращает список всех чатов для данного пользователя, "
                     "упорядоченных по дате последнего сообщения.",
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                description='ID чата',
+                required=True, type=int
+                )
+        ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 description="Список чатов успешно получен"

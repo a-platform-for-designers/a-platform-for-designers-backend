@@ -3,6 +3,7 @@ from djoser.serializers import UserSerializer
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 from rest_framework.fields import SerializerMethodField, IntegerField
 from rest_framework.validators import UniqueTogetherValidator
+from typing import Any
 
 from api.serializers.specialization_serializers import SpecializationSerializer
 from api.serializers.sphere_serializers import SphereSerializer
@@ -39,10 +40,10 @@ class OrderReadSerializer(ModelSerializer):
             'is_published'
         )
 
-    def get_pub_date(self, obj):
+    def get_pub_date(self, obj) -> str:
         return f'Published {obj.pub_date.strftime("%d %B %Y")}'
 
-    def get_is_responded_order(self, obj):
+    def get_is_responded_order(self, obj) -> bool:
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
@@ -50,7 +51,7 @@ class OrderReadSerializer(ModelSerializer):
             user=request.user, order=obj
         ).exists()
 
-    def get_is_favorited_order(self, obj):
+    def get_is_favorited_order(self, obj) -> bool:
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
