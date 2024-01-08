@@ -1,6 +1,10 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserManager(BaseUserManager):
@@ -60,6 +64,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     objects = UserManager()
+
+    def save(self, *args, **kwargs):
+        # Логируем перед сохранением
+        logger.info(
+            f"Saving user {self.email} with date_joined {self.date_joined}"
+        )
+        # Вызов оригинального метода save
+        super().save(*args, **kwargs)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']

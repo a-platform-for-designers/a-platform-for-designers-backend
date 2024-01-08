@@ -255,3 +255,19 @@ CHANNEL_LAYERS = {
 MESSAGE_STR = 30
 
 MESSAGES_PAGE_SIZE = 50
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}

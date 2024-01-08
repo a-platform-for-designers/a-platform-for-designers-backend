@@ -163,7 +163,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # Начальный набор данных
-        queryset = User.objects.all()
+        queryset = User.objects.all().order_by('id')
 
         if self.action == 'list':
             # Фильтрация по количеству кейсов
