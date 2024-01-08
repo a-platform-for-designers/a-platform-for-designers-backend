@@ -18,7 +18,7 @@ from api.views.user_views import (
     ProfileCustomerViewSet, ProfileDesignerViewSet, UserProfileViewSet,
     MentorViewSet, CustomUserViewSet
 )
-
+from api.views.support_views import SupportTicketView
 
 router = routers.DefaultRouter()
 router.register('auth/users', CustomUserViewSet, basename='auth_users')
@@ -53,7 +53,8 @@ router.register('languages', LanguageViewSet, basename='languages')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('support/', SupportTicketView.as_view(), name='support'),
+    path('auth/', include('djoser.urls.authtoken')),
     # path('auth/token/login', TokenCreateView.as_view(), name='login'),
     # path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
 ]

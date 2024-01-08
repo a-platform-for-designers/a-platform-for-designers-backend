@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'channels',
 
     # Local apps
+    'support',
     'users',
     'api',
     'job',
