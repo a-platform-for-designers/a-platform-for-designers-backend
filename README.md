@@ -54,6 +54,7 @@ REDIS_PORT=6379
 ```
 
 > Генератор секретного ключа: infra/secretgenerate.py
+>
 > Код, который преобразует изображение в строку в формате base64: infra/converter.py
 
  - [ ] Запустить Docker из папки infra:
@@ -110,9 +111,11 @@ dos2unix: converting file wait-for-it.sh to Unix format...
 
 > Выполняем миграции и загружаем данные:
 > 
-> python manage.py makemigrations users
+> python manage.py makemigrations
 > 
 > python manage.py migrate
+> 
+> python manage.py load_data
 > 
 > python manage.py collectstatic --no-input
  

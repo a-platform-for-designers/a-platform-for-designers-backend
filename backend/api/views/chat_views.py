@@ -17,15 +17,13 @@ from job.models import Chat
 
 
 @extend_schema(
-    # ... другие параметры extend_schema ...
     parameters=[
         OpenApiParameter(
             name='id',
-            description='ID чата',
+            description='ID',
             required=True,
             type=int
         ),
-        # Добавьте другие параметры здесь, если они есть
     ]
 )
 class ChatViewSet(viewsets.ModelViewSet):
@@ -46,13 +44,6 @@ class ChatViewSet(viewsets.ModelViewSet):
         summary="Получение списка чатов",
         description="Возвращает список всех чатов для данного пользователя, "
                     "упорядоченных по дате последнего сообщения.",
-        parameters=[
-            OpenApiParameter(
-                name='id',
-                description='ID чата',
-                required=True, type=int
-            )
-        ],
         responses={
             status.HTTP_200_OK: OpenApiResponse(
                 description="Список чатов успешно получен"
