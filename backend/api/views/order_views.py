@@ -79,6 +79,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         description="Возвращает список всех опубликованных заказов."
     )
     def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        if not queryset.exists():
+            return Response([], status=status.HTTP_200_OK)
+
         return super().list(request, *args, **kwargs)
 
     @extend_schema(
