@@ -3,7 +3,7 @@ from djoser.serializers import UserSerializer
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 from rest_framework.fields import SerializerMethodField, IntegerField
 from rest_framework.validators import UniqueTogetherValidator
-from typing import Any
+# from typing import Any
 
 from api.serializers.specialization_serializers import SpecializationSerializer
 from api.serializers.sphere_serializers import SphereSerializer

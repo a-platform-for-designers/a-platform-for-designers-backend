@@ -324,6 +324,7 @@ class AuthorListSerializer(AuthorSerializer):
 
     """
     country = SerializerMethodField(read_only=True)
+    specialization = serializers.SerializerMethodField(read_only=True)
     skills = serializers.SerializerMethodField(read_only=True)
     instruments = serializers.SerializerMethodField(read_only=True)
     work_status = SerializerMethodField(read_only=True)
@@ -353,6 +354,15 @@ class AuthorListSerializer(AuthorSerializer):
             return str(profile.country)
         except ProfileDesigner.DoesNotExist:
             return ''
+
+    def get_specialization(self, obj) -> List[Dict[str, Any]]:
+        try:
+            return SpecializationSerializer(
+                obj.profiledesigner.specialization.all(),
+                many=True
+            ).data
+        except ProfileDesigner.DoesNotExist:
+            return []
 
     def get_skills(self, obj) -> List[Dict[str, Any]]:
         try:

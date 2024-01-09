@@ -2,7 +2,7 @@ from django_filters import rest_framework as filters
 
 from job.models import Case, Order
 from users.models import User
-from job.models import Instrument, Skill
+from job.models import Specialization, Instrument, Skill
 
 
 class CaseFilter(filters.FilterSet):
@@ -24,8 +24,10 @@ class DesignersFilter(filters.FilterSet):
     скиллам и инструментам.
 
     """
-    specialization = filters.AllValuesMultipleFilter(
-        field_name='profiledesigner__specialization'
+    specialization = filters.ModelMultipleChoiceFilter(
+        queryset=Specialization.objects.all(),
+        field_name='profiledesigner__specialization',
+        to_field_name='id'
     )
     work_status = filters.BooleanFilter(
         field_name='profiledesigner__work_status',
@@ -43,7 +45,12 @@ class DesignersFilter(filters.FilterSet):
 
     class Meta:
         model = User
-        fields = ('specialization', 'work_status', 'skills', 'instruments')
+        fields = (
+            'specialization',
+            'work_status',
+            'skills',
+            'instruments'
+        )
 
 
 class OrdersFilter(filters.FilterSet):

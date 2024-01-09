@@ -115,7 +115,8 @@ class OrderViewSet(viewsets.ModelViewSet):
         description="Возвращает детали конкретного заказа.",
         responses={
             status.HTTP_200_OK: OpenApiResponse(
-                description="Детали заказа предоставлены"
+                description="Детали заказа предоставлены",
+                response=OrderReadSerializer,
             ),
             status.HTTP_404_NOT_FOUND: OpenApiResponse(
                 description="Заказ не найден"
