@@ -36,13 +36,17 @@ class MentoringWriteSerializer(serializers.ModelSerializer):
         fields = ('id', 'experience', 'expertise', 'price', 'agreement_free')
 
     def validate(self, data):
-        if data.get('price') and data.get('agreement_free'):
+        price = data.get('price')
+        agreement_free = data.get('agreement_free')
+
+        if price is not None and agreement_free is not None:
             raise serializers.ValidationError(
-                "Какое то из полей price/agreement_free должно быть пустым"
+                "Только одно из полей price/agreement_free "
+                "должно быть заполнено"
             )
-        if not data.get('price') and not data.get('agreement_free'):
+        if price is None and agreement_free is None:
             raise serializers.ValidationError(
-                "Какое то из полей price/agreement_free должно быть заполнено"
+                "Какое-то из полей price/agreement_free должно быть заполнено"
             )
         return data
 
