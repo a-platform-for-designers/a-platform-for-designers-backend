@@ -16,7 +16,5 @@ class SupportTicketSerializer(serializers.ModelSerializer):
             'name',
             'email',
             'subject',
-            'message',
-            'is_read',
-            'created_at'
+            'message'
         ]

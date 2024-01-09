@@ -125,8 +125,7 @@ dos2unix: converting file wait-for-it.sh to Unix format...
 
 ```
 docker-compose up -d
-docker-compose exec backend python manage.py makemigrations users
-docker-compose exec backend python manage.py makemigrations job
+docker-compose exec backend python manage.py makemigrations
 docker-compose exec backend python manage.py migrate
 docker-compose exec backend python manage.py createsuperuser
 docker-compose exec backend python manage.py collectstatic --noinput
