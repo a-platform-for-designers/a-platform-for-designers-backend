@@ -29,10 +29,10 @@ class DesignersFilter(filters.FilterSet):
         field_name='profiledesigner__work_status',
     )
     skills = filters.AllValuesMultipleFilter(
-        field_name='profiledesigner__skills__id',
+        field_name='profiledesigner__skills',
     )
     instruments = filters.AllValuesMultipleFilter(
-        field_name='profiledesigner__instruments__id',
+        field_name='profiledesigner__instruments',
     )
 
     class Meta:
