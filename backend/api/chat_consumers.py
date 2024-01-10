@@ -86,7 +86,7 @@ class ChatConsumer(WebsocketConsumer):
 
         else:
             message = text_data_json['message']
-            file = text_data_json['file']
+            file = text_data_json.get('file')
             message_create = Message.objects.create(
                 sender=self.sender,
                 text=message,
