@@ -4,7 +4,9 @@ import os
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.parsers import MultiPartParser, FormParser
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import extend_schema
 
 from rest_framework import viewsets, status
 from rest_framework.exceptions import APIException
@@ -32,16 +34,37 @@ class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
     http_method_names = ['post']
     permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
 
     @extend_schema(
         summary="Загрузка файла",
         description="Загружает файл в /media/messages/ и выдает "
-        "ссылку на него для последующей отправки в сообщениях.",
+                    "ссылку на него для последующей отправки в сообщениях.",
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'chat': {
+                        'type': 'integer',
+                        'description': 'Идентификатор чата',
+                    },
+                    'file': {
+                        'type': 'string',
+                        'format': 'binary',
+                        'description': 'Файл для загрузки',
+                    },
+                },
+            }
+        },
         responses={
+            status.HTTP_201_CREATED: OpenApiResponse(
+                description="Файл успешно загружен"
+            ),
             status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
                 description="Неавторизованный доступ"
-            )
-        }
+            ),
+            # Добавьте другие возможные ответы по необходимости
+        },
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
