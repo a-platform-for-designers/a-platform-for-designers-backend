@@ -71,8 +71,6 @@ class OrderViewSet(viewsets.ModelViewSet):
             return OrderReadSerializer
         elif self.action in ('create', 'partial_update'):
             return OrderWriteSerializer
-        else:
-            return OrderReadSerializer
 
     @extend_schema(
         summary="Список заказов",
@@ -320,12 +318,20 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         if user.is_customer:
             orders = user.orders.all()
-            serializer = OrderAuthorListReadSerializer(orders, many=True)
+            serializer = OrderAuthorListReadSerializer(
+                orders,
+                many=True,
+                context={'request': request}
+            )
             return Response(serializer.data)
 
         responses = user.order_responses.values_list('order', flat=True)
         orders = Order.objects.filter(id__in=responses)
-        serializer = OrderReadSerializer(orders, many=True)
+        serializer = OrderReadSerializer(
+            orders,
+            many=True,
+            context={'request': request}
+        )
         return Response(serializer.data)
 
     # @action(
