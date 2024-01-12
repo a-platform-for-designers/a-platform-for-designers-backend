@@ -55,7 +55,8 @@ class MentoringWriteSerializer(serializers.ModelSerializer):
         try:
             profiledesigner = user.profiledesigner
             if not profiledesigner.specialization.filter(
-                name='Менторство').exists():
+                name='Менторство'
+            ).exists():
                 raise serializers.ValidationError(
                     "Укажите в специализации 'менторство',"
                     "чтобы заполнять страницу ментора"
