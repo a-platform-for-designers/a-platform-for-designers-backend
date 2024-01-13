@@ -164,7 +164,11 @@ class OrderViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        return self.delete_object(Order, request.user, kwargs.get('pk'))
+        order.delete()
+        return Response(
+            {"detail": "Заказ успешно удален"},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
     @staticmethod
     def delete_object(model, user, pk):
