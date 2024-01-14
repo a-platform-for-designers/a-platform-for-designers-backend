@@ -75,6 +75,7 @@ class OrderAuthorReadSerializer(OrderReadSerializer):
             'sphere',
             'description',
             'pub_date',
+            'is_published',
             'applicants',
         )
 
@@ -102,6 +103,7 @@ class OrderAuthorListReadSerializer(OrderReadSerializer):
             'description',
             'pub_date',
             'responses',
+            'is_published'
         )
 
     def get_responses(self, obj):

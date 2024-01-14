@@ -6,7 +6,7 @@ from rest_framework import serializers
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.skill_serializers import SkillSerializer
 from job.models import Mentoring
-from users.models import User
+from users.models import User, ProfileDesigner
 
 
 class MentoringReadSerializer(serializers.ModelSerializer):
@@ -53,10 +53,29 @@ class MentoringWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context.get('request').user
         try:
+            profiledesigner = user.profiledesigner
+            if not profiledesigner.specialization.filter(
+                name='Менторство'
+            ).exists():
+                raise serializers.ValidationError(
+                    "Укажите в специализации 'менторство',"
+                    "чтобы заполнять страницу ментора"
+                )
+        except ProfileDesigner.DoesNotExist:
+            raise serializers.ValidationError(
+                "Заполните анкету профиля и укажите там 'менторство'"
+            )
+        try:
             mentoring = user.mentoring
-            if validated_data.get('price') and mentoring.agreement_free:
+            if (
+                validated_data.get('price')
+                and mentoring.agreement_free is not None
+            ):
                 mentoring.agreement_free = None
-            if validated_data.get('agreement_free') and mentoring.price:
+            if (
+                validated_data.get('agreement_free') is not None
+                and mentoring.price
+            ):
                 mentoring.price = None
             for attr, value in validated_data.items():
                 setattr(mentoring, attr, value)

@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Q
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -439,7 +439,9 @@ class MentorViewSet(
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DesignersFilter
     queryset = User.objects.filter(
-        profiledesigner__specialization__name='Менторство'
+        Q(mentoring__isnull=False) & Q(
+            profiledesigner__specialization__name='Менторство'
+        )
     ).distinct()
     serializer_class = MentorSerializer
 
