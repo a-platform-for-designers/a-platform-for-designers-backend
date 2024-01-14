@@ -30,7 +30,11 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
+    'https://localhost',
     'http://backend',
+    'https://backend',
+    'http://designcollab.pro',
+    'https://designcollab.pro',
     'http://127.0.0.1',
     'https://127.0.0.1',
     'http://46.183.163.139',
