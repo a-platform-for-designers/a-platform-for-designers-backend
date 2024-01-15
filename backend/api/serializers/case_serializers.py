@@ -4,6 +4,7 @@ from django.db import transaction
 
 from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.sphere_serializers import SphereSerializer
+from api.serializers.specialization_serializers import SpecializationSerializer
 from api.serializers.caseimage_serializers import CaseImageSerializer
 from job.models import Case, FavoriteCase, CaseImage
 from api.serializers.user_serializers import AuthorSerializer
@@ -14,6 +15,7 @@ class CaseSerializer(serializers.ModelSerializer):
     author = AuthorSerializer()
     instruments = InstrumentSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
+    specialization = SpecializationSerializer()
     # is_like = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
     avatar = Base64ImageField()
@@ -32,6 +34,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
+            'specialization'
             # 'is_like'
         ]
 
