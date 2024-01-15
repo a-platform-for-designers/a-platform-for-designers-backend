@@ -26,7 +26,7 @@ class CaseViewSet(ModelViewSet):
     Также позволяет получать кейс по ID.
 
     """
-    http_method_names = ['get', 'post', 'delete']
+    http_method_names = ['get', 'post', 'delete', 'patch']
     queryset = Case.objects.all()
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
