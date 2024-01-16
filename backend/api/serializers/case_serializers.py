@@ -116,14 +116,18 @@ class CaseCreateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instruments = validated_data.pop('instruments', [])
-        
         if len(instruments) > 5:
             raise serializers.ValidationError('Количество инструментов не'
                                               'должно превышать 5.')
-        
         instance.title = validated_data.get('title', instance.title)
         instance.sphere = validated_data.get('sphere', instance.sphere)
+        instance.working_term = validated_data.get('working_term',
+                                                   instance.working_term)
+        instance.specialization = validated_data.get('specialization',
+                                                     instance.specialization)
+        instance.description = validated_data.get('description',
+                                                  instance.description)
+        instance.avatar = validated_data.get('avatar', instance.avatar)
         instance.save()
         instance.instruments.set(instruments)
-
         return instance
