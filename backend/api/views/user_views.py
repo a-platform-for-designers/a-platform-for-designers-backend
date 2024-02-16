@@ -25,6 +25,7 @@ from api.serializers.user_serializers import (
     TokenResponseSerializer, UserProfileCreateSerializer
 )
 from api.permissions import IsAuthorOrReadOnly
+from job.models import Like
 # from api.mixins import RetrieveMixin
 
 
@@ -330,6 +331,27 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                 current_user,
                 target_author_id,
                 action_type='delete'
+            )
+
+    @action(
+        detail=True,
+        methods=('post',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def like(self, request, pk):
+        user = request.user
+        like = user.likes.filter(author__id=pk).exists()
+        if like:
+            user.likes.filter(author__id=pk).delete()
+            return Response(
+                {"detail": "Лайк удален"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            Like.objects.create(author=User.objects.get(id=pk), liker=user)
+            return Response(
+                {"detail": "Лайк поставлен"},
+                status=status.HTTP_201_CREATED
             )
 
     def manage_subscription(

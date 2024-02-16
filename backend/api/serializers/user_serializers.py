@@ -13,7 +13,7 @@ from api.serializers.skill_serializers import SkillSerializer
 from api.serializers.language_serializers import LanguageSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from users.models import ProfileCustomer, ProfileDesigner
-from job.models import Case, Specialization, Language, Instrument, Skill
+from job.models import Case, Specialization, Language, Instrument, Skill, Like
 
 
 User = get_user_model()
@@ -212,6 +212,7 @@ class UserProfileSerializer(UserSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
     date_joined = SerializerMethodField()
     portfolio = SerializerMethodField()
+    likes = SerializerMethodField()
 
     class Meta:
         ordering = ['id']
@@ -227,7 +228,8 @@ class UserProfileSerializer(UserSerializer):
             'profilecustomer',
             'profiledesigner',
             'mentoring',
-            'portfolio'
+            'portfolio',
+            'likes'
         )
 
     def get_date_joined(self, obj) -> str:
@@ -243,6 +245,8 @@ class UserProfileSerializer(UserSerializer):
         cases = Case.objects.filter(author=obj)
         return PortfolioSerializer(cases, many=True).data
 
+    def get_likes(self, obj):
+        return Like.objects.filter(author=obj).count()
 
 class UserProfileCreateSerializer(UserCreateSerializer):
     """

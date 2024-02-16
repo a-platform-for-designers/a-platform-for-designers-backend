@@ -362,30 +362,30 @@ class Mentoring(models.Model):
         return f'Менторство {self.user.email}'
 
 
-# class Like(models.Model):
-#     """
-#     Модель лайков
+class Like(models.Model):
+    """
+    Модель лайков
 
-#     """
+    """
 
-#     liker = models.ForeignKey(
-#         User,
-#         on_delete=models.SET_NULL,
-#         related_name='likes',
-#         null=True
-#     )
-#     author = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         related_name='likers'
-#     )
+    liker = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='likes',
+        null=True
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='likers'
+    )
 
-#     class Meta:
-#         verbose_name = 'Лайк'
-#         verbose_name_plural = 'Лайки'
+    class Meta:
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'
 
-#     def __str__(self):
-#         return f'{self.liker} лайкнул {self.author}'
+    def __str__(self):
+        return f'{self.liker} лайкнул {self.author}'
 
 
 class Order(models.Model):
