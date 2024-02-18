@@ -248,6 +248,7 @@ class UserProfileSerializer(UserSerializer):
     def get_likes(self, obj):
         return Like.objects.filter(author=obj).count()
 
+
 class UserProfileCreateSerializer(UserCreateSerializer):
     """
     Сериализатор для создания пользователя.
