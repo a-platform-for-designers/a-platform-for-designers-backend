@@ -249,6 +249,7 @@ class UserProfileCreateSerializer(UserCreateSerializer):
     Сериализатор для создания пользователя.
 
     """
+
     id = serializers.IntegerField(read_only=True)
 
     class Meta:
