@@ -34,6 +34,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://backend',
     'https://backend',
     'http://designcollab.pro',
+    'https://www.designcollab.pro',
+    'http://www.designcollab.pro',
     'https://designcollab.pro',
     'http://127.0.0.1',
     'https://127.0.0.1',
@@ -276,3 +278,12 @@ LOGGING = {
         },
     },
 }
+
+# Настройки безопасности
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
