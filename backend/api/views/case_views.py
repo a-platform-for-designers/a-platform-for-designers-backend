@@ -136,7 +136,7 @@ class CaseViewSet(ModelViewSet):
                     {"detail": "Проект добавлен в избранное"},
                     status=status.HTTP_201_CREATED
                 )
-        
+
         elif request.method == 'DELETE':
             if favorite:
                 user.favorite_cases.filter(case__id=pk).delete()
