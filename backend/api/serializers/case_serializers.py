@@ -14,7 +14,7 @@ class CaseSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Case."""
     author = AuthorSerializer()
     instruments = InstrumentSerializer(many=True)
-    is_favorited = serializers.SerializerMethodField()
+    # is_favorited = serializers.SerializerMethodField()
     specialization = SpecializationSerializer()
     # is_like = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
@@ -33,7 +33,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'images',
             'working_term',
             'description',
-            'is_favorited',
+            # 'is_favorited',
             'specialization'
             # 'is_like'
         ]
