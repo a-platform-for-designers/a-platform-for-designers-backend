@@ -8,9 +8,9 @@
 
 **DesignCollab** - это веб-платформа для дизайнеров, позволяющая сотрудничать, обмениваться идеями и создавать проекты. Платформа предлагает удобный интерфейс и инструменты для эффективной работы.
 
-- **Сайт**: [Посетите здесь](http://designcollab.pro/)
-- **Swagger**: [Интерфейс Swagger](http://designcollab.pro/api/schema/swagger-ui/)
-- **Redoc**: [Интерфейс Redoc](http://designcollab.pro/api/schema/redoc/)
+- **Сайт**: [Посетите здесь](https://designcollab.pro/)
+- **Swagger**: [Интерфейс Swagger](https://designcollab.pro/api/schema/swagger-ui/)
+- **Redoc**: [Интерфейс Redoc](https://designcollab.pro/api/schema/redoc/)
 
 ## Технологии:
 Django - это мощный фреймворк для создания веб-приложений на Python. Он предоставляет широкий спектр инструментов, включая маршрутизацию, шаблонизацию, аутентификацию и многое другое, что значительно упрощает процесс разработки веб-приложений.
