@@ -141,6 +141,7 @@ jobs:
             sudo bash -c 'echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env'
             sudo bash -c 'echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> .env'
             sudo bash -c 'echo EMAIL_USE_TLS=${{ secrets.EMAIL_USE_TLS }} >> .env'
+            sudo bash -c 'echo EMAIL_USE_SSL=${{ secrets.EMAIL_USE_SSL }} >> .env'
             sudo bash -c 'echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> .env'
             sudo bash -c 'echo EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} >> .env'
 
