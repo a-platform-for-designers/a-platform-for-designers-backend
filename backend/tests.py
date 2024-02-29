@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
@@ -26,6 +27,13 @@ class UserTokenTest(APITestCase):
         )
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         print('Пользователь успешно создан.')
+
+        # Активация пользователя
+        User = get_user_model()
+        user = User.objects.get(email=user_data['email'])
+        user.is_active = True
+        user.save()
+        print('Пользователь успешно активирован.')
 
         for field in user_data:
             if field != 'password':
