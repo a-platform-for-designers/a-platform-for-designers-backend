@@ -3,14 +3,12 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 
-
 class UserTokenTest(APITestCase):
 
     def test_create_user_and_get_token(self):
         """
         Убедимся, что мы можем создать нового пользователя
         и получить для него токен.
-
         """
         create_url = reverse('users-list')
         user_data = {
@@ -29,8 +27,8 @@ class UserTokenTest(APITestCase):
         print('Пользователь успешно создан.')
 
         # Активация пользователя
-        User = get_user_model()
-        user = User.objects.get(email=user_data['email'])
+        user_model = get_user_model()  # Изменено имя переменной
+        user = user_model.objects.get(email=user_data['email'])
         user.is_active = True
         user.save()
         print('Пользователь успешно активирован.')
