@@ -10,6 +10,7 @@ class UserTokenTest(APITestCase):
         """
         Убедимся, что мы можем создать нового пользователя
         и получить для него токен.
+
         """
         create_url = reverse('users-list')
         user_data = {
@@ -27,12 +28,11 @@ class UserTokenTest(APITestCase):
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         print('Пользователь успешно создан.')
 
-        # Активация пользователя
-        user_model = get_user_model()  # Изменено имя переменной
+        user_model = get_user_model()
         user = user_model.objects.get(email=user_data['email'])
         user.is_active = True
         user.save()
-        print('Пользователь успешно активирован.')
+        print('Пользователь успешно активирован!')
 
         for field in user_data:
             if field != 'password':
@@ -48,4 +48,4 @@ class UserTokenTest(APITestCase):
         self.assertEqual(token_response.status_code, status.HTTP_200_OK)
 
         self.assertIn('auth_token', token_response.data)
-        print('Токен успешно получен.')
+        print('Токен успешно получен!')
