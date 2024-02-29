@@ -3,6 +3,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
 
+
 class UserTokenTest(APITestCase):
 
     def test_create_user_and_get_token(self):
