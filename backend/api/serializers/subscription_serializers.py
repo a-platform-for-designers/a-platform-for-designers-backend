@@ -49,7 +49,7 @@ class SubscriptionSerializer(UserProfileSerializer):
             profile_designer = obj.profiledesigner
             serializer = SpecializationSerializer(
                 profile_designer.specialization, many=True
-                )
+            )
             return serializer.data
         return None
 
