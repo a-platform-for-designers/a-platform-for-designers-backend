@@ -124,6 +124,13 @@ jobs:
             sudo bash -c 'echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env'
             sudo bash -c 'echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env'
             sudo bash -c 'echo TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }} >> .env'
+            sudo bash -c 'echo EMAIL_BACKEND=${{ secrets.EMAIL_BACKEND }} >> .env'
+            sudo bash -c 'echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env'
+            sudo bash -c 'echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> .env'
+            sudo bash -c 'echo EMAIL_USE_TLS=${{ secrets.EMAIL_USE_TLS }} >> .env'
+            sudo bash -c 'echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> .env'
+            sudo bash -c 'echo EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} >> .env'
+
             sudo docker-compose up -d --force-recreate            
             # Удаление контейнеров фронта
             sudo docker rm -f $(sudo docker ps -a -q -f name=root-frontend-1)
