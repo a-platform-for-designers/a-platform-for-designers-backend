@@ -1,9 +1,10 @@
 from django_filters.rest_framework import DjangoFilterBackend
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-# from rest_framework.decorators import action
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from api.filters import CaseFilter
@@ -12,7 +13,7 @@ from api.pagination import LimitPageNumberPagination
 from api.serializers.case_serializers import (
     CaseSerializer, CaseCreateSerializer
 )
-from job.models import Case
+from job.models import Case, FavoriteCase, User
 from api.permissions import IsAuthorOrReadOnly
 
 
@@ -113,34 +114,38 @@ class CaseViewSet(ModelViewSet):
 
         return super().destroy(request, *args, **kwargs)
 
-    # @action(
-    #     detail=True,
-    #     methods=['POST', 'DELETE'],
-    # )
-    # def favorite(self, request, pk):
-    #     case_obj = get_object_or_404(Case, pk=pk)
-    #     if request.method == 'POST':
-    #         already_existed, created = FavoriteCase.objects.get_or_create(
-    #             user=request.user,
-    #             case=case_obj
-    #         )
-    #         if not created:
-    #             return Response(
-    #                 {'errors': 'Ошибка при создании записи'},
-    #                 status=status.HTTP_400_BAD_REQUEST,
-    #             )
-    #         serializer = CaseShortSerializer(case_obj,
-    #                                          context={'request': request})
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     if request.method == 'DELETE':
-    #         favorite = FavoriteCase.objects.filter(user=request.user,
-    #                                                case=case_obj)
-    #         if favorite.delete()[0]:
-    #             return Response(
-    #                 {'message': 'Проект удален из избранного.'},
-    #                 status=status.HTTP_204_NO_CONTENT,
-    #             )
-    #         return Response(
-    #             {'errors': 'Проект не найден в избранном.'},
-    #             status=status.HTTP_400_BAD_REQUEST,
-    #         )
+    @action(
+        detail=True,
+        methods=('post', 'delete',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def favorite(self, request, pk):
+        user = request.user
+        case = Case.objects.get(pk=pk)
+        favorite = user.favorite_cases.filter(case__id=pk).exists()
+
+        if request.method == 'POST':
+            if favorite:
+                return Response(
+                    {"detail": "Проект уже добавлен в избранное"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            else:
+                FavoriteCase.objects.create(user=user, case=case)
+                return Response(
+                    {"detail": "Проект добавлен в избранное"},
+                    status=status.HTTP_201_CREATED
+                )
+
+        elif request.method == 'DELETE':
+            if favorite:
+                user.favorite_cases.filter(case__id=pk).delete()
+                return Response(
+                    {"detail": "Проект удален из избранного"},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "Проект не был добавлен в избранное"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
