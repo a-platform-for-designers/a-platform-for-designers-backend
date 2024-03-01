@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers, status
 from rest_framework.validators import UniqueTogetherValidator
 
+from .specialization_serializers import SpecializationSerializer
 from .user_serializers import UserProfileSerializer
 from users.models import Subscription
 
@@ -22,6 +23,8 @@ class SubscriptionSerializer(UserProfileSerializer):
         first_name (str): Имя пользователя.
         last_name (str): Фамилия пользователя.
         is_subscribed (bool): Статус подписки на автора.
+        photo (str): Ссылка на фото пользователя.
+        specialization (str): Специализация пользователя.
 
     Методы:
         validate (Dict): Валидирует данные, проверяя наличие
@@ -30,12 +33,25 @@ class SubscriptionSerializer(UserProfileSerializer):
     Примечание:
         Использует модель User для определения полей сериализатора.
     """
+    specialization = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('email', 'id', 'first_name',
-                  'last_name', 'is_subscribed')
+                  'last_name', 'is_subscribed',
+                  'photo', 'specialization')
         read_only_fields = ('email',)
+
+    def get_specialization(self, obj):
+
+        if hasattr(obj, 'profiledesigner'):
+
+            profile_designer = obj.profiledesigner
+            serializer = SpecializationSerializer(
+                profile_designer.specialization, many=True
+                )
+            return serializer.data
+        return None
 
     def validate(self, data: Dict) -> Dict:
         author = self.instance
