@@ -113,3 +113,17 @@ class CaseCreateSerializer(serializers.ModelSerializer):
         case.instruments.set(instruments)
         self.add_images(case=case, images=images)
         return case
+    
+    def update(self, instance, validated_data):
+        instruments_data = validated_data.pop('instruments', [])
+        images_data = validated_data.pop('images', [])
+
+        instance = super().update(instance, validated_data)
+
+        instance.instruments.clear()
+        instance.instruments.add(*instruments_data)
+
+        CaseImage.objects.filter(case=instance).delete()
+        self.add_images(instance, images_data)
+
+        return instance
