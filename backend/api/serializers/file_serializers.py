@@ -23,6 +23,6 @@ class FileSerializer(serializers.ModelSerializer):
     # def to_representation(self, instance):
     #     representation = super().to_representation(instance)
     #     file_url = representation['file']
-    #     file_name = file_url.split('/')[-1]  # получаем имя файла из полного пути
-    #     representation['file'] = f'/media/messages/{file_name}' # заменяем полный путь на нужный формат
+    #     file_name = file_url.split('/')[-1]
+    #     representation['file'] = f'/media/messages/{file_name}'
     #     return representation

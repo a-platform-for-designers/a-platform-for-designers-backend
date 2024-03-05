@@ -1,15 +1,7 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status
-from rest_framework.exceptions import APIException
+from rest_framework import permissions
 
 from job.models import Chat
-
-
-class ChatDoesNotExictsException(APIException):
-    status_code = status.HTTP_404_NOT_FOUND
-    default_detail = (
-        'Чат с таким ID не существует.'
-    )
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
