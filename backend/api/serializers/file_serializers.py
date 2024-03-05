@@ -20,9 +20,9 @@ class FileSerializer(serializers.ModelSerializer):
         model = File
         fields = ('id', 'chat', 'sender', 'pub_date', 'file')
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        file_url = representation['file']
-        file_name = file_url.split('/')[-1]  # получаем имя файла из полного пути
-        representation['file'] = f'/media/messages/{file_name}' # заменяем полный путь на нужный формат
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     file_url = representation['file']
+    #     file_name = file_url.split('/')[-1]  # получаем имя файла из полного пути
+    #     representation['file'] = f'/media/messages/{file_name}' # заменяем полный путь на нужный формат
+    #     return representation
