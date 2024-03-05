@@ -1,8 +1,15 @@
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions
+from rest_framework import permissions, status
+from rest_framework.exceptions import APIException
 
-from job.models import Chat, Message
+from job.models import Chat
+
+
+class ChatDoesNotExictsException(APIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = (
+        'Чат с таким ID не существует.'
+    )
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -61,16 +68,11 @@ class IsInitiatorOrReceiverChatPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if view.action == 'retrieve':
             chat_id = view.kwargs['pk']
-            chat = Chat.objects.get(pk=chat_id)
+            chat = get_object_or_404(Chat.objects.filter(pk=chat_id))
             return (
                 chat.initiator == request.user or chat.receiver == request.user
             )
-        elif view.action == 'list':
-            user = request.user
-            return Chat.objects.filter(
-                Q(initiator=user) | Q(receiver=user)
-            ).exists()
-        elif request.method == 'POST':
+        else:
             return True
 
     def has_object_permission(self, request, view, obj):
@@ -85,7 +87,7 @@ class IsInitiatorOrReceiverMessagePermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         chat_id = view.kwargs['chat_id']
-        chat = Chat.objects.get(pk=chat_id)
+        chat = get_object_or_404(Chat.objects.filter(pk=chat_id))
         return chat.initiator == request.user or chat.receiver == request.user
 
     def has_object_permission(self, request, view, obj):
