@@ -3,9 +3,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
+from djoser.views import UserViewSet
 from djoser.views import UserViewSet as DjoserUserViewSet
 from djoser.views import TokenCreateView as DjoserTokenCreateView
-from djoser.signals import user_registered
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -202,19 +202,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         }
     )
     def create(self, request, *args, **kwargs):
+        djoser_view = UserViewSet.as_view({'post': 'create'})
 
-        response = super().create(request, *args, **kwargs)
-
-        # Проверяем, что пользователь был успешно создан
-        if response.status_code == 201:
-            user_instance = response.data
-            user = self.get_queryset().get(pk=user_instance['id'])
-
-            user_registered.send(
-                sender=self.__class__,
-                user=user,
-                request=request
-            )
+        response = djoser_view(request._request, *args, **kwargs)
 
         return response
 
