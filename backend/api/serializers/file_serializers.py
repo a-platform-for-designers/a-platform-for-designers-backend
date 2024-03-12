@@ -19,3 +19,10 @@ class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
         fields = ('id', 'chat', 'sender', 'pub_date', 'file')
+
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     file_url = representation['file']
+    #     file_name = file_url.split('/')[-1]
+    #     representation['file'] = f'/media/messages/{file_name}'
+    #     return representation
