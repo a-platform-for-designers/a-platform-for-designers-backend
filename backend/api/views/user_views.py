@@ -308,6 +308,39 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             )
 
     @extend_schema(
+        summary='Лайк пользователя',
+        description=(
+            "Позволяет текущему пользователю поставить лайк другому "
+            "пользователю, если лайк уже стоит, он будет удален. "
+            "Возвращает сообщение о создании или удалении лайка."
+        ),
+        responses={
+            200: OpenApiResponse(description="Лайк удален"),
+            201: OpenApiResponse(description="Лайк поставлен"),
+        }
+    )
+    @action(
+        detail=True,
+        methods=('post',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def like(self, request, pk):
+        user = request.user
+        like = user.likes.filter(author__id=pk).exists()
+        if like:
+            user.likes.filter(author__id=pk).delete()
+            return Response(
+                {"detail": "Лайк удален"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            Like.objects.create(author=User.objects.get(id=pk), liker=user)
+            return Response(
+                {"detail": "Лайк поставлен"},
+                status=status.HTTP_201_CREATED
+            )
+
+    @extend_schema(
         summary="Управление подпиской",
         description="Позволяет пользователю подписаться на "
         "другого пользователя или отписаться от него.",
@@ -338,27 +371,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                 action_type='delete'
             )
 
-    @action(
-        detail=True,
-        methods=('post',),
-        permission_classes=(IsAuthenticated,)
-    )
-    def like(self, request, pk):
-        user = request.user
-        like = user.likes.filter(author__id=pk).exists()
-        if like:
-            user.likes.filter(author__id=pk).delete()
-            return Response(
-                {"detail": "Лайк удален"},
-                status=status.HTTP_200_OK
-            )
-        else:
-            Like.objects.create(author=User.objects.get(id=pk), liker=user)
-            return Response(
-                {"detail": "Лайк поставлен"},
-                status=status.HTTP_201_CREATED
-            )
-
     def manage_subscription(
         self,
         request,
@@ -366,33 +378,26 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         target_author_id,
         action_type
     ):
-        # Получаем целевого автора из ID
         target_author = get_object_or_404(User, pk=target_author_id)
 
         if action_type == 'create':
-            # Подготавливаем данные для сериализатора
             data = {'user': current_user.id, 'author': target_author.id}
 
-            # Инициализируем сериализатор с данными
             serializer = SubscriptionCreateSerializer(data=data)
 
-            # Проверяем валидность данных
             if serializer.is_valid():
-                # Если данные валидны, сохраняем объект подписки
                 serializer.save()
                 return Response(
                     serializer.data,
                     status=status.HTTP_201_CREATED
                 )
             else:
-                # Возвращаем ошибки валидации
                 return Response(
                     serializer.errors,
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
         elif action_type == 'delete':
-            # Пытаемся получить инстанс подписки и удалить его
             try:
                 subscription_instance = Subscription.objects.get(
                     user=current_user,
@@ -401,14 +406,13 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                 subscription_instance.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             except Subscription.DoesNotExist:
-                # Если подписка не найдена, возвращаем ошибку 404
                 return Response(
                     {"error": "Подписка не найдена."},
                     status=status.HTTP_404_NOT_FOUND
                 )
 
     @extend_schema(
-        summary='Список подписок пользователя',
+        summary="Список подписок пользователя",
         description=(
             "Возвращает список пользователей, на которых подписан текущий "
             "пользователь, позволяя управлять своими подписками."
@@ -425,6 +429,34 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         serializer = SubscriptionSerializer(
             paginated_queryset,
             many=True,
+            context={'request': request}
+        )
+        return self.get_paginated_response(serializer.data)
+
+    @extend_schema(
+        summary='Список подписчиков текущего пользователя',
+        description=(
+            "Возвращает список пользователей, которые подписаны на текущего "
+            "пользователя."
+        )
+    )
+    @action(
+        methods=['get'], detail=False,
+        permission_classes=[IsAuthenticated],
+        url_path='my-subscribers'
+    )
+    def my_subscribers(self, request):
+        current_user = request.user
+        queryset = User.objects.filter(subscriber__author=current_user)
+        page = self.paginate_queryset(queryset)
+        if page is None:
+            serializer = SubscriptionSerializer(
+                queryset, many=True,
+                context={'request': request}
+            )
+            return Response(serializer.data)
+        serializer = SubscriptionSerializer(
+            page, many=True,
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)

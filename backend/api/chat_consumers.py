@@ -13,7 +13,7 @@ from api.serializers.message_serializers import MessageSerializer
 from job.models import Chat, Message
 
 
-ALLOWED_TYPES = ['pdf', 'docx', 'doc', 'jpg', 'jpeg', 'png']
+ALLOWED_TYPES = ['pdf', 'docx', 'doc', 'jpg', 'jpeg', 'png', 'mp3', 'webp']
 
 
 class ChatConsumer(WebsocketConsumer):
