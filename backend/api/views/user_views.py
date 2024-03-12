@@ -461,6 +461,20 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
+    @extend_schema(
+        summary='Количество подписчиков пользователя',
+        description='Возвращает кол-во подписчиков указанного пользователя.'
+    )
+    @action(
+        methods=['get'],
+        detail=True, permission_classes=[AllowAny],
+        url_path='subscribers-count'
+    )
+    def subscribers_count(self, request, pk=None):
+        user = get_object_or_404(User, pk=pk)
+        subscribers_count = Subscription.objects.filter(author=user).count()
+        return Response({'subscribers_count': subscribers_count})
+
 
 class MentorViewSet(
     mixins.ListModelMixin,
