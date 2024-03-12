@@ -19,6 +19,7 @@ from job.models import Chat
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = [ext for ext, mime in mimetypes.types_map.items()]
+ALLOWED_EXTENSIONS.append('.webp')
 
 
 class FileViewSet(viewsets.ModelViewSet):
