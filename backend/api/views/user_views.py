@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from djoser.views import UserViewSet as DjoserUserViewSet
 from djoser.views import TokenCreateView as DjoserTokenCreateView
+from djoser.signals import user_registered
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -201,7 +202,21 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         }
     )
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+
+        response = super().create(request, *args, **kwargs)
+
+        # Проверяем, что пользователь был успешно создан
+        if response.status_code == 201:
+            user_instance = response.data
+            user = self.get_queryset().get(pk=user_instance['id'])
+
+            user_registered.send(
+                sender=self.__class__,
+                user=user,
+                request=request
+            )
+
+        return response
 
     @extend_schema(
         summary="Получение списка пользователей",
