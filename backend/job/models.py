@@ -195,13 +195,13 @@ class FavoriteCase(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Избранное'
-        verbose_name_plural = 'Избранное'
+        verbose_name = 'Избранный проекты'
+        verbose_name_plural = 'Избранные проекты'
         ordering = ['case']
 
     def __str__(self):
         return (f'Пользователь {self.user} добавил {self.case} '
-                'в избранное')
+                'в избранный проект')
 
 
 class Chat(models.Model):
