@@ -61,12 +61,12 @@ urlpatterns = [
         'favorite_orders/',
         FavoriteOrdersView.as_view(),
         name='favorite-orders'
-        ),
+    ),
     path(
         'favorite_cases/',
         FavoriteCasesView.as_view(),
         name='favorite-cases'
-        ),
+    ),
     # path('auth/token/login', TokenCreateView.as_view(), name='login'),
     # path('auth/', include('djoser.urls')),
 ]
