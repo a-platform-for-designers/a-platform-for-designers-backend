@@ -76,7 +76,7 @@ class OrderAuthorReadSerializer(OrderReadSerializer):
             'description',
             'pub_date',
             'is_published',
-            'applicants',
+            'applicants'
         )
 
     def get_applicants(self, obj):

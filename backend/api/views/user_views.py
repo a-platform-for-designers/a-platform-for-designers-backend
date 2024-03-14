@@ -308,6 +308,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             )
 
     @extend_schema(
+        request=EmptySerializer,
         summary='Лайк пользователя',
         description=(
             "Позволяет текущему пользователю поставить лайк другому "

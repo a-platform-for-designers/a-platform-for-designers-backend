@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
@@ -13,7 +14,8 @@ from api.pagination import LimitPageNumberPagination
 from api.serializers.case_serializers import (
     CaseSerializer, CaseCreateSerializer
 )
-from job.models import Case, FavoriteCase, User
+from api.serializers.empty_serializers import EmptySerializer
+from job.models import Case, FavoriteCase
 from api.permissions import IsAuthorOrReadOnly
 
 
@@ -114,38 +116,62 @@ class CaseViewSet(ModelViewSet):
 
         return super().destroy(request, *args, **kwargs)
 
-    @action(
-        detail=True,
-        methods=('post', 'delete',),
-        permission_classes=(IsAuthenticated,)
+    @extend_schema(
+        request=EmptySerializer,
+        summary="Переключение состояния избранного для проекта",
+        description="Добавляет проект в избранные пользователя или "
+        "удаляет его оттуда, если он уже добавлен.",
+        responses={
+            200: "Проект удален из избранного",
+            201: "Проект добавлен в избранное"
+        }
     )
-    def favorite(self, request, pk):
+    @action(
+        detail=True, methods=['post'],
+        permission_classes=[IsAuthenticated]
+    )
+    def favorite_case(self, request, pk=None):
         user = request.user
-        case = Case.objects.get(pk=pk)
-        favorite = user.favorite_cases.filter(case__id=pk).exists()
+        case = self.get_object()
+        favorite_exists = FavoriteCase.objects.filter(
+            user=user, case=case
+        ).exists()
 
-        if request.method == 'POST':
-            if favorite:
-                return Response(
-                    {"detail": "Проект уже добавлен в избранное"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            else:
-                FavoriteCase.objects.create(user=user, case=case)
-                return Response(
-                    {"detail": "Проект добавлен в избранное"},
-                    status=status.HTTP_201_CREATED
-                )
+        if favorite_exists:
+            FavoriteCase.objects.filter(user=user, case=case).delete()
+            return Response(
+                {"detail": "Проект удален из избранного"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            FavoriteCase.objects.create(user=user, case=case)
+            return Response(
+                {"detail": "Проект добавлен в избранное"},
+                status=status.HTTP_201_CREATED
+            )
 
-        elif request.method == 'DELETE':
-            if favorite:
-                user.favorite_cases.filter(case__id=pk).delete()
-                return Response(
-                    {"detail": "Проект удален из избранного"},
-                    status=status.HTTP_200_OK
-                )
-            else:
-                return Response(
-                    {"detail": "Проект не был добавлен в избранное"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+
+@extend_schema(
+    summary="Получение списка избранных проектов",
+    description=(
+        "Возвращает список всех проектов (cases), добавленных в избранное "
+        "текущим пользователем. Предоставляет подробную информацию по каждому "
+        "проекту, включая статус избранного."
+    ),
+    responses={200: CaseSerializer(many=True)}
+)
+class FavoriteCasesView(APIView):
+    """
+    Список избранных проектов пользователя.
+
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        favorite_cases = FavoriteCase.objects.filter(user=request.user)
+        cases = [fav_case.case for fav_case in favorite_cases]
+        serializer = CaseSerializer(
+            cases, many=True,
+            context={'request': request}
+        )
+        return Response(serializer.data)

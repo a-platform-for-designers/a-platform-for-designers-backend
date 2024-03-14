@@ -80,7 +80,7 @@ class CaseAdmin(admin.ModelAdmin):
 
 
 @admin.register(FavoriteCase)
-class FavoriteAdmin(admin.ModelAdmin):
+class FavoriteCaseAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'user',

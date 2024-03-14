@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
@@ -16,9 +17,8 @@ from api.serializers.order_serializers import (
     OrderAuthorListReadSerializer
 
 )
-from job.models import Order, OrderResponse
-# from users.models import User
-# FavoriteOrderSerializer, FavoriteOrder,
+from api.serializers.empty_serializers import EmptySerializer
+from job.models import Order, OrderResponse, FavoriteOrder
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -338,56 +338,55 @@ class OrderViewSet(viewsets.ModelViewSet):
         )
         return Response(serializer.data)
 
-    # @action(
-    #     detail=True,
-    #     methods=['patch'],
-    #     url_path=r'approve_customer/(?P<designer_id>\d+)'
-    # )
-    # def approve_customer(self, request, pk, designer_id):
-    #     order = get_object_or_404(Order, id=pk)
-    #     if self.request.user != order.customer:
-    #         return Response(
-    #             {'errors': 'Только автор заказа может назначать исполнит'},
-    #             status=status.HTTP_403_FORBIDDEN
-    #         )
-    #     if order.executor is not None:
-    #         return Response(
-    #             {'errors': 'У заказа уже есть исполнитель'},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-    #     try:
-    #         response = OrderResponse.objects.get(
-    #             user=designer_id,
-    #             order=order.id
-    #         )
-    #         order.executor = response.user
-    #         order.save()
-    #         return Response(
-    #             {'message': 'Исполнитель успешно добавлен'},
-    #             status=status.HTTP_201_CREATED
-    #         )
-    #     except OrderResponse.DoesNotExist:
-    #         return Response(
-    #             {'message': 'Данный пользователь не откликался на заказ'},
-    #             status=status.HTTP_400_HTTP_400_BAD_REQUEST
-    #         )
+    @extend_schema(
+        request=EmptySerializer,
+        summary="Добавление/удаление заказа из избранных",
+        description="Добавляет заказ в избранные пользователя или удаляет "
+        " его оттуда, если он уже добавлен.",
+        responses={
+            200: "Заказ удален из избранного",
+            201: "Заказ добавлен в избранное"
+        }
+    )
+    @action(
+        detail=True, methods=['post'],
+        permission_classes=[IsAuthenticated]
+    )
+    def favorite_order(self, request, pk=None):
+        order = self.get_object()
+        user = request.user
+        favorite_exists = user.favorite_orders.filter(order=order).exists()
 
-    # @action(detail=True, methods=['patch'])
-    # def delete_customer(self, request, pk):
-    #     order = get_object_or_404(Order, id=pk)
-    #     if self.request.user != order.customer:
-    #         return Response(
-    #             {'errors': 'Только автор заказа может удалять исполнителей'},
-    #             status=status.HTTP_403_FORBIDDEN
-    #         )
-    #     if order.executor is None:
-    #         return Response(
-    #             {'errors': 'У заказа нет исполнителя'},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-    #     order.executor = None
-    #     order.save()
-    #     return Response(
-    #         {'message': 'Исполнитель успешно удален'},
-    #         status=status.HTTP_201_CREATED
-    #     )
+        if favorite_exists:
+            user.favorite_orders.filter(order=order).delete()
+            return Response(
+                {"detail": "Заказ удален из избранного"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            FavoriteOrder.objects.create(user=user, order=order)
+            return Response(
+                {"detail": "Заказ добавлен в избранное"},
+                status=status.HTTP_201_CREATED
+            )
+
+
+@extend_schema(
+    summary="Получение списка избранных заказов",
+    description="Возвращает список всех заказов, "
+    "добавленных в избранное текущим пользователем.",
+    responses={200: OrderReadSerializer(many=True)}
+)
+class FavoriteOrdersView(APIView):
+    """
+    Список избранных заказов.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        favorite_orders = FavoriteOrder.objects.filter(user=request.user)
+        orders = [fav_order.order for fav_order in favorite_orders]
+        serializer = OrderReadSerializer(
+            orders, many=True, context={'request': request}
+        )
+        return Response(serializer.data)

@@ -19,6 +19,8 @@ from api.views.user_views import (
     MentorViewSet, CustomUserViewSet
 )
 from api.views.support_views import SupportTicketView
+from api.views.order_views import FavoriteOrdersView
+from api.views.case_views import FavoriteCasesView
 
 router = routers.DefaultRouter()
 router.register('auth/users', CustomUserViewSet, basename='auth_users')
@@ -55,6 +57,16 @@ urlpatterns = [
     path('', include(router.urls)),
     path('support/', SupportTicketView.as_view(), name='support'),
     path('auth/', include('djoser.urls.authtoken')),
+    path(
+        'favorite_orders/',
+        FavoriteOrdersView.as_view(),
+        name='favorite-orders'
+        ),
+    path(
+        'favorite_cases/',
+        FavoriteCasesView.as_view(),
+        name='favorite-cases'
+        ),
     # path('auth/token/login', TokenCreateView.as_view(), name='login'),
     # path('auth/', include('djoser.urls')),
 ]
