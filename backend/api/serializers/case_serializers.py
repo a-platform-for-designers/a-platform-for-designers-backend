@@ -130,7 +130,6 @@ class CaseCreateSerializer(serializers.ModelSerializer):
 
 
 class CaseFavoriteShortSerializer(serializers.ModelSerializer):
-    is_favorited = serializers.SerializerMethodField()
 
     class Meta:
         model = Case
