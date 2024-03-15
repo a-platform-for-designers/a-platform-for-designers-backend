@@ -12,7 +12,8 @@ from api.filters import CaseFilter
 from api.pagination import LimitPageNumberPagination
 # from api.serializers.caseimage_serializers import CaseImageSerializer
 from api.serializers.case_serializers import (
-    CaseSerializer, CaseCreateSerializer
+    CaseSerializer, CaseCreateSerializer,
+    CaseFavoriteShortSerializer
 )
 from api.serializers.empty_serializers import EmptySerializer
 from job.models import Case, FavoriteCase
@@ -170,8 +171,7 @@ class FavoriteCasesView(APIView):
     def get(self, request):
         favorite_cases = FavoriteCase.objects.filter(user=request.user)
         cases = [fav_case.case for fav_case in favorite_cases]
-        serializer = CaseSerializer(
-            cases, many=True,
-            context={'request': request}
+        serializer = CaseFavoriteShortSerializer(
+            cases, many=True, context={'request': request}
         )
         return Response(serializer.data)

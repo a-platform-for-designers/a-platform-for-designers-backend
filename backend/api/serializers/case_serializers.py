@@ -127,3 +127,11 @@ class CaseCreateSerializer(serializers.ModelSerializer):
         self.add_images(instance, images_data)
 
         return instance
+
+
+class CaseFavoriteShortSerializer(serializers.ModelSerializer):
+    is_favorited = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Case
+        fields = ('id', 'title', 'avatar')
