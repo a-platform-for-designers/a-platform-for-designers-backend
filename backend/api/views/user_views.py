@@ -308,40 +308,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             )
 
     @extend_schema(
-        request=EmptySerializer,
-        summary='Лайк пользователя',
-        description=(
-            "Позволяет текущему пользователю поставить лайк другому "
-            "пользователю, если лайк уже стоит, он будет удален. "
-            "Возвращает сообщение о создании или удалении лайка."
-        ),
-        responses={
-            200: OpenApiResponse(description="Лайк удален"),
-            201: OpenApiResponse(description="Лайк поставлен"),
-        }
-    )
-    @action(
-        detail=True,
-        methods=('post',),
-        permission_classes=(IsAuthenticated,)
-    )
-    def like(self, request, pk):
-        user = request.user
-        like = user.likes.filter(author__id=pk).exists()
-        if like:
-            user.likes.filter(author__id=pk).delete()
-            return Response(
-                {"detail": "Лайк удален"},
-                status=status.HTTP_200_OK
-            )
-        else:
-            Like.objects.create(author=User.objects.get(id=pk), liker=user)
-            return Response(
-                {"detail": "Лайк поставлен"},
-                status=status.HTTP_201_CREATED
-            )
-
-    @extend_schema(
         summary="Управление подпиской",
         description="Позволяет пользователю подписаться на "
         "другого пользователя или отписаться от него.",

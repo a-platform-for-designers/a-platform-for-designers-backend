@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,13 +10,12 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from api.filters import CaseFilter
 from api.pagination import LimitPageNumberPagination
-# from api.serializers.caseimage_serializers import CaseImageSerializer
 from api.serializers.case_serializers import (
     CaseSerializer, CaseCreateSerializer,
     CaseFavoriteShortSerializer
 )
 from api.serializers.empty_serializers import EmptySerializer
-from job.models import Case, FavoriteCase
+from job.models import Case, FavoriteCase, Like
 from api.permissions import IsAuthorOrReadOnly
 
 
@@ -148,6 +147,40 @@ class CaseViewSet(ModelViewSet):
             FavoriteCase.objects.create(user=user, case=case)
             return Response(
                 {"detail": "Проект добавлен в избранное"},
+                status=status.HTTP_201_CREATED
+            )
+
+    @extend_schema(
+        request=EmptySerializer,
+        summary='Лайк кейсу',
+        description=(
+            "Текущий пользователь ставит лайк кейсу. Если лайк уже стоит, он "
+            "будет удален. Возвращает сообщение о создании/удалении лайка."
+        ),
+        responses={
+            200: OpenApiResponse(description="Лайк удален"),
+            201: OpenApiResponse(description="Лайк поставлен"),
+        }
+    )
+    @action(
+        detail=True,
+        methods=('post',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def like(self, request, pk):
+        user = request.user
+        case = get_object_or_404(Case, pk=pk)
+        like = case.case_likes.filter(liker=user).exists()
+        if like:
+            case.case_likes.get(liker=user).delete()
+            return Response(
+                {"detail": "Лайк удален"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            Like.objects.create(liker=user, case=case)
+            return Response(
+                {"detail": "Лайк поставлен"},
                 status=status.HTTP_201_CREATED
             )
 
