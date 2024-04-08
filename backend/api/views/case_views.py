@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,7 +16,7 @@ from api.serializers.case_serializers import (
     CaseFavoriteShortSerializer
 )
 from api.serializers.empty_serializers import EmptySerializer
-from job.models import Case, FavoriteCase
+from job.models import Case, FavoriteCase, Like
 from api.permissions import IsAuthorOrReadOnly
 
 
@@ -31,7 +31,11 @@ class CaseViewSet(ModelViewSet):
 
     """
     http_method_names = ['get', 'post', 'delete', 'patch']
-    queryset = Case.objects.all()
+    queryset = Case.objects.select_related(
+        'author',
+        'specialization',
+        'sphere'
+    ).prefetch_related('instruments').all()
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -148,6 +152,41 @@ class CaseViewSet(ModelViewSet):
             FavoriteCase.objects.create(user=user, case=case)
             return Response(
                 {"detail": "Проект добавлен в избранное"},
+                status=status.HTTP_201_CREATED
+            )
+
+    @extend_schema(
+        request=EmptySerializer,
+        summary='Лайк пользователя',
+        description=(
+            "Позволяет текущему пользователю поставить лайк другому "
+            "пользователю, если лайк уже стоит, он будет удален. "
+            "Возвращает сообщение о создании или удалении лайка."
+        ),
+        responses={
+            200: OpenApiResponse(description="Лайк удален"),
+            201: OpenApiResponse(description="Лайк поставлен"),
+        }
+    )
+    @action(
+        detail=True,
+        methods=('post',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def like(self, request, pk):
+        user = request.user
+        case = get_object_or_404(Case, pk=pk)
+        like = case.case_likes.filter(liker=user).exists()
+        if like:
+            case.case_likes.filter(liker=user).delete()
+            return Response(
+                {"detail": "Лайк удален"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            Like.objects.create(liker=user, case=case)
+            return Response(
+                {"detail": "Лайк поставлен"},
                 status=status.HTTP_201_CREATED
             )
 

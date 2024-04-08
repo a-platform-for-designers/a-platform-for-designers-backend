@@ -374,10 +374,10 @@ class Like(models.Model):
         related_name='likes',
         null=True
     )
-    author = models.ForeignKey(
-        User,
+    case = models.ForeignKey(
+        Case,
         on_delete=models.CASCADE,
-        related_name='likers'
+        related_name='case_likes'
     )
 
     class Meta:
@@ -385,7 +385,7 @@ class Like(models.Model):
         verbose_name_plural = 'Лайки'
 
     def __str__(self):
-        return f'{self.liker} лайкнул {self.author}'
+        return f'{self.liker} лайкнул {self.case}'
 
 
 class Order(models.Model):

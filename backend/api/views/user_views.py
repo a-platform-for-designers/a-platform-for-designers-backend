@@ -155,7 +155,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     Разрешения:
     - Создание профиля открыто для всех.
     - Операции чтения требуют аутентификации.
-
     """
     http_method_names = ['get', 'post', 'delete', 'head', 'options', 'trace']
     permission_classes = (AllowAny,)
@@ -165,18 +164,23 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # Начальный набор данных
-        queryset = User.objects.all().order_by('id')
+        queryset = User.objects.all()
 
         if self.action == 'list':
             # Фильтрация по количеству кейсов
-            queryset = queryset.annotate(
+            users_with_cases = queryset.annotate(
                 num_cases=Count('case')
             ).filter(
                 num_cases__gte=1,
                 is_customer=False
             )
+            # Исключаем юзера из выдачи
             if self.request.user.is_authenticated:
-                queryset = queryset.exclude(pk=self.request.user.pk)
+                users_with_cases = queryset.exclude(pk=self.request.user.pk)
+            # Сортируем по количеству лайков
+            users_with_cases.annotate(
+                num_likes=Count('case__like')
+            ).order_by('-num_likes')
         return queryset
 
     def get_serializer_class(self):
@@ -305,40 +309,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response(
                 {"detail": str(e)}, status=status.HTTP_404_NOT_FOUND
-            )
-
-    @extend_schema(
-        request=EmptySerializer,
-        summary='Лайк пользователя',
-        description=(
-            "Позволяет текущему пользователю поставить лайк другому "
-            "пользователю, если лайк уже стоит, он будет удален. "
-            "Возвращает сообщение о создании или удалении лайка."
-        ),
-        responses={
-            200: OpenApiResponse(description="Лайк удален"),
-            201: OpenApiResponse(description="Лайк поставлен"),
-        }
-    )
-    @action(
-        detail=True,
-        methods=('post',),
-        permission_classes=(IsAuthenticated,)
-    )
-    def like(self, request, pk):
-        user = request.user
-        like = user.likes.filter(author__id=pk).exists()
-        if like:
-            user.likes.filter(author__id=pk).delete()
-            return Response(
-                {"detail": "Лайк удален"},
-                status=status.HTTP_200_OK
-            )
-        else:
-            Like.objects.create(author=User.objects.get(id=pk), liker=user)
-            return Response(
-                {"detail": "Лайк поставлен"},
-                status=status.HTTP_201_CREATED
             )
 
     @extend_schema(
