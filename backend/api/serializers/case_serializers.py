@@ -35,7 +35,7 @@ class CaseSerializer(serializers.ModelSerializer):
             'description',
             'is_favorited',
             'specialization',
-            'is_like'
+            'is_liked'
         )
 
     def get_is_favorited(self, obj) -> bool:
@@ -46,7 +46,7 @@ class CaseSerializer(serializers.ModelSerializer):
         return FavoriteCase.objects.filter(
             case=obj, user=request.user).exists()
 
-    def get_is_like(self, obj) -> bool:
+    def get_is_liked(self, obj) -> bool:
         """Проверка на добавление проекта в лайки."""
         request = self.context.get('request')
         return request.user.is_anonymous and Like.objects.filter(
