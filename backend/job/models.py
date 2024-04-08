@@ -363,10 +363,7 @@ class Mentoring(models.Model):
 
 
 class Like(models.Model):
-    """
-    Модель лайков
-
-    """
+    """Модель лайков."""
 
     liker = models.ForeignKey(
         User,

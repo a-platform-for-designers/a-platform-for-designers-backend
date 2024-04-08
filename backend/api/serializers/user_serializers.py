@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
@@ -246,7 +247,9 @@ class UserProfileSerializer(UserSerializer):
         return PortfolioSerializer(cases, many=True).data
 
     def get_likes(self, obj):
-        return Like.objects.filter(author=obj).count()
+        cases = obj.case.all()
+        likes = cases.aggregate(likes=Count('case_likes'))['likes']
+        return likes
 
 
 class UserProfileCreateSerializer(UserCreateSerializer):

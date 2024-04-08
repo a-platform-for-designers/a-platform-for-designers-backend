@@ -10,7 +10,6 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from api.filters import CaseFilter
 from api.pagination import LimitPageNumberPagination
-# from api.serializers.caseimage_serializers import CaseImageSerializer
 from api.serializers.case_serializers import (
     CaseSerializer, CaseCreateSerializer,
     CaseFavoriteShortSerializer
@@ -157,11 +156,10 @@ class CaseViewSet(ModelViewSet):
 
     @extend_schema(
         request=EmptySerializer,
-        summary='Лайк пользователя',
+        summary='Лайк кейсу',
         description=(
-            "Позволяет текущему пользователю поставить лайк другому "
-            "пользователю, если лайк уже стоит, он будет удален. "
-            "Возвращает сообщение о создании или удалении лайка."
+            "Текущий пользователь ставит лайк кейсу. Если лайк уже стоит, он "
+            "будет удален. Возвращает сообщение о создании/удалении лайка."
         ),
         responses={
             200: OpenApiResponse(description="Лайк удален"),
@@ -178,7 +176,7 @@ class CaseViewSet(ModelViewSet):
         case = get_object_or_404(Case, pk=pk)
         like = case.case_likes.filter(liker=user).exists()
         if like:
-            case.case_likes.filter(liker=user).delete()
+            case.case_likes.get(liker=user).delete()
             return Response(
                 {"detail": "Лайк удален"},
                 status=status.HTTP_200_OK
