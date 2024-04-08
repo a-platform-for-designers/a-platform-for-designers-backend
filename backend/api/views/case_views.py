@@ -30,7 +30,11 @@ class CaseViewSet(ModelViewSet):
 
     """
     http_method_names = ['get', 'post', 'delete', 'patch']
-    queryset = Case.objects.all()
+    queryset = Case.objects.select_related(
+        'author',
+        'specialization',
+        'sphere'
+    ).prefetch_related('instruments').all()
     pagination_class = LimitPageNumberPagination
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
