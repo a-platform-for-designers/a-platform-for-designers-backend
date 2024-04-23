@@ -6,7 +6,7 @@ from api.serializers.instrument_serializers import InstrumentSerializer
 from api.serializers.sphere_serializers import SphereSerializer
 from api.serializers.specialization_serializers import SpecializationSerializer
 from api.serializers.caseimage_serializers import CaseImageSerializer
-from job.models import Case, FavoriteCase, CaseImage, Like
+from job.models import Case, FavoriteCase, CaseImage
 from api.serializers.user_serializers import AuthorSerializer
 
 
@@ -16,14 +16,14 @@ class CaseSerializer(serializers.ModelSerializer):
     instruments = InstrumentSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     specialization = SpecializationSerializer()
-    is_liked = serializers.SerializerMethodField()
+    # is_like = serializers.SerializerMethodField()
     images = CaseImageSerializer(many=True)
     avatar = Base64ImageField()
     sphere = SphereSerializer()
 
     class Meta:
         model = Case
-        fields = (
+        fields = [
             'id',
             'author',
             'title',
@@ -34,24 +34,25 @@ class CaseSerializer(serializers.ModelSerializer):
             'working_term',
             'description',
             'is_favorited',
-            'specialization',
-            'is_like'
-        )
+            'specialization'
+            # 'is_like'
+        ]
 
     def get_is_favorited(self, obj) -> bool:
-        """Проверка на добавление проекта в избранное."""
+        """проверка на добавление проекта в избранное."""
         request = self.context.get('request')
         if request.user.is_anonymous:
             return False
         return FavoriteCase.objects.filter(
             case=obj, user=request.user).exists()
 
-    def get_is_like(self, obj) -> bool:
-        """Проверка на добавление проекта в лайки."""
-        request = self.context.get('request')
-        return request.user.is_anonymous and Like.objects.filter(
-            author=obj.author
-        ).exists()
+    # def get_is_like(self, obj) -> bool:
+    #     """проверка на добавление проекта в лайки."""
+    #     request = self.context.get('request')
+    #     if request.user.is_anonymous:
+    #         return False
+    #     return Like.objects.filter(
+    #         author=obj.author).exists()
 
 
 class CaseShortSerializer(serializers.ModelSerializer):

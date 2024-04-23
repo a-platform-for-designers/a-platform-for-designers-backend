@@ -155,6 +155,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     Разрешения:
     - Создание профиля открыто для всех.
     - Операции чтения требуют аутентификации.
+
     """
     http_method_names = ['get', 'post', 'delete', 'head', 'options', 'trace']
     permission_classes = (AllowAny,)
@@ -164,23 +165,18 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # Начальный набор данных
-        queryset = User.objects.all()
+        queryset = User.objects.all().order_by('id')
 
         if self.action == 'list':
             # Фильтрация по количеству кейсов
-            users_with_cases = queryset.annotate(
+            queryset = queryset.annotate(
                 num_cases=Count('case')
             ).filter(
                 num_cases__gte=1,
                 is_customer=False
             )
-            # Исключаем юзера из выдачи
             if self.request.user.is_authenticated:
-                users_with_cases = queryset.exclude(pk=self.request.user.pk)
-            # Сортируем по количеству лайков
-            users_with_cases.annotate(
-                num_likes=Count('case__like')
-            ).order_by('-num_likes')
+                queryset = queryset.exclude(pk=self.request.user.pk)
         return queryset
 
     def get_serializer_class(self):
