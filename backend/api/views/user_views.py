@@ -26,7 +26,7 @@ from api.serializers.user_serializers import (
     TokenResponseSerializer, UserProfileCreateSerializer
 )
 from api.permissions import IsAuthorOrReadOnly
-from job.models import Like
+# from job.models import Like
 # from api.mixins import RetrieveMixin
 
 
@@ -178,9 +178,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             if self.request.user.is_authenticated:
                 users_with_cases = queryset.exclude(pk=self.request.user.pk)
             # Сортируем по количеству лайков
-            users_with_cases.annotate(
-                num_likes=Count('case__like')
-            ).order_by('-num_likes')
+        users_with_cases.annotate(
+            num_likes=Count('case__case_likes')
+        ).order_by('-num_likes')
         return queryset
 
     def get_serializer_class(self):
