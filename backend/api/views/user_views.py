@@ -179,7 +179,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                 users_with_cases = queryset.exclude(pk=self.request.user.pk)
             # Сортируем по количеству лайков
         users_with_cases.annotate(
-            num_likes=Count('case__case_likes')
+            num_likes=Count('case__likes')
         ).order_by('-num_likes')
         return queryset
 
