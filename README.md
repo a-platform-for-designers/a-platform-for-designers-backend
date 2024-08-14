@@ -54,6 +54,13 @@ SECRET_KEY='secretgenerate'
 DEBUG = True
 REDIS_HOST=redis
 REDIS_PORT=6379
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.example.com'
+EMAIL_PORT = 'EMAIL_PORT'
+EMAIL_USE_TLS = 'EMAIL_USE_TLS'
+EMAIL_USE_SSL = 'EMAIL_USE_SSL', 'False'
+EMAIL_HOST_USER = 'EMAIL_HOST_USER'
+EMAIL_HOST_PASSWORD = 'EMAIL_HOST_PASSWORD'
 ```
 
 > Генератор секретного ключа: infra/secretgenerate.py
