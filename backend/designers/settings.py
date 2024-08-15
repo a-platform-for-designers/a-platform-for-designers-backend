@@ -37,8 +37,6 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.designcollab.pro',
     'http://www.designcollab.pro',
     'https://designcollab.pro',
-    'http://127.0.0.1',
-    'https://127.0.0.1',
     'http://46.183.163.139',
     'https://46.183.163.139',
     'http://91.226.81.209',
