@@ -43,6 +43,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://46.183.163.139',
     'http://91.226.81.209',
     'https://91.226.81.209'
+    'http://95.163.236.20',
+    'https://95.163.236.20'
 ]
 
 INSTALLED_APPS = [
