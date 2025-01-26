@@ -8,9 +8,6 @@
 
 **DesignCollab** - это веб-платформа для дизайнеров, позволяющая сотрудничать, обмениваться идеями и создавать проекты. Платформа предлагает удобный интерфейс и инструменты для эффективной работы.
 
-- **Сайт**: [Посетите здесь](https://designcollab.pro/)
-- **Swagger**: [Интерфейс Swagger](https://designcollab.pro/api/schema/swagger-ui/)
-- **Redoc**: [Интерфейс Redoc](https://designcollab.pro/api/schema/redoc/)
 
 ## Технологии
 
